@@ -1,0 +1,3204 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Tasks</title>
+    <style>
+        :root {
+            /* Palette: Softer Light Mode */
+            --bg-body: #F0F0F2;
+            --bg-sidebar: rgba(235, 235, 240, 0.85);
+            --bg-card: #FAFAFA;
+
+            --text-main: #2C2C2E;
+            /* Softer Black */
+            --text-sub: #5A5A5F;
+            --text-on-accent: #FFFFFF;
+
+            --border-color: rgba(0, 0, 0, 0.08);
+            --border-subtle: rgba(0, 0, 0, 0.05);
+
+            /* Accents - Soft & Human */
+            --accent-blue: #007AFF;
+            --accent-green: #3CB868;
+            --accent-red: #FF3B30;
+            --accent-orange: #FF9500;
+            --accent-gray: #8E8E93;
+
+            /* Shadows for Depth */
+            --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.06);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.14);
+
+            /* Radius */
+            --radius-xs: 8px;
+            --radius-sm: 12px;
+            --radius-md: 20px;
+            --radius-lg: 24px;
+
+            --sidebar-width: 300px;
+            /* Standard width */
+            --mix-base: #FAFAFA;
+        }
+
+        /* Dark Mode Variables */
+        body.dark-mode {
+            --bg-body: #1C1C1E;
+            --bg-sidebar: rgba(44, 44, 46, 0.75);
+            --bg-card: #2C2C2E;
+            --text-main: #F5F5F7;
+            --text-sub: #AEAEB2;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --border-subtle: rgba(255, 255, 255, 0.05);
+            --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.5);
+            --mix-base: #2C2C2E;
+        }
+
+        /* Dark Mode Overrides for Hardcoded Colors */
+        body.dark-mode .nav-group {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-mode .nav-btn {
+            color: var(--text-main);
+        }
+
+        body.dark-mode .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        body.dark-mode .nav-btn.active {
+            background: #3A3A3C;
+            color: #FFFFFF;
+        }
+
+        body.dark-mode .btn-calendar,
+        body.dark-mode .subtask-row .btn-mini,
+        body.dark-mode .badge-select {
+            background: #3A3A3C !important;
+            color: #D1D1D6 !important;
+            border-color: transparent !important;
+        }
+
+        body.dark-mode .btn-calendar:hover,
+        body.dark-mode .subtask-row .btn-mini:hover,
+        body.dark-mode .badge-select:hover {
+            background: #48484A !important;
+        }
+
+        body.dark-mode .form-control,
+        body.dark-mode .memo-area,
+        body.dark-mode .sub-memo-area {
+            background: #1C1C1E !important;
+            border-color: #3A3A3C !important;
+            color: #FFFFFF !important;
+        }
+
+        body.dark-mode .sub-input-name {
+            background: transparent !important;
+            border-color: transparent !important;
+            color: #FFFFFF !important;
+        }
+
+        body.dark-mode .modal-container {
+            background: #2C2C2E;
+            color: #FFFFFF;
+        }
+
+        body.dark-mode .modal-title {
+            color: #FFFFFF;
+        }
+
+        body.dark-mode .modal-header {
+            border-color: #3A3A3C;
+        }
+
+        /* Dark Mode - Settings Modal */
+        body.dark-mode .settings-list {
+            background: #1C1C1E;
+            border-color: #3A3A3C;
+        }
+
+        body.dark-mode .settings-item {
+            border-color: #3A3A3C;
+            color: #FFFFFF;
+        }
+
+        body.dark-mode .settings-item-name {
+            color: #FFFFFF;
+        }
+
+        body.dark-mode .settings-item-dot {
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        body.dark-mode .add-input {
+            background: #1C1C1E !important;
+            border-color: #3A3A3C !important;
+            color: #FFFFFF !important;
+        }
+
+        body.dark-mode .add-input::placeholder {
+            color: #9A9A9F;
+        }
+
+        body.dark-mode .btn-add-setting {
+            background: #FFFFFF;
+            color: #000000;
+        }
+
+        body.dark-mode .btn-add-setting:hover {
+            background: #E5E5EA;
+        }
+
+        /* Dark Mode - Color Picker Area */
+        body.dark-mode .color-selector-wrapper {
+            background: transparent;
+        }
+
+        body.dark-mode #newStatusColorSelector {
+            background: transparent;
+        }
+
+        body.dark-mode .settings-section>div[style*="background:#F9F9F9"] {
+            background: #1C1C1E !important;
+            border-color: #3A3A3C !important;
+        }
+
+        /* Dark Mode - Status Color Area */
+        body.dark-mode .status-color-area {
+            background: #1C1C1E !important;
+            border-color: #3A3A3C !important;
+        }
+
+        /* Dark Mode - Danger Zone */
+        body.dark-mode .settings-grid>div:last-child {
+            background: rgba(255, 59, 48, 0.15) !important;
+            border-color: rgba(255, 59, 48, 0.3) !important;
+        }
+
+        body.dark-mode .settings-grid>div:last-child span {
+            color: #FF453A !important;
+        }
+
+        /* Dark Mode - Modal Footer Buttons */
+        body.dark-mode .btn-danger-modal {
+            color: #FF453A;
+            border-color: #FF453A;
+        }
+
+        body.dark-mode .btn-primary-modal {
+            background: #FFFFFF;
+            color: #000000;
+        }
+
+        body.dark-mode .btn-footer {
+            color: #B0B0B5;
+            border-color: rgba(255, 255, 255, 0.25);
+        }
+
+        body.dark-mode .btn-footer:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #FFFFFF;
+        }
+
+        body.dark-mode .edit-input {
+            background: #1C1C1E !important;
+            border: 1px solid #3A3A3C !important;
+            color: #FFFFFF !important;
+        }
+
+        body.dark-mode .settings-label {
+            color: #98989D;
+        }
+
+        /* Dark Mode - Global Memo Area */
+        body.dark-mode .global-memo-area {
+            background: #2C2C2E;
+            border-color: #3A3A3C;
+        }
+
+        body.dark-mode #globalMemo,
+        body.dark-mode #globalMemoView {
+            background: #1C1C1E;
+            border: 1px solid #3A3A3C;
+            color: #FFFFFF;
+        }
+
+        body.dark-mode #globalMemoView.empty-memo {
+            color: #9A9A9F;
+        }
+
+        body.dark-mode .memo-view-mode {
+            background: rgba(58, 58, 60, 0.5);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: #D1D1D6;
+        }
+
+        body.dark-mode .memo-view-mode.empty-memo,
+        body.dark-mode .sub-memo-area.empty-memo {
+            color: #9A9A9F;
+        }
+
+        body.dark-mode .memo-view-mode:hover {
+            background: rgba(72, 72, 74, 0.5);
+        }
+
+        /* Dark Mode - Date Input */
+        body.dark-mode .meta-input {
+            background: #3A3A3C !important;
+            border-color: #48484A !important;
+            color: #FFFFFF !important;
+        }
+
+        body.dark-mode .meta-input::placeholder {
+            color: #9A9A9F;
+        }
+
+        body.dark-mode .memo-area::placeholder,
+        body.dark-mode .sub-memo-area::placeholder {
+            color: #9A9A9F;
+        }
+
+        /* Dark Mode - Action Buttons */
+        body.dark-mode .icon-action-btn {
+            background: #3A3A3C;
+            border-color: #48484A;
+            color: #D1D1D6;
+        }
+
+        body.dark-mode .icon-action-btn:hover {
+            background: #48484A;
+            color: #FFFFFF;
+            border-color: #636366;
+        }
+
+        body.dark-mode .icon-action-btn.btn-del:hover {
+            background: rgba(255, 59, 48, 0.2);
+            color: #FF453A;
+            border-color: #FF453A;
+        }
+
+        /* Dark Mode - Date Picker Icon */
+        body.dark-mode .date-picker-icon {
+            background: #3A3A3C;
+        }
+
+        body.dark-mode .date-picker-icon svg {
+            stroke: #D1D1D6;
+        }
+
+        /* Dark Mode - Add Task Button */
+        body.dark-mode .btn-add {
+            background: #FFFFFF;
+            color: #000000;
+        }
+
+        body.dark-mode .btn-add:hover {
+            background: #E5E5EA;
+        }
+
+        /* Dark Mode Button Style */
+        .btn-dark-mode-toggle {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            background: rgba(118, 118, 128, 0.12);
+            border: none;
+            border-radius: var(--radius-xs);
+            color: var(--text-main);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+
+        body.dark-mode .btn-dark-mode-toggle {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-dark-mode-toggle:hover {
+            background: rgba(118, 118, 128, 0.24);
+        }
+
+        body.dark-mode .btn-dark-mode-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* RESET & BASICS */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "Hiragino Kaku Gothic ProN", sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.5;
+            font-size: 15px;
+            font-weight: 500;
+            /* Thicker for Japanese text */
+            overflow-x: hidden;
+            /* Prevent horizontal scroll */
+        }
+
+        /* Fix: Enforce Font Family on Form Elements */
+        input,
+        textarea,
+        select,
+        button {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "Hiragino Kaku Gothic ProN", sans-serif !important;
+        }
+
+        /* FIX: Hide Hamburger on Desktop by default */
+        .btn-sidebar-toggle {
+            display: none;
+        }
+
+        /* FIX: Sidebar Layout Adjustments */
+        .input-card>div {
+            margin-bottom: 12px !important;
+            /* Force spacing between inputs */
+        }
+
+        /* FIX: Deadline Wrapper - Button to Right */
+        .deadline-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .deadline-wrapper .form-control {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .deadline-wrapper .date-picker-icon {
+            flex-shrink: 0;
+            /* Ensure it stays square */
+        }
+
+        /* LAYOUT */
+        .layout-wrapper {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        /* SIDEBAR - GLASSMORPHISM */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-sidebar);
+            /* Frost Effect */
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-right: 1px solid var(--border-color);
+
+            height: 100vh;
+            position: sticky;
+            top: 0;
+
+            padding: 24px 20px;
+            /* Inner spacing */
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            z-index: 100;
+            overflow-y: auto;
+            overflow-x: hidden;
+            flex-shrink: 0;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .resizer {
+            width: 4px;
+            cursor: col-resize;
+            background: transparent;
+            z-index: 101;
+            margin-left: -2px;
+            /* Center grab area */
+        }
+
+        .resizer:hover {
+            background: rgba(0, 122, 255, 0.2);
+        }
+
+        .content {
+            flex: 1;
+            min-width: 0;
+            /* Enable flex shrink */
+            padding: 40px 48px;
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+        }
+
+        /* Main Task Area */
+        .main-tasks-area {
+            flex: 1;
+            min-width: 0;
+            /* Crucial for child truncation */
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .task-list {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Right Column */
+        .right-memo-column {
+            width: 320px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 40px;
+            height: calc(100vh - 80px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* TYPOGRAPHY & HEADERS */
+        h1 {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+            margin: 0;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        h1:hover {
+            opacity: 0.7;
+        }
+
+        .section-label,
+        .global-memo-label,
+        .footer-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-sub);
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        /* NAV BUTTONS */
+        .nav-scroll-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-group {
+            display: flex;
+            gap: 4px;
+            background: rgba(118, 118, 128, 0.12);
+            /* Apple Control bg */
+            padding: 4px;
+            border-radius: 12px;
+            overflow-x: auto;
+            flex: 1;
+        }
+
+        /* Hide Scrollbar */
+        .nav-group::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+            /* Was #AAA on dark, now dark */
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+            flex: 0 0 auto;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .nav-btn.active {
+            background: #FFFFFF;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+            color: #000;
+        }
+
+        .nav-btn.btn-trash-mode.active {
+            color: var(--accent-red);
+        }
+
+        .scroll-btn {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            color: #555;
+            position: absolute;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .nav-scroll-wrapper:hover .scroll-btn {
+            opacity: 1;
+        }
+
+        .scroll-btn.left {
+            left: -10px;
+        }
+
+        .scroll-btn.right {
+            right: -10px;
+        }
+
+        /* INPUTS & FORMS */
+        .input-card {
+            background: transparent;
+            /* Seamless input forms */
+            padding: 0;
+            border: none;
+            box-shadow: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .input-group-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-sub);
+            margin-bottom: 2px;
+            margin-left: 2px;
+            display: block;
+        }
+
+        .form-control,
+        .badge-select {
+            width: 100%;
+            height: 40px;
+            border: none;
+            background: #EFEFF4;
+            /* Light gray input fill */
+            border-radius: var(--radius-sm);
+            padding: 0 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        /* Remove default select arrows for cleaner look or style them? */
+
+        .form-control:focus,
+        .badge-select:focus {
+            outline: none;
+            background: #FFFFFF;
+            box-shadow: 0 0 0 2px var(--accent-blue);
+        }
+
+        textarea.form-control {
+            min-height: 80px;
+            height: auto;
+            padding: 12px;
+            resize: none;
+            line-height: 1.5;
+        }
+
+        /* Buttons */
+        .btn-add {
+            background: var(--text-main);
+            /* Black */
+            color: #FFF;
+            height: 48px;
+            border: none;
+            border-radius: 24px;
+            /* Pill */
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s;
+            margin-top: 8px;
+            width: 100%;
+        }
+
+        .btn-add:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+            opacity: 0.9;
+        }
+
+        .btn-add:active {
+            transform: scale(0.98);
+        }
+
+        .date-picker-icon {
+            width: 40px;
+            height: 40px;
+            background: #EFEFF4;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .date-picker-overlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* TASK CARDS */
+        .task-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            /* Borderless look with soft shadow */
+            border: 1px solid var(--border-subtle);
+            box-shadow: var(--shadow-sm);
+            padding: 24px;
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            width: 100%;
+            box-sizing: border-box;
+            transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .task-card:hover {
+            transform: translateY(-2px) scale(1.002);
+            box-shadow: var(--shadow-md);
+            border-color: rgba(0, 0, 0, 0.0);
+            /* highlight */
+            z-index: 5;
+        }
+
+        .task-card.dragging {
+            opacity: 0.6;
+            transform: scale(0.98);
+            box-shadow: none;
+        }
+
+        /* Completed */
+        .task-card.archived {
+            background: #FAFAFA;
+            border-left: 4px solid #CCC !important;
+            opacity: 0.8;
+            box-shadow: none;
+        }
+
+        .drag-handle {
+            color: #E0E0E0;
+            cursor: grab;
+            font-size: 20px;
+            padding-top: 6px;
+        }
+
+        .drag-handle:hover {
+            color: var(--accent-gray);
+        }
+
+        .task-content-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .task-title-input {
+            width: 100%;
+            font-size: 18px;
+            font-weight: 700;
+            background: transparent;
+            border: none;
+            padding: 8px 0;
+            color: var(--text-main);
+            transition: color 0.2s;
+        }
+
+        .task-title-input:focus {
+            outline: none;
+            border-bottom: 2px solid var(--accent-blue);
+        }
+
+        .task-meta-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .meta-input {
+            height: 32px;
+            border: none;
+            background: #F2F2F7;
+            border-radius: 8px;
+            padding: 0 10px;
+            font-size: 13px;
+            color: var(--text-sub);
+            width: auto;
+            max-width: 120px;
+        }
+
+        .task-meta-row .badge-select {
+            height: 32px;
+            width: auto;
+            font-size: 14px;
+            border-radius: 8px;
+            background: #F2F2F7;
+        }
+
+        /* ACTIONS */
+        .task-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+            width: 160px;
+            flex-shrink: 0;
+        }
+
+        .action-block {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .btn-complete-action {
+            background: var(--accent-green);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            height: 36px;
+            width: 100%;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            box-shadow: var(--shadow-xs);
+            transition: all 0.2s;
+        }
+
+        .btn-complete-action:hover {
+            transform: scale(1.02);
+            opacity: 0.9;
+        }
+
+        .action-row-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-action-btn {
+            background: #FFF;
+            border: 1px solid #E5E5EA;
+            color: #8E8E93;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            /* Circle */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+        }
+
+        .icon-action-btn:hover {
+            background: #F2F2F7;
+            color: var(--text-main);
+            border-color: #D1D1D6;
+        }
+
+        .icon-action-btn.btn-del:hover {
+            color: var(--accent-red);
+            background: #FFF0F0;
+            border-color: #FFD0D0;
+        }
+
+        .timestamps {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            align-items: flex-start;
+            margin-top: 8px;
+        }
+
+        .ts-item {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .ts-label {
+            font-weight: 600;
+            margin-right: 4px;
+        }
+
+        /* MEMO & LINKIFY */
+        .memo-area,
+        .memo-view-mode {
+            width: 100%;
+            font-size: 14px;
+            color: #555;
+            line-height: 1.6;
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px dashed rgba(0, 0, 0, 0.1);
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            margin-top: 8px;
+            min-height: 48px;
+        }
+
+        .memo-view-mode:hover {
+            background: #FAFAFA;
+            border-style: solid;
+        }
+
+        .memo-view-mode.empty-memo {
+            color: #888;
+        }
+
+        .memo-view-mode a {
+            color: var(--accent-blue);
+            text-decoration: underline;
+        }
+
+        /* Sub-memo area (inherit from memo-view-mode) */
+        .sub-memo-area {
+            width: 100%;
+            font-size: 14px;
+            color: #555;
+            line-height: 1.6;
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px dashed rgba(0, 0, 0, 0.1);
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            min-height: 48px;
+            box-sizing: border-box;
+            resize: none;
+        }
+
+        .sub-memo-area:hover {
+            background: #FAFAFA;
+            border-style: solid;
+        }
+
+        .sub-memo-area:focus {
+            outline: none;
+            border: 1px solid var(--accent-blue);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* SUBTASKS */
+
+        .subtasks-wrapper {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(0, 0, 0, 0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .subtask-row {
+            background: #FAFAFA;
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            border: 1px solid transparent;
+            transition: background 0.2s;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .subtask-row:hover {
+            background: #F2F2F7;
+        }
+
+        .subtask-row.completed-sub {
+            opacity: 0.6;
+            text-decoration: none;
+            /* No strikethrough styling here */
+            background: #F9F9F9 !important;
+        }
+
+        .sub-content {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .sub-input-name {
+            font-size: 14px;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            width: 100%;
+            color: var(--text-main);
+            padding: 4px 0;
+        }
+
+        .sub-input-name:focus,
+        textarea.sub-input-name:focus {
+            outline: none;
+            border-bottom: 2px solid var(--accent-blue) !important;
+        }
+
+        .sub-details-row {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            width: 100%;
+        }
+
+        .sub-meta-line {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .btn-mini {
+            height: 28px;
+            padding: 0 10px;
+            font-size: 13px;
+            font-weight: 600;
+            background: white;
+            border: 1px solid #E5E5EA;
+            border-radius: 6px;
+            color: #5A5A5F;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-mini:hover {
+            background: #F2F2F7;
+            color: #333;
+        }
+
+        .btn-mini-complete {
+            height: 28px;
+            background: var(--accent-green);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 0 12px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .btn-add-sub {
+            background: transparent;
+            border: 2px dashed #E5E5EA;
+            color: #6E6E73;
+            font-weight: 600;
+            font-size: 13px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            align-self: flex-start;
+            margin-top: 8px;
+        }
+
+        .btn-add-sub:hover {
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+            background: rgba(0, 122, 255, 0.05);
+        }
+
+        /* GLOBAL MEMO */
+        .global-memo-area {
+            background: #FFF;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            padding: 20px;
+            border: 1px solid var(--border-subtle);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #globalMemo:focus {
+            outline: none;
+            border: 1px solid var(--accent-blue);
+        }
+
+        /* Global Memo - unified styles for view and edit mode */
+        #globalMemo,
+        #globalMemoView {
+            width: 100%;
+            font-size: 14px;
+            color: #555;
+            line-height: 1.6;
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px dashed rgba(0, 0, 0, 0.1);
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            min-height: 48px;
+            box-sizing: border-box;
+        }
+
+        #globalMemo {
+            resize: none;
+            flex: 1;
+        }
+
+        #globalMemoView {
+            cursor: pointer;
+        }
+
+        #globalMemoView:hover {
+            background: #FAFAFA;
+            border-style: solid;
+        }
+
+        /* MODALS */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-container {
+            background: #FFFFFF;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 24px;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.2);
+            padding: 32px;
+            transform: scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.open .modal-container {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            border-bottom: 2px solid #F2F2F7;
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1D1D1F;
+            text-align: center;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+            border-top: 2px solid #F2F2F7;
+            padding-top: 20px;
+        }
+
+        .btn-primary-modal {
+            background: #1D1D1F;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 10px 20px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-danger-modal {
+            background: transparent;
+            color: var(--accent-red);
+            border: 2px solid var(--accent-red);
+            border-radius: 12px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        /* SETTINGS GRID */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .settings-list {
+            list-style: none;
+            border: 1px solid #E5E5EA;
+            border-radius: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .settings-item {
+            padding: 8px 12px;
+            border-bottom: 1px solid #E5E5EA;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+        }
+
+        .settings-item-name {
+            flex: 1;
+        }
+
+        .settings-item .btn-mini:first-of-type {
+            margin-left: auto;
+        }
+
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+
+        .btn-add-setting {
+            background: #333;
+            color: white;
+            border-radius: 8px;
+            padding: 0 10px;
+            height: 32px;
+            border: none;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .add-input {
+            height: 32px;
+            background: #FFF !important;
+            border: 1px solid #DDD !important;
+        }
+
+        /* FOOTER */
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 24px;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .footer-btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .btn-footer {
+            background: transparent;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            color: #5A5A5F;
+            border-radius: 8px;
+            padding: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-footer:hover {
+            background: #E5E5EA;
+            color: #000;
+        }
+
+        /* FIX: Settings Modal Refinements */
+        #settingsModal .modal-container {
+            max-width: 800px;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .settings-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .settings-list {
+            border: 1px solid #E5E5EA;
+            border-radius: 12px;
+            padding: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .add-row {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            align-items: stretch;
+        }
+
+        .add-row .form-control {
+            flex: 1;
+            height: 40px;
+        }
+
+        .add-row .btn-add-setting {
+            height: 40px;
+            display: flex;
+            align-items: center;
+        }
+
+        .btn-add-setting {
+            height: 40px;
+            /* Match input height */
+            padding: 0 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* FIX: Danger Zone Styling Override */
+        .settings-grid>div:last-child {
+            background: #FFF0F0 !important;
+            border: 2px solid #FFD0D0 !important;
+            padding: 20px !important;
+            margin-top: 16px;
+        }
+
+        /* FIX: Danger Button */
+        .btn-danger-strong {
+            background: var(--accent-red);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 700;
+        }
+
+        .btn-danger-strong:hover {
+            opacity: 0.9;
+        }
+
+        /* FIX: Color Picker Chips */
+        .color-selector-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 8px;
+            padding: 4px 0;
+            flex-wrap: nowrap;
+        }
+
+        .color-opt {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            /* Circle */
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.2s, box-shadow 0.2s;
+            flex-shrink: 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .color-opt:hover {
+            transform: scale(1.15);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .color-opt.selected {
+            border-color: #333;
+            /* Selection ring */
+            transform: scale(1.1);
+        }
+
+        .color-divider {
+            height: 24px;
+            width: 1px;
+            background: #E5E5EA;
+            margin: 0 4px;
+        }
+
+        .custom-color-wrapper input[type="color"] {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        /* FIX: Final Refinements (Fonts, Spacing, Buttons) */
+        /* 1. Global Text Size Increase */
+        .task-title-input {
+            font-size: 18px !important;
+            font-weight: 600 !important;
+        }
+
+        .sub-input-name {
+            font-size: 16px !important;
+            font-weight: 700 !important;
+            /* Textarea styles */
+            resize: none;
+            overflow: hidden;
+            min-height: 24px;
+            line-height: 1.5;
+            padding: 0;
+            margin: 0;
+            field-sizing: content;
+            /* Modern auto-grow if supported, fallback to JS */
+        }
+
+        .memo-view-mode,
+        .memo-area,
+        textarea.memo-area {
+            font-size: 14px !important;
+            font-weight: normal;
+            overflow-wrap: anywhere;
+            word-break: break-all;
+            /* Fallback */
+            white-space: pre-wrap;
+        }
+
+        .meta-input {
+            font-size: 14px !important;
+        }
+
+        .input-group-label {
+            font-size: 13px !important;
+        }
+
+        /* 2. Subtask Styling Refinements */
+        .sub-name-row {
+            margin-bottom: 8px;
+            /* Space below title */
+        }
+
+        /* Subtask Calendar: Blend into gray background */
+        .subtask-row .btn-calendar {
+            background: transparent !important;
+            border-color: transparent !important;
+        }
+
+        .subtask-row .btn-calendar:hover {
+            background: rgba(0, 0, 0, 0.05) !important;
+            border-color: #D1D1D6 !important;
+        }
+
+        /* 3. Gray Controls (Requested Fix) */
+        .btn-calendar,
+        .subtask-row .btn-mini {
+            background: #F2F2F7 !important;
+            border: 1px solid transparent !important;
+            /* Cleaner look */
+            color: #555;
+        }
+
+        .btn-calendar:hover,
+        .subtask-row .btn-mini:hover {
+            background: #E5E5EA !important;
+        }
+
+        /* 2. Subtask Spacing & Layout */
+        .sub-actions-row {
+            margin-top: 10px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        /* 3. Square Parent Task Buttons */
+        .icon-action-btn {
+            border-radius: 8px !important;
+            /* Soft square */
+        }
+
+        /* 4. Calendar Icon Button */
+        .btn-calendar {
+            border-radius: 8px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.2s;
+            padding: 0;
+        }
+
+        .date-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+        }
+
+        .btn-calendar:hover {
+            background: rgba(0, 0, 0, 0.05);
+            color: #333;
+        }
+
+        /* 5. Subtask Complete Button (Pill) */
+        .btn-mini-complete {
+            border-radius: 100px !important;
+            padding: 0 16px !important;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1200px) {
+            .layout-wrapper {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                position: fixed;
+                width: 100% !important;
+                height: auto;
+                z-index: 2000;
+                background: rgba(255, 255, 255, 0.98);
+                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+                border-right: none;
+                padding: 12px 20px;
+            }
+
+            .sidebar-content {
+                display: none;
+                margin-top: 20px;
+            }
+
+            .sidebar.expanded .sidebar-content {
+                display: block;
+                height: 100vh;
+                overflow-y: auto;
+                padding-bottom: 20px;
+            }
+
+            .sidebar.expanded {
+                height: 100vh !important;
+            }
+
+            .sidebar-header-row {
+                margin-bottom: 0;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .btn-sidebar-toggle {
+                display: flex !important;
+                background: none;
+                border: none;
+                font-size: 30px;
+                cursor: pointer;
+                color: #333;
+                width: 40px;
+                height: 40px;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .content {
+                padding: 88px 20px 20px 20px;
+                flex-direction: column;
+                gap: 24px;
+            }
+
+            .main-tasks-area {
+                width: 100%;
+            }
+
+            .right-memo-column {
+                position: static;
+                width: 100%;
+                height: auto;
+                order: -1;
+            }
+
+            .global-memo-area {
+                margin-bottom: 0;
+            }
+
+            .task-card {
+                flex-direction: column;
+                gap: 16px;
+                padding: 16px;
+            }
+
+            .drag-handle {
+                display: none;
+            }
+
+            .task-actions {
+                width: 100%;
+                align-items: stretch;
+                flex-direction: row;
+                justify-content: space-between;
+                flex-wrap: wrap;
+            }
+
+            .action-block {
+                width: 100%;
+                flex-direction: row;
+            }
+
+            .btn-complete-action {
+                flex: 1;
+            }
+
+            .timestamps {
+                margin-top: 0;
+                flex-direction: row;
+                justify-content: flex-end;
+                align-items: flex-end;
+                gap: 12px;
+                min-width: 100%;
+                text-align: right;
+            }
+
+            .sub-content {
+                grid-template-columns: 1fr;
+                grid-template-areas: "name" "details" "actions";
+            }
+
+            /* Dark Mode - Mobile Sidebar */
+            body.dark-mode .sidebar {
+                background: rgba(28, 28, 30, 0.98);
+                border-color: rgba(255, 255, 255, 0.1);
+            }
+
+            body.dark-mode .btn-sidebar-toggle {
+                color: #FFFFFF;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <div class="layout-wrapper">
+        <!-- LEFT SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header-row">
+                <h1 onclick="resetView()">My Tasks</h1>
+                <button class="btn-sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">≡</button>
+            </div>
+
+            <!-- Collapsible Content Wrapper -->
+            <div class="sidebar-content" id="sidebarContent">
+                <!-- Round 29: Label Adjustment -->
+                <span class="section-label" style="margin-top:0px;">New Task</span>
+                <div class="input-card" id="inputFormSection">
+                    <div class="input-row-main">
+                        <!-- Round 29: Japanese Label -->
+                        <label class="input-group-label" for="inputName">タスク名</label>
+                        <input type="text" id="inputName" class="form-control" placeholder="タスク名を入力"
+                            style="font-weight:700;">
+                    </div>
+
+                    <div style="display:flex; flex-direction:row; gap:10px;">
+                        <div style="flex:1;">
+                            <!-- Round 29: Japanese Label -->
+                            <label class="input-group-label" for="inputCategory">カテゴリ</label>
+                            <select id="inputCategory" class="badge-select" onchange="updateSelectColor(this)"></select>
+                        </div>
+                        <div style="flex:1;">
+                            <!-- Round 29: Japanese Label -->
+                            <label class="input-group-label" for="inputStatus">ステータス</label>
+                            <select id="inputStatus" class="badge-select" onchange="updateSelectColor(this)"></select>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:5px;">
+                        <!-- Round 29: Japanese Label -->
+                        <label class="input-group-label" for="inputDeadline">期限</label>
+                        <!-- Round 27: Hybrid Input -->
+                        <div class="deadline-wrapper">
+                            <!-- Round 28: "期限を入力" -->
+                            <input type="text" id="inputDeadline" class="form-control" placeholder="期限を入力"
+                                style="flex:1;">
+                            <div class="date-picker-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                                <input type="date" class="date-picker-overlay"
+                                    onchange="document.getElementById('inputDeadline').value = this.value.replace(/-/g, '/')">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:5px;">
+                        <!-- Round 29: Japanese Label -->
+                        <label class="input-group-label" for="inputMemo">メモ</label>
+                        <textarea id="inputMemo" class="form-control memo-area" placeholder="詳細を入力" rows="1"
+                            oninput="autoResize(this)"
+                            style="resize:none; background:#FAFAFA; border-color:#DDD;"></textarea>
+                    </div>
+
+                    <button class="btn-add" onclick="addTask()">タスクを登録</button>
+                </div>
+
+                <div style="flex:1;"></div>
+
+                <div style="display:flex; flex-direction:column; gap:8px;"> <!-- Reduced Gap -->
+                    <!-- Round 28: VIEWS Label -->
+                    <div style="margin-top: 40px;"> <!-- Round 30: Added Spacing -->
+                        <span class="section-label">VIEWS</span>
+                        <!-- Round 51: View Scroll Wrapper -->
+                        <div class="nav-scroll-wrapper">
+                            <button class="scroll-btn left"
+                                onclick="scrollNav('view-buttons-container', 'left')">‹</button>
+                            <div class="nav-group" id="view-buttons-container">
+                                <button class="nav-btn active" id="btn-view-active"
+                                    onclick="setViewMode('active')">すべて</button>
+                                <button class="nav-btn" id="btn-view-archived"
+                                    onclick="setViewMode('archived')">完了</button>
+                                <button class="nav-btn btn-trash-mode" id="btn-view-trash"
+                                    onclick="setViewMode('trash')">ゴミ箱</button>
+                            </div>
+                            <button class="scroll-btn right"
+                                onclick="scrollNav('view-buttons-container', 'right')">›</button>
+                        </div>
+                    </div>
+
+                    <!-- Round 28: FILTERS Label -->
+                    <div>
+                        <span class="section-label">FILTERS</span>
+                        <!-- Round 50: Scroll Wrapper -->
+                        <div class="nav-scroll-wrapper">
+                            <button class="scroll-btn left"
+                                onclick="scrollNav('filter-buttons-container', 'left')">‹</button>
+                            <div class="nav-group" id="filter-buttons-container"></div>
+                            <button class="scroll-btn right"
+                                onclick="scrollNav('filter-buttons-container', 'right')">›</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="trashControls"
+                    style="display:none; padding:12px; background:#333; border-radius:var(--radius-sm); border:2px dashed #555; color:white;">
+                    <div class="trash-header" style="display:flex; justify-content:space-between; align-items:center;">
+                        <span>ゴミ箱編集</span>
+                        <button class="btn-empty-trash" onclick="emptyTrash()"
+                            style="background:#440000; color:#ff9999; border:2px solid #773333; border-radius:var(--radius-xs); padding:4px 8px; cursor:pointer;">空にする</button>
+                    </div>
+                </div>
+
+                <!-- Sidebar Footer -->
+                <div class="sidebar-footer">
+                    <div class="backup-controls">
+                        <span class="footer-label">DATA MANAGEMENT</span>
+                        <div class="footer-btn-grid">
+                            <button class="btn-footer" onclick="exportData()">保存</button>
+                            <button class="btn-footer" onclick="triggerImport()">読込</button>
+                            <button class="btn-footer" id="btnOpenSettings">設定</button>
+                            <button class="btn-footer" id="btnOpenHelp">使い方</button>
+                        </div>
+                        <button class="btn-dark-mode-toggle" id="btnToggleDarkMode" onclick="toggleDarkMode()">
+                            <span id="darkModeIcon"></span>
+                            <span id="darkModeLabel">ダークモード</span>
+                        </button>
+                        <input type="file" id="importFile" accept=".json" style="display:none"
+                            onchange="importData(this)">
+                    </div>
+                </div>
+            </div><!-- End Sidebar Content -->
+        </aside>
+
+        <div class="resizer" id="resizer"></div>
+
+        <main class="content">
+            <!-- Center: Task List Area -->
+            <div class="main-tasks-area">
+                <ul id="taskList" class="task-list"></ul>
+            </div>
+
+            <!-- Right: Global Memo Area -->
+            <div class="right-memo-column">
+                <div class="global-memo-area">
+                    <label class="global-memo-label" for="globalMemo">Global Memo</label>
+                    <!-- Round 56: View/Edit Toggle -->
+                    <div id="globalMemoView" class="memo-view-mode" onclick="toggleGlobalMemoEdit(true)"></div>
+                    <textarea id="globalMemo" class="hidden" placeholder="自由記述のメモエリアです。タスク全体の概略や備忘録にお使いください"
+                        oninput="autoResize(this)" onblur="toggleGlobalMemoEdit(false)"></textarea>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- SETTINGS MODAL -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <div class="modal-title">設定 (Settings)</div>
+            </div>
+
+            <!-- Compact Grid Layout -->
+            <div class="settings-grid">
+                <div class="settings-section">
+                    <div class="settings-label">カテゴリ (Categories)</div>
+                    <ul class="settings-list" id="settingsCatList"></ul>
+                    <div class="add-row">
+                        <!-- Round 28: Clean Placeholder -->
+                        <input type="text" id="newCatName" class="form-control add-input" placeholder="新しいカテゴリ名">
+                        <button class="btn-add-setting" onclick="addCategory()">追加</button>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-label">ステータス (Statuses)</div>
+                    <ul class="settings-list" id="settingsStatusList"></ul>
+                    <div class="status-color-area"
+                        style="background:#F9F9F9; padding:10px; border-radius:var(--radius-xs); border:2px solid #EEE;">
+                        <div class="color-selector-wrapper" id="newStatusColorSelector">
+                            <div class="color-opt" style="background:#FF3B30" onclick="selectColor('#FF3B30')"
+                                data-col="#FF3B30" title="Red"></div>
+                            <div class="color-opt" style="background:#007AFF" onclick="selectColor('#007AFF')"
+                                data-col="#007AFF" title="Blue"></div>
+                            <div class="color-opt" style="background:#34C759" onclick="selectColor('#34C759')"
+                                data-col="#34C759" title="Green"></div>
+                            <div class="color-opt" style="background:#FF9500" onclick="selectColor('#FF9500')"
+                                data-col="#FF9500" title="Orange"></div>
+                            <div class="color-opt" style="background:#AF52DE" onclick="selectColor('#AF52DE')"
+                                data-col="#AF52DE" title="Purple"></div>
+                            <div class="color-opt" style="background:#8E8E93" onclick="selectColor('#8E8E93')"
+                                data-col="#8E8E93" title="Gray"></div>
+                            <div class="color-opt" style="background:#000000" onclick="selectColor('#000000')"
+                                data-col="#000000" title="Black"></div>
+
+                            <span class="color-divider"></span>
+
+                            <div class="custom-color-wrapper">
+                                <input type="color" id="customColorPicker" onchange="selectColor(this.value)">
+                            </div>
+                        </div>
+                        <div class="add-row">
+                            <!-- Round 28: Clean Placeholder -->
+                            <input type="text" id="newStatusName" class="form-control add-input"
+                                placeholder="新しいステータス名">
+                            <button class="btn-add-setting" onclick="addStatus()">追加</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Round 28: Factory Reset in Danger Zone -->
+                <!-- Spans 2 columns on grid -->
+                <div
+                    style="grid-column: 1 / -1; background:#ffecec; border:2px solid #ffcccc; padding:10px; border-radius:var(--radius-xs); display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:14px; font-weight:700; color:#d9534f;">危険な操作 (Danger Zone)</span>
+                    <button class="btn-danger-strong" onclick="factoryReset()">全データを削除して初期化</button>
+                </div>
+            </div>
+
+            <!-- Task List -->
+            <div class="modal-footer">
+                <button class="btn-danger-modal" onclick="resetSettings()">設定のみリセット</button>
+                <button class="btn-primary-modal" onclick="closeSettingsModal()">設定を保存して閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HELP MODAL -->
+    <div class="modal-overlay" id="helpModal">
+        <div class="modal-container" style="max-width: 800px;">
+            <div class="modal-header">
+                <div class="modal-title">使い方 (How to Use)</div>
+            </div>
+            <div class="modal-content" style="max-height: 60vh; overflow-y: auto;">
+                <h3 style="margin-top: 0;">基本操作</h3>
+                <ul>
+                    <li><strong>タスクの追加</strong>: サイドバー（スマホではメニュー内）からタスク名、カテゴリ、ステータス、期限、メモを入力して登録します。</li>
+                    <li><strong>編集</strong>: タスク名やメモなどの内容は、クリックすることで直接編集できます。</li>
+                    <li><strong>並び替え</strong>: タスクやサブタスクは、項目をドラッグ＆ドロップすることで自由に並び替えが可能です。</li>
+                    <li><strong>完了と削除</strong>: 「完了」ボタンでタスクをアーカイブし、「削除」ボタン（ゴミ箱アイコン）でゴミ箱へ移動します。</li>
+                </ul>
+
+                <h3 style="margin-top: 24px;">サブタスク機能</h3>
+                <ul>
+                    <li><strong>サブタスクの追加</strong>: 各タスクカードの「＋サブタスクを追加」ボタンから追加できます。</li>
+                    <li><strong>サブタスクの完了</strong>: サブタスクの「完了」ボタンをクリックすると完了マークがつきます。</li>
+                    <li><strong>完了サブタスクの表示/非表示</strong>: 完了したサブタスクは折りたたんで非表示にできます。</li>
+                </ul>
+
+                <h3 style="margin-top: 24px;">ビュー機能</h3>
+                <ul>
+                    <li><strong>すべて</strong>: アクティブなタスクを表示します。</li>
+                    <li><strong>完了</strong>: アーカイブしたタスクを表示します。</li>
+                    <li><strong>ゴミ箱</strong>: 削除したタスクを表示します。ここから復元または完全削除が可能です。</li>
+                    <li><strong>カテゴリフィルター</strong>: 特定のカテゴリのタスクのみを表示できます。</li>
+                </ul>
+
+                <h3 style="margin-top: 24px;">データ管理</h3>
+                <ul>
+                    <li><strong>保存</strong>: 現在のデータをJSONファイルとしてエクスポートします。</li>
+                    <li><strong>読込</strong>: 保存したJSONファイルからデータを復元します。</li>
+                    <li><strong>自動保存</strong>: データはブラウザに自動保存されます。</li>
+                </ul>
+
+                <h3 style="margin-top: 24px;">設定</h3>
+                <ul>
+                    <li><strong>カテゴリ管理</strong>: カテゴリの追加、編集、削除ができます。</li>
+                    <li><strong>ステータス管理</strong>: ステータスの追加、編集、削除、色の変更ができます。</li>
+                    <li><strong>ダークモード</strong>: 明るい/暗いテーマを切り替えられます。</li>
+                </ul>
+
+                <h3 style="margin-top: 24px;">グローバルメモ</h3>
+                <ul>
+                    <li>右側のメモエリアは自由に使える備忘録です。URLを入力すると自動的にリンクになります。</li>
+                </ul>
+            </div>
+            <div class="modal-footer" style="justify-content: center;">
+                <button class="btn-primary-modal" onclick="closeHelpModal()">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONFIRM IMPORT MODAL -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-container" style="max-width: 400px;">
+            <div class="modal-header">
+                <div class="modal-title">データの読み込み確認</div>
+            </div>
+            <div class="modal-content" style="text-align: center; padding: 20px 0;">
+                <p style="color: #666; margin-bottom: 16px;">現在のデータを上書きして、ファイルのデータを読み込みますか？</p>
+                <p style="color: var(--accent-red); font-size: 12px;">※この操作は取り消せません</p>
+            </div>
+            <div class="modal-footer" style="justify-content: center;">
+                <button class="btn-danger-modal" onclick="closeConfirmModal()">キャンセル</button>
+                <button class="btn-primary-modal" onclick="executeImport()">読み込む</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUBTASK MODAL -->
+    <div class="modal-overlay" id="subtaskModal">
+        <div class="modal-container" style="max-width: 400px;">
+            <div class="modal-header">
+                <div class="modal-title">サブタスクを追加</div>
+            </div>
+            <div class="modal-content" style="padding: 20px 0;">
+                <input type="text" id="newSubtaskInput" class="form-control" placeholder="サブタスク名を入力"
+                    onkeydown="if(event.key === 'Enter') submitNewSubtask()">
+            </div>
+            <div class="modal-footer" style="justify-content: center;">
+                <button class="btn-danger-modal" onclick="closeSubtaskModal()">キャンセル</button>
+                <button class="btn-primary-modal" onclick="submitNewSubtask()">追加</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUCCESS MODAL -->
+    <div class="modal-overlay" id="successModal">
+        <div class="modal-container" style="max-width: 300px; text-align: center;">
+            <div style="font-size: 48px; margin-bottom: 16px;">✓</div>
+            <div class="modal-title" style="margin-bottom: 16px;">タスクを登録しました</div>
+            <button class="btn-primary-modal" onclick="closeSuccessModal()" style="width: 100%;">OK</button>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'task_app_data_v25_ux';
+        const DEFAULT_SETTINGS = {
+            categories: [
+                { id: 'none', name: '未設定' },
+                { id: 'customer', name: '顧客案件' },
+                { id: 'office', name: '社内業務' }
+            ],
+            statuses: [
+                { id: 'not_started', name: '未着手', color: '#999999' },
+                { id: 'requires_action', name: '要対応', color: '#D44C47' },
+                { id: 'waiting', name: '待ち', color: '#2383E2' }
+            ]
+        };
+
+        let appData = {
+            tasks: [],
+            globalMemo: '',
+            settings: JSON.parse(JSON.stringify(DEFAULT_SETTINGS))
+        };
+
+        // Round 58: Missing Globals Restored
+        let viewMode = 'active';
+        let filterCategory = 'all';
+        let expandedSubtasksMap = {};
+
+        // Round 59: Additional Missing Globals
+        let draggedItem = null;
+        let pendingImportData = null;
+        let editingCatIndex = -1;
+        let editingStatusIndex = -1;
+        let currentHeaderSubtaskTaskId = null;
+        let selectedNewStatusColor = '#007AFF';
+
+        function loadData() {
+            const json = localStorage.getItem(STORAGE_KEY);
+            if (json) {
+                try {
+                    const data = JSON.parse(json);
+                    if (data) {
+                        appData = data;
+                        // Ensure settings exist
+                        if (!appData.settings) appData.settings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+                        // Ensure tasks exist
+                        if (!Array.isArray(appData.tasks)) appData.tasks = [];
+                    }
+                } catch (e) {
+                    console.error('Load Error:', e);
+                    // Reset on error to prevent broken state
+                    appData = {
+                        tasks: [],
+                        globalMemo: '',
+                        settings: JSON.parse(JSON.stringify(DEFAULT_SETTINGS))
+                    };
+                }
+            }
+
+            // Initialize UI
+            if (typeof initDarkMode === 'function') initDarkMode();
+            const memoEl = document.getElementById('globalMemo');
+            if (memoEl) {
+                memoEl.value = appData.globalMemo || '';
+                if (typeof autoResize === 'function') autoResize(memoEl);
+            }
+
+            // Update Global Memo View
+            const memoView = document.getElementById('globalMemoView');
+            const memoText = appData.globalMemo || '';
+            if (memoView) {
+                if (memoText.trim()) {
+                    memoView.innerHTML = linkify(escapeHtml(memoText));
+                    memoView.classList.remove('empty-memo');
+                } else {
+                    memoView.innerHTML = '自由記述のメモエリアです。タスク全体の概略や備忘録にお使いください';
+                    memoView.classList.add('empty-memo');
+                }
+            }
+
+            // Render
+            if (typeof renderApp === 'function') renderApp();
+
+            // Setup Search Listener
+            const searchEl = document.getElementById('searchInput');
+            if (searchEl) {
+                searchEl.addEventListener('input', (e) => {
+                    // Determine logic for search (not fully implemented yet but preventing error)
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            initResizer();
+
+            // Setup Settings Button
+            const btnSettings = document.getElementById('btnOpenSettings');
+            if (btnSettings) btnSettings.addEventListener('click', openSettingsModal);
+
+            // Setup Help Button
+            const btnHelp = document.getElementById('btnOpenHelp');
+            if (btnHelp) btnHelp.addEventListener('click', openHelpModal);
+
+            // Setup Global Memo View
+            updateGlobalMemoView();
+        });
+        function exportData() {
+            // Round 57: Sync Global Memo before export
+            const memoEl = document.getElementById('globalMemo');
+            if (memoEl) appData.globalMemo = memoEl.value;
+
+            const str = JSON.stringify(appData, null, 2);
+            const url = URL.createObjectURL(new Blob([str], { type: "application/json" }));
+
+            // Generate Filename: mytasks_backup_yyyymmdd_hhmm.json
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            const hh = String(now.getHours()).padStart(2, '0');
+            const min = String(now.getMinutes()).padStart(2, '0');
+            const filename = `mytasks_backup_${yyyy}${mm}${dd}${hh}${min}.json`;
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+        function triggerImport() { document.getElementById('importFile').click(); }
+        function importData(input) {
+            if (!input.files[0]) return;
+            const r = new FileReader();
+            r.onload = e => {
+                try {
+                    const l = JSON.parse(e.target.result);
+                    // Validate Structure
+                    if (l.settings && l.tasks) {
+                        pendingImportData = l;
+                        openConfirmModal();
+                    } else {
+                        alert("無効なデータ形式です。");
+                        input.value = '';
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert("読込失敗: ファイルが破損している可能性があります。");
+                    input.value = '';
+                }
+            };
+            r.readAsText(input.files[0]);
+        }
+
+        function renderApp() { renderInputOptions(); renderFilters(); renderTasks(); }
+
+        function renderInputOptions() {
+            const cat = document.getElementById('inputCategory');
+            const st = document.getElementById('inputStatus');
+            const currentCat = cat.value; const currentSt = st.value;
+            cat.innerHTML = appData.settings.categories.map(c => `<option value="${c.id}">${c.name}</option>
+                    `).join('');
+            st.innerHTML = appData.settings.statuses.map(s => `<option value="${s.id}">${s.name}</option>
+                    `).join('');
+            // Restore value if exists
+            if (appData.settings.categories.some(c => c.id === currentCat)) cat.value = currentCat;
+            if (appData.settings.statuses.some(s => s.id === currentSt)) st.value = currentSt;
+            updateSelectColor(cat); updateSelectColor(st);
+        }
+
+        function renderFilters() {
+            const container = document.getElementById('filter-buttons-container');
+            let html = `<button class="nav-btn ${filterCategory === 'all' ? 'active' : ''}"
+                        onclick="setFilter('all')">すべて</button>`;
+            appData.settings.categories.forEach(c => {
+                let label = c.name.replace(/^[\uD800-\uDBFF][\uDC00-\uDFFF]\s*/, '');
+                if (label.length === 0) label = c.name;
+                html += `<button class="nav-btn ${filterCategory === c.id ? 'active' : ''}"
+                        onclick="setFilter('${c.id}')">${label}</button>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderTasks() {
+            const list = document.getElementById('taskList');
+            list.innerHTML = '';
+            const showActive = viewMode === 'active';
+            const showArchived = viewMode === 'archived';
+            const showTrash = viewMode === 'trash';
+
+            const filtered = appData.tasks.filter(t => {
+                if (filterCategory !== 'all' && t.category !== filterCategory) return false;
+                if (viewMode === 'active') return !t.isDeleted && !t.isArchived;
+                if (viewMode === 'archived') return !t.isDeleted && t.isArchived;
+                if (viewMode === 'trash') return t.isDeleted;
+                return false;
+            });
+
+            if (filtered.length === 0) {
+                list.innerHTML = `<li style="text-align:center; padding:32px; color:#bbb;">タスクはありません</li>`; return;
+            }
+
+            filtered.forEach(task => {
+                const li = document.createElement('li'); li.className = `task-card`;
+                const sConfig = appData.settings.statuses.find(s => s.id === task.status) || { color: '#999' };
+
+                if (task.isDeleted) li.classList.add('deleted');
+                else if (task.isArchived) li.classList.add('archived');
+                else {
+                    li.style.backgroundColor = `color-mix(in srgb, ${sConfig.color} 5%, var(--mix-base))`;
+                    li.style.borderLeft = `5px solid ${sConfig.color}`;
+                }
+
+                if (showActive) {
+                    li.classList.add('draggable'); li.draggable = true; li.dataset.id = task.id;
+                    li.addEventListener('dragstart', handleDragStart); li.addEventListener('dragover',
+                        handleDragOver); li.addEventListener('drop', handleDrop); li.addEventListener('dragend',
+                            handleDragEnd);
+                }
+                const ro = showTrash || showArchived;
+
+                let subHtml = '';
+                if (task.subtasks && task.subtasks.length) {
+                    const active = task.subtasks.filter(s => !s.isArchived);
+                    const compl = task.subtasks.filter(s => s.isArchived);
+                    const genRow = (s) => {
+                        const st = appData.settings.statuses.find(x => x.id === s.status) || { color: '#999' };
+                        const rowCls = s.isArchived ? 'subtask-row completed-sub' : 'subtask-row';
+                        const style = s.isArchived ? '' : `border-left: 5px solid ${st.color}; background: color-mix(in
+                    srgb, ${st.color} 5%, var(--mix-base));`;
+                        const sOpts = appData.settings.statuses.map(o => `<option value="${o.id}" ${s.status === o.id
+                            ? 'selected' : ''}>${o.name}</option>`).join('');
+
+                        // Draggable attributes
+                        const draggableAttrs = !ro && !s.isArchived ? `draggable="true" data-parent-id="${task.id}"
+                    data-sub-id="${s.id}" ondragstart="handleSubtaskDragStart(event)"
+                    ondragover="handleSubtaskDragOver(event)" ondrop="handleSubtaskDrop(event)"
+                    ondragend="handleSubtaskDragEnd(event)"` : '';
+                        const dragClass = !ro && !s.isArchived ? 'sub-draggable' : '';
+
+                        return `<div class="${rowCls} ${dragClass}" style="${style}" ${draggableAttrs}>
+                        ${!ro && !s.isArchived ? `<div class="sub-drag-handle"
+                            style="cursor:grab; color:#DDD; padding-top:6px; margin-right:8px; font-size:16px;">⋮⋮</div>
+                        ` : ''}
+                        <div class="sub-content">
+                            <div class="sub-name-row">
+                                <textarea class="sub-input-name" rows="1" oninput="autoResize(this)"
+                                    onblur="updateSubtask('${task.id}','${s.id}','name',this.value)" ${ro ? 'disabled'
+                                : ''}>${escapeHtml(s.name)}</textarea>
+                            </div>
+                            <div class="sub-details-row">
+                                <div class="sub-meta-line">
+                                    <select class="btn-mini"
+                                        onchange="updateSubtask('${task.id}','${s.id}','status',this.value)" ${ro
+                                ? 'disabled' : ''}>${sOpts}</select>
+                                    <div class="date-input-wrapper">
+                                        <input type="text" class="meta-input has-picker" value="${escapeHtml(s.deadline)}"
+                                            placeholder="期限を入力" id="sub-deadline-${task.id}-${s.id}"
+                                            onchange="updateSubtask('${task.id}','${s.id}','deadline',this.value)" ${ro
+                                ? 'disabled' : ''}>
+                                        ${!ro ? `<button class="btn-calendar"
+                                            onclick="document.getElementById('sub-dp-${task.id}-${s.id}').showPicker()"><svg
+                                                width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round">
+                                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                                            </svg></button>
+                                        <input type="date" id="sub-dp-${task.id}-${s.id}"
+                                            style="visibility:hidden; position:absolute; width:0; height:0;"
+                                            onchange="const v = this.value.replace(/-/g, '/'); document.getElementById('sub-deadline-${task.id}-${s.id}').value = v; updateSubtask('${task.id}', '${s.id}', 'deadline', v)">`
+                                : ''}
+                                    </div>
+                                </div>
+                                <!-- Round 56: Subtask Memo Toggle -->
+                                ${!ro ? `
+                                <div id="sub-memo-view-${task.id}-${s.id}"
+                                    class="sub-memo-area memo-view-mode ${!s.memo ? 'empty-memo' : ''}"
+                                    onclick="toggleMemoEdit('${task.id}', '${s.id}', true, 'sub')">${s.memo ?
+                                    linkify(escapeHtml(s.memo)) : '詳細を入力'}</div>
+                                <textarea id="sub-memo-edit-${task.id}-${s.id}" class="sub-memo-area hidden"
+                                    placeholder="詳細を入力" oninput="autoResize(this)"
+                                    onblur="toggleMemoEdit('${task.id}', '${s.id}', false, 'sub'); updateSubtask('${task.id}','${s.id}','memo',this.value)">${escapeHtml(s.memo)}</textarea>
+                                ` : `
+                                <div class="sub-memo-area memo-view-mode">${s.memo ? linkify(escapeHtml(s.memo)) : '(詳細なし)'}
+                                </div>
+                                `}
+                            </div>
+                            <div class="sub-actions-row">
+                                ${!ro ? `<button class="btn-mini-complete"
+                                    onclick="toggleSubtaskComplete('${task.id}','${s.id}')">${s.isArchived ? '戻す' :
+                                    '完了'}</button>
+                                <button class="btn-mini" onclick="moveSubtask('${task.id}','${s.id}','up')"><svg
+                                        width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="18 15 12 9 6 15"></polyline>
+                                    </svg></button>
+                                <button class="btn-mini" onclick="moveSubtask('${task.id}','${s.id}','down')"><svg
+                                        width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg></button>
+                                <button class="btn-mini del" onclick="deleteSubtask('${task.id}','${s.id}')"><svg
+                                        width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path
+                                            d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                        </path>
+                                    </svg></button>` : ''}
+                            </div>
+                        </div>
+                    </div>`;
+                    };
+                    active.forEach(s => subHtml += genRow(s));
+                    if (compl.length) {
+                        if (expandedSubtasksMap[task.id]) {
+                            compl.forEach(s => subHtml += genRow(s)); subHtml +=
+                                `<button class="btn-sub-toggle"
+                        onclick="toggleSubtaskVisibility('${task.id}')">完了したサブタスクを隠す</button>`;
+                        }
+                        else subHtml += `<button class="btn-sub-toggle"
+                        onclick="toggleSubtaskVisibility('${task.id}')">完了したサブタスクを表示 (${compl.length})</button>`;
+                    }
+                }
+
+                const cOpts = appData.settings.categories.map(c => `<option value="${c.id}" ${task.category === c.id
+                    ? 'selected' : ''}>${c.name}</option>`).join('');
+                const sOpts = appData.settings.statuses.map(s => `<option value="${s.id}" ${task.status === s.id
+                    ? 'selected' : ''}>${s.name}</option>`).join('');
+
+                let btns = '';
+                if (showActive) btns = `<div class="action-block"><button class="btn-complete-action"
+                            onclick="toggleComplete('${task.id}')">完了</button>
+                        <div class="action-row-buttons"><button class="icon-action-btn"
+                                onclick="moveTask('${task.id}','up')"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <polyline points="18 15 12 9 6 15"></polyline>
+                                </svg></button><button class="icon-action-btn"
+                                onclick="moveTask('${task.id}','down')"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg></button><button class="icon-action-btn btn-del"
+                                onclick="deleteTask('${task.id}')"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path
+                                        d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                    </path>
+                                </svg></button>
+                        </div>
+                    </div>`;
+                else if (showArchived) btns = `<div class="action-block"><button class="btn-complete-action clean"
+                            onclick="toggleComplete('${task.id}')">戻す</button>
+                        <div class="action-row-buttons"><button class="icon-action-btn btn-del"
+                                onclick="deleteTask('${task.id}')"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path
+                                        d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                    </path>
+                                </svg></button></div>
+                    </div>`;
+                else if (showTrash) btns = `<div class="action-block"><button class="btn-complete-action clean"
+                            onclick="restoreTask('${task.id}')">復元</button>
+                        <div class="action-row-buttons"><button class="icon-action-btn btn-del"
+                                onclick="deleteTask('${task.id}')"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg></button></div>
+                    </div>`;
+
+                const tsCreated = `<span class="ts-item"><span
+                            class="ts-label">作成日:</span>${formatDate(task.createdAt)}</span>`;
+                const tsUpdated = task.updatedAt !== task.createdAt ? `<span class="ts-item"><span
+                            class="ts-label">更新日:</span>${formatDate(task.updatedAt)}</span>` : '';
+                const tsCompleted = task.isArchived && task.archivedAt ? `<span class="ts-item"><span
+                            class="ts-label" style="color:#45B06C">完了日:</span>${formatDate(task.archivedAt)}</span>` :
+                    '';
+
+                li.innerHTML = `
+                    ${showActive ? `<div class="drag-handle">⋮⋮</div>` : ''}
+                    <div class="task-content-wrapper">
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <input type="text" class="task-title-input" value="${escapeHtml(task.name)}"
+                                onchange="updateTask('${task.id}','name',this.value)" ${ro ? 'disabled' : ''}>
+                        </div>
+                        <div class="task-meta-row">
+                            <select class="badge-select" onchange="updateTask('${task.id}','category',this.value)" ${ro
+                        ? 'disabled' : ''}>${cOpts}</select>
+                            <select class="badge-select" onchange="updateTask('${task.id}','status',this.value)"
+                                style="color:${sConfig.color}" ${ro ? 'disabled' : ''}>${sOpts}</select>
+                            <div class="date-input-wrapper">
+                                <input type="text" class="meta-input has-picker" value="${escapeHtml(task.deadline)}"
+                                    placeholder="期限を入力" id="deadline-${task.id}"
+                                    onchange="updateTask('${task.id}','deadline',this.value)" ${ro ? 'disabled' : ''}>
+                                ${!ro ? `<button class="btn-calendar"
+                                    onclick="document.getElementById('dp-${task.id}').showPicker()"><svg width="14"
+                                        height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                                    </svg></button>
+                                <input type="date" id="dp-${task.id}"
+                                    style="visibility:hidden; position:absolute; width:0; height:0;"
+                                    onchange="const v = this.value.replace(/-/g, '/'); document.getElementById('deadline-${task.id}').value = v; updateTask('${task.id}', 'deadline', v)">`
+                        : ''}
+                            </div>
+                        </div>
+
+                        <!-- Round 56: Task Memo Toggle -->
+                        ${!ro ? `
+                        <div id="memo-view-${task.id}"
+                            class="memo-area memo-view-mode ${!task.memo ? 'empty-memo' : ''}"
+                            onclick="toggleMemoEdit('${task.id}', null, true, 'main')">${task.memo ?
+                            linkify(escapeHtml(task.memo)) : '詳細を入力'}</div>
+                        <textarea id="memo-edit-${task.id}" class="memo-area hidden" rows="1" placeholder="詳細を入力"
+                            oninput="autoResize(this)"
+                            onblur="toggleMemoEdit('${task.id}', null, false, 'main'); updateTask('${task.id}','memo',this.value)">${escapeHtml(task.memo)}</textarea>
+                        ` : `
+                        <div class="memo-area memo-view-mode">${task.memo ? linkify(escapeHtml(task.memo)) : '(詳細なし)'}</div>
+                        `}
+
+                        <div class="subtasks-wrapper">
+                            ${subHtml}
+                            ${!ro ? `<button class="btn-add-sub" onclick="addSubtask('${task.id}')">＋
+                                サブタスクを追加</button>` : ''}
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        ${btns}
+                        <div class="timestamps">
+                            ${tsCreated}
+                            ${tsUpdated}
+                            ${tsCompleted}
+                        </div>
+                    </div>
+                    `;
+                list.appendChild(li);
+            });
+
+            // Round 28: Auto-Resize Memo after Render
+            setTimeout(() => {
+                document.querySelectorAll('textarea').forEach(el => autoResize(el));
+            }, 0);
+        }
+
+        function updateSelectColor(sel) {
+            const s = appData.settings.statuses.find(x => x.id === sel.value);
+            if (s) { sel.style.color = s.color; sel.style.fontWeight = '700'; } else sel.style.color =
+                '#333';
+        }
+
+        // CRUD
+        function autoResize(el) {
+            el.style.height = 'auto'; // Reset
+            el.style.height = (el.scrollHeight + 2) + 'px'; // +2 for border safety
+        }
+        function escapeHtml(s) {
+            return s ? s.replace(/[&<>"']/g, m => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": ' &#039;'
+            }[m])) : '';
+        }
+        function formatDate(is) {
+            if (!is) return '';
+            const d = new Date(is);
+            return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} ${d.getHours()}:${d.getMinutes().toString().padStart(2, '0')}`;
+        }
+
+        // Restored Dark Mode
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateDarkModeUI(isDark);
+        }
+
+        function initDarkMode() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.body.classList.add('dark-mode');
+                updateDarkModeUI(true);
+            } else {
+                updateDarkModeUI(false);
+            }
+        }
+
+        function updateDarkModeUI(isDark) {
+            const icon = document.getElementById('darkModeIcon');
+            const label = document.getElementById('darkModeLabel');
+            if (icon && label) {
+                icon.textContent = ''; // Text only
+                label.textContent = isDark ? 'ライトモードに切り替え' : 'ダークモードに切り替え';
+            }
+        }
+
+        function saveData() {
+            const memoEl = document.getElementById('globalMemo');
+            if (memoEl) {
+                appData.globalMemo = memoEl.value;
+            }
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+        }
+
+        function resetView() {
+            setViewMode('active');
+            setFilter('all');
+        }
+
+        function setFilter(c) {
+            filterCategory = c;
+            renderApp();
+        }
+
+        function setViewMode(m) {
+            viewMode = m;
+            const f = document.getElementById('inputFormSection');
+            const t = document.getElementById('trashControls');
+
+            // Always show form, but disable it if not active
+            f.style.display = 'block';
+            if (m === 'active') {
+                f.classList.remove('disabled-area');
+            } else {
+                f.classList.add('disabled-area');
+            }
+
+            // Toggle Trash Controls (below disabled form)
+            if (m === 'trash') {
+                t.style.display = 'block';
+            } else {
+                t.style.display = 'none';
+            }
+
+            // Update active button state
+            ['active', 'archived', 'trash'].forEach(mode => {
+                const btn = document.getElementById('btn-view-' + mode);
+                if (btn) btn.classList.toggle('active', mode === m);
+            });
+
+            renderTasks();
+        }
+
+        // Initial Render call
+        renderTasks();
+
+
+        function addTask() {
+            const n = document.getElementById('inputName'); if (!n.value.trim()) {
+                alert('入力してください'); return;
+            }
+            const now = new Date().toISOString();
+            appData.tasks.unshift({
+                id: Date.now().toString(), name: n.value, status:
+                    document.getElementById('inputStatus').value, category:
+                    document.getElementById('inputCategory').value, deadline:
+                    document.getElementById('inputDeadline').value, memo:
+                    document.getElementById('inputMemo').value, isArchived: false, isDeleted: false,
+                createdAt: now, updatedAt: now, archivedAt: '', subtasks: []
+            });
+            saveData(); renderTasks(); n.value = ''; document.getElementById('inputDeadline').value
+                = ''; document.getElementById('inputMemo').value = '';
+
+            // Round 55: Success Modal
+            openSuccessModal();
+        }
+        function updateTask(id, f, v) {
+            const t = appData.tasks.find(x => x.id === id); if (t) {
+                t[f] = v; t.updatedAt = new Date().toISOString(); saveData(); if (['status',
+                    'category'].includes(f)) renderTasks();
+            }
+        }
+
+        function toggleComplete(id) {
+            const t = appData.tasks.find(x => x.id === id);
+            if (t) {
+                t.isArchived = !t.isArchived;
+                t.updatedAt = new Date().toISOString();
+                if (t.isArchived) t.archivedAt = new Date().toISOString();
+                else t.archivedAt = '';
+                saveData(); renderTasks();
+            }
+        }
+
+        function deleteTask(id) {
+            if (viewMode === 'trash') {
+                if (confirm('完全削除?'))
+                    appData.tasks = appData.tasks.filter(x => x.id !== id);
+            } else {
+                const t =
+                    appData.tasks.find(x => x.id === id); if (t) t.isDeleted = true;
+            } saveData();
+            renderTasks();
+        }
+        function restoreTask(id) {
+            const t = appData.tasks.find(x => x.id === id); if (t)
+                t.isDeleted = false; saveData(); renderTasks();
+        }
+        function emptyTrash() {
+            if (confirm('空にする?')) appData.tasks = appData.tasks.filter(x =>
+                !x.isDeleted); saveData(); renderTasks();
+        }
+        function moveTask(id, d) {
+            const i = appData.tasks.findIndex(x => x.id === id);
+            if (i < 0) return;
+
+            if (d === 'up' && i > 0) {
+                [appData.tasks[i], appData.tasks[i - 1]] = [appData.tasks[i - 1], appData.tasks[i]];
+                saveData();
+                renderTasks();
+            } else if (d === 'down' && i < appData.tasks.length - 1) {
+                [appData.tasks[i], appData.tasks[i + 1]] = [appData.tasks[i + 1], appData.tasks[i]];
+                saveData();
+                renderTasks();
+            }
+        }
+
+        function addSubtask(tid) {
+            // Round 48: Use Custom Modal
+            openSubtaskModal(tid);
+        }
+        function updateSubtask(tid, sid, f, v) {
+            const
+                t = appData.tasks.find(x => x.id === tid);
+            if (t) {
+                const s = t.subtasks.find(y => y.id === sid);
+                if (s) {
+                    s[f] = v;
+                    saveData();
+                    if (f === 'status') renderTasks();
+                }
+            }
+        }
+        function toggleSubtaskComplete(tid, sid) {
+            const t = appData.tasks.find(x =>
+                x.id === tid); if (t) {
+                    const s = t.subtasks.find(y => y.id === sid); if (s) {
+                        s.isArchived = !s.isArchived; saveData(); renderTasks();
+                    }
+                }
+        }
+        function deleteSubtask(tid, sid) {
+            const t = appData.tasks.find(x => x.id ===
+                tid); if (t) {
+                    t.subtasks = t.subtasks.filter(y => y.id !== sid); saveData();
+                    renderTasks();
+                }
+        }
+        function toggleSubtaskVisibility(tid) {
+            expandedSubtasksMap[tid] =
+                !expandedSubtasksMap[tid]; renderTasks();
+        }
+
+        function moveSubtask(taskId, subtaskId, direction) {
+            const t = appData.tasks.find(x => x.id === taskId);
+            if (!t || !t.subtasks) return;
+            const idx = t.subtasks.findIndex(s => s.id === subtaskId);
+            if (idx === -1) return;
+
+            if (direction === 'up') {
+                if (idx > 0) {
+                    const temp = t.subtasks[idx];
+                    t.subtasks[idx] = t.subtasks[idx - 1];
+                    t.subtasks[idx - 1] = temp;
+                    saveData(); renderTasks();
+                }
+            } else {
+                if (idx < t.subtasks.length - 1) {
+                    const temp = t.subtasks[idx];
+                    t.subtasks[idx] = t.subtasks[idx + 1]; t.subtasks[idx + 1] = temp; saveData();
+                    renderTasks();
+                }
+            }
+        } // Subtask DnD Globals let draggedSubtask=null; let
+        draggedSubtaskParentId = null; window.handleSubtaskDragStart = function (e) {
+            e.stopPropagation(); // Critical: Prevent parent drag
+            draggedSubtask = e.currentTarget;
+            draggedSubtaskParentId = e.currentTarget.dataset.parentId;
+            e.currentTarget.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', e.currentTarget.dataset.subId);
+            e.dataTransfer.setData('application/x-subtask-id',
+                e.currentTarget.dataset.subId); // Custom type 
+        };
+        window.handleSubtaskDragOver = function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const target = e.currentTarget;
+
+            // Only allow dropping if parents match
+            if (target.dataset.parentId !== draggedSubtaskParentId) {
+                e.dataTransfer.dropEffect = 'none';
+                return;
+            }
+            e.dataTransfer.dropEffect = 'move';
+
+            if (target === draggedSubtask) return;
+
+            const rect = target.getBoundingClientRect();
+            const offset = e.clientY - rect.top;
+            const midY = rect.height / 2;
+
+            // Real-time DOM Sorting
+            const parent = target.parentNode;
+            if (offset < midY) {
+                parent.insertBefore(draggedSubtask, target);
+            } else {
+                parent.insertBefore(draggedSubtask, target.nextSibling);
+            }
+        };
+
+        window.handleSubtaskDrop = function (e) {
+            e.stopPropagation();
+            const target = e.currentTarget;
+            if (draggedSubtask) {
+                draggedSubtask.classList.remove('dragging');
+            }
+            if (target.dataset.parentId !== draggedSubtaskParentId) return;
+
+            const t = appData.tasks.find(x => x.id === draggedSubtaskParentId);
+            if (!t) return;
+            if (!draggedSubtask) return;
+
+            const container = draggedSubtask.parentNode;
+            const newSubtasks = [];
+            const rows = Array.from(container.children).filter(c => c.classList.contains('subtask-row'));
+
+            rows.forEach(row => {
+                const sid = row.dataset.subId;
+                const sub = t.subtasks.find(s => s.id === sid);
+                if (sub) newSubtasks.push(sub);
+            });
+
+            const archived = t.subtasks.filter(s => s.isArchived);
+            t.subtasks = [...newSubtasks, ...archived];
+
+            saveData();
+            renderTasks();
+
+            draggedSubtask = null;
+            draggedSubtaskParentId = null;
+        };
+
+        window.handleSubtaskDragEnd = function (e) {
+            e.stopPropagation();
+            if (draggedSubtask) {
+                draggedSubtask.classList.remove('dragging');
+            }
+            draggedSubtask = null;
+            draggedSubtaskParentId = null;
+        };
+
+        /* Round 56: Generic Memo Toggle & Linkify */
+        window.toggleMemoEdit = function (taskId, subId, edit, type) {
+            let viewId, editId;
+            if (type === 'main') {
+                viewId = `memo-view-${taskId}`;
+                editId = `memo-edit-${taskId}`;
+            } else {
+                viewId = `sub-memo-view-${taskId}-${subId}`;
+                editId = `sub-memo-edit-${taskId}-${subId}`;
+            }
+
+            const view = document.getElementById(viewId);
+            const area = document.getElementById(editId);
+            if (!view || !area) return;
+
+            if (edit) {
+                view.classList.add('hidden');
+                area.classList.remove('hidden');
+                autoResize(area); // Ensure correct height
+                area.focus();
+            } else {
+                area.classList.add('hidden');
+                view.classList.remove('hidden');
+
+                // Update view content immediately
+                const text = area.value;
+                if (!text.trim()) {
+                    view.innerHTML = type === 'main' ? '詳細を入力' : '詳細を入力'; // Placeholder
+                    view.classList.add('empty-memo');
+                } else {
+                    view.innerHTML = linkify(escapeHtml(text));
+                    view.classList.remove('empty-memo');
+                }
+            }
+        };
+
+        function linkify(text) {
+            // URL Pattern: starting with http/https
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            return text.replace(urlRegex, function (url) {
+                return '<a href="' + url + '" target="_blank" onclick="event.stopPropagation()">' + url + '</a>';
+            }).replace(/\n/g, '<br>');
+        }
+
+        // Resizer
+        function initResizer() {
+            const r = document.getElementById('resizer');
+            r.addEventListener('mousedown', e => {
+                e.preventDefault();
+                r.classList.add('resizing'); document.body.style.cursor = 'col-resize'; const mv
+                    = me => {
+                        const w = me.clientX;
+                        // Added checks for min/max width
+                        if (w < 200) return; // Min width if (w> 600) return; // Max width
+                        document.documentElement.style.setProperty('--sidebar-width', w + 'px');
+                    };
+                const up = () => {
+                    r.classList.remove('resizing'); document.body.style.cursor =
+                        'default'; document.removeEventListener('mousemove', mv);
+                    document.removeEventListener('mouseup', up);
+                };
+                document.addEventListener('mousemove', mv);
+                document.addEventListener('mouseup', up);
+            });
+        }
+        // DnD
+        function handleDragStart(e) {
+            draggedItem = this;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            // Set data to ensure drag works on some browsers
+            e.dataTransfer.setData('text/plain', this.dataset.id);
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+
+            const target = this;
+            if (target === draggedItem) return;
+
+            // Calculate position to decide insertion (Before or After)
+            const rect = target.getBoundingClientRect();
+            const offset = e.clientY - rect.top;
+            const midY = rect.height / 2;
+
+            const list = document.getElementById('taskList');
+
+            return false;
+        }
+
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+            // Clean up any remaining visual artifacts if needed
+            const list = document.getElementById('taskList');
+            Array.from(list.children).forEach(item => {
+                item.classList.remove('over'); // if we used this class
+            });
+        }
+
+        // Round 59: Missing handleDrop function
+        function handleDrop(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (!draggedItem) return;
+
+            const target = this;
+            if (target === draggedItem) return;
+
+            const list = document.getElementById('taskList');
+            const items = Array.from(list.querySelectorAll('.task-card'));
+
+            const fromIndex = items.indexOf(draggedItem);
+            const toIndex = items.indexOf(target);
+
+            if (fromIndex === -1 || toIndex === -1) return;
+
+            // Calculate position based on mouse position
+            const rect = target.getBoundingClientRect();
+            const offset = e.clientY - rect.top;
+            const midY = rect.height / 2;
+
+            // DOM manipulation for visual feedback
+            if (offset < midY) {
+                list.insertBefore(draggedItem, target);
+            } else {
+                list.insertBefore(draggedItem, target.nextSibling);
+            }
+
+            // Update data model - reorder based on current DOM order
+            const visibleTaskIds = Array.from(list.querySelectorAll('.task-card')).map(el => el.dataset.id);
+            const reorderedTasks = [];
+            const otherTasks = [];
+
+            appData.tasks.forEach(task => {
+                const index = visibleTaskIds.indexOf(task.id);
+                if (index !== -1) {
+                    reorderedTasks[index] = task;
+                } else {
+                    otherTasks.push(task);
+                }
+            });
+
+            appData.tasks = [...reorderedTasks.filter(t => t), ...otherTasks];
+            saveData();
+        }
+
+        // Round 59: Missing toggleGlobalMemoEdit function
+        function toggleGlobalMemoEdit(isEdit) {
+            const view = document.getElementById('globalMemoView');
+            const edit = document.getElementById('globalMemo');
+
+            if (!view || !edit) return;
+
+            if (isEdit) {
+                view.classList.add('hidden');
+                edit.classList.remove('hidden');
+                autoResize(edit);
+                edit.focus();
+            } else {
+                edit.classList.add('hidden');
+                view.classList.remove('hidden');
+                updateGlobalMemoView();
+                saveData();
+            }
+        }
+
+        // Round 59: Missing updateGlobalMemoView function
+        function updateGlobalMemoView() {
+            const view = document.getElementById('globalMemoView');
+            const edit = document.getElementById('globalMemo');
+
+            if (!view || !edit) return;
+
+            const text = edit.value || appData.globalMemo || '';
+            if (!text.trim()) {
+                view.innerHTML = '自由記述のメモエリアです。タスク全体の概略や備忘録にお使いください';
+                view.classList.add('empty-memo');
+            } else {
+                view.innerHTML = linkify(escapeHtml(text));
+                view.classList.remove('empty-memo');
+            }
+        }
+
+        function submitNewSubtask() {
+            if (!currentHeaderSubtaskTaskId) return;
+            const input = document.getElementById('newSubtaskInput');
+            const name = input.value.trim();
+            if (!name) return;
+
+            const t = appData.tasks.find(x => x.id === currentHeaderSubtaskTaskId);
+            if (t) {
+                t.subtasks.push({
+                    id: Date.now().toString(),
+                    name: name,
+                    status: appData.settings.statuses[0].id,
+                    isArchived: false,
+                    // Round 29 Support
+                    deadline: '',
+                    memo: ''
+                });
+                saveData();
+                renderTasks();
+                closeSubtaskModal();
+            }
+        }
+
+        // Modal Management - Success
+        function openSuccessModal() {
+            const m = document.getElementById('successModal');
+            if (m) m.classList.add('open');
+        }
+        function closeSuccessModal() {
+            const m = document.getElementById('successModal');
+            if (m) m.classList.remove('open');
+        }
+
+        // Modal Global Functions
+        window.openSettingsModal = function () {
+            console.log('Open Settings Modal Triggered');
+            const m = document.getElementById('settingsModal');
+            if (m) { m.classList.add('open'); renderSettingsLists(); }
+        }
+        window.closeSettingsModal = function () {
+            const m = document.getElementById('settingsModal');
+            if (m) { m.classList.remove('open'); renderApp(); }
+        }
+        window.openHelpModal = function () {
+            console.log('Open Help Modal Triggered');
+            const m = document.getElementById('helpModal');
+            if (m) m.classList.add('open');
+        }
+        window.closeHelpModal = function () {
+            const m = document.getElementById('helpModal');
+            if (m) m.classList.remove('open');
+        }
+        window.toggleSidebar = function () {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar) {
+                sidebar.classList.toggle('expanded');
+            }
+        }
+        window.openSubtaskModal = function (parentId) {
+            currentHeaderSubtaskTaskId = parentId;
+            const m = document.getElementById('subtaskModal');
+            if (m) {
+                m.classList.add('open');
+                setTimeout(() => document.getElementById('newSubtaskInput').focus(),
+                    100);
+            }
+        }
+        window.closeSubtaskModal = function () {
+            const m = document.getElementById('subtaskModal');
+            if (m) m.classList.remove('open');
+            // Cleanup input
+            const i = document.getElementById('newSubtaskInput');
+            if (i) i.value = '';
+        }
+
+        // Import Confirmation Modal Logic
+        window.openConfirmModal = function () {
+            const m = document.getElementById('confirmModal');
+            if (m) m.classList.add('open');
+        }
+        window.closeConfirmModal = function () {
+            const m = document.getElementById('confirmModal');
+            if (m) m.classList.remove('open');
+            pendingImportData = null; // Clear pending data
+            document.getElementById('importFile').value = ''; // Reset input
+        }
+        window.executeImport = function () {
+            if (pendingImportData) {
+                appData = pendingImportData;
+                pendingImportData = null; // Clear after use
+
+                // Update Global Memo UI BEFORE saveData (saveData reads from memoEl.value)
+                const memoEl = document.getElementById('globalMemo');
+                const memoView = document.getElementById('globalMemoView');
+                const memoText = appData.globalMemo || '';
+
+                if (memoEl) {
+                    memoEl.value = memoText;
+                    if (typeof autoResize === 'function') autoResize(memoEl);
+                }
+
+                // Now save data (will read correct memoEl.value)
+                saveData();
+
+                if (memoView) {
+                    if (memoText.trim()) {
+                        memoView.innerHTML = linkify(escapeHtml(memoText));
+                        memoView.classList.remove('empty-memo');
+                    } else {
+                        memoView.innerHTML = '自由記述のメモエリアです。タスク全体の概略や備忘録にお使いください';
+                        memoView.classList.add('empty-memo');
+                    }
+                }
+
+                renderApp();
+                closeConfirmModal();
+                alert('データを読み込みました。');
+            }
+        }
+
+        // Round 51: Generic Horizontal Scroll Logic
+        window.scrollNav = function (elementId, direction) {
+            const container = document.getElementById(elementId);
+            if (container) {
+                const scrollAmount = 150; // Increased responsiveness
+                if (direction === 'left') {
+                    container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+                } else {
+                    container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                }
+            }
+        }
+
+        function renderSettingsLists() {
+            const cl = document.getElementById('settingsCatList'), sl =
+                document.getElementById('settingsStatusList');
+            cl.innerHTML = appData.settings.categories.map((c, i) => {
+                if (editingCatIndex === i) return `<li class="settings-item"><input
+                                                        type="text" class="edit-input" id="editCatInput-${i}"
+                                                        value="${escapeHtml(c.name)}"><button class="btn-mini"
+                                                        onclick="saveEditCategory(${i})">保存</button></li>`;
+                return `<li class="settings-item"><span
+                                                        class="settings-item-name">${c.name}</span><button
+                                                        class="btn-mini" onclick="startEditCategory(${i})"><svg
+                                                            width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                                            stroke="currentColor" stroke-width="2"
+                                                            stroke-linecap="round" stroke-linejoin="round">
+                                                            <path d="M12 20h9"></path>
+                                                            <path
+                                                                d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z">
+                                                            </path>
+                                                        </svg></button><button class="btn-mini del"
+                                                        onclick="deleteCategory(${i})"><svg width="14" height="14"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                            stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round">
+                                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                                            <path
+                                                                d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                                            </path>
+                                                        </svg></button>
+                                                </li>`;
+            }).join('');
+            sl.innerHTML = appData.settings.statuses.map((s, i) => {
+                if (editingStatusIndex === i) return `<li class="settings-item"
+                                                    style="background:#f0f0f0;"><input type="color"
+                                                        id="editStatusColor-${i}" value="${s.color}"
+                                                        style="border:none;width:24px;height:24px;margin-right:4px;"><input
+                                                        type="text" class="edit-input" id="editStatusName-${i}"
+                                                        value="${escapeHtml(s.name)}"><button class="btn-mini"
+                                                        onclick="saveEditStatus(${i})">保存</button></li>`;
+                return `<li class="settings-item">
+                                                    <div class="settings-item-dot" style="background:${s.color}"></div>
+                                                    <span class="settings-item-name">${s.name}</span><button
+                                                        class="btn-mini" onclick="startEditStatus(${i})"><svg width="14"
+                                                            height="14" viewBox="0 0 24 24" fill="none"
+                                                            stroke="currentColor" stroke-width="2"
+                                                            stroke-linecap="round" stroke-linejoin="round">
+                                                            <path d="M12 20h9"></path>
+                                                            <path
+                                                                d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z">
+                                                            </path>
+                                                        </svg></button><button class="btn-mini del"
+                                                        onclick="deleteStatus(${i})"><svg width="14" height="14"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                            stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round">
+                                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                                            <path
+                                                                d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                                            </path>
+                                                        </svg></button>
+                                                </li>`;
+            }).join('');
+        }
+
+        // Round 28: Initial Version (Soft Reset)
+        function resetSettings() {
+            if
+                (confirm("カスタム設定（カテゴリ・ステータス）をすべてリセットし、初期状態に戻しますか？\n※既存のタスクデータは削除されませんが、カテゴリの割り当てなどが無効になる可能性があります。")) {
+                appData.settings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+                saveData();
+                closeSettingsModal();
+            }
+        }
+
+        // Round 28: Factory Reset (Hard Reset)
+        function factoryReset() {
+            if
+                (confirm("【警告】\nタスクを含むすべてのデータを完全に削除し、アプリを初期状態に戻します。\n削除されたデータは復元できません。\n\n本当によろしいですか？")) {
+                localStorage.removeItem(STORAGE_KEY);
+                // Also remove legacy keys if any
+                localStorage.removeItem('task_app_data_v25_ux');
+                localStorage.removeItem('task_app_data_v24_settings');
+                location.reload();
+            }
+        }
+
+        function addCategory() {
+            const v =
+                document.getElementById('newCatName').value.trim(); if (v) {
+                    appData.settings.categories.push({ id: 'c_' + Date.now(), name: v });
+                    saveData(); document.getElementById('newCatName').value = '';
+                    renderSettingsLists();
+                }
+        }
+        function startEditCategory(i) {
+            editingCatIndex = i; renderSettingsLists();
+        }
+        function saveEditCategory(i) {
+            const v =
+                document.getElementById(`editCatInput-${i}`).value.trim(); if (v) {
+                    appData.settings.categories[i].name = v; saveData();
+                } editingCatIndex = -1;
+            renderSettingsLists();
+        }
+        function deleteCategory(i) {
+            if (appData.settings.categories.length > 1 &&
+                confirm("削除してよいですか？")) {
+                appData.settings.categories.splice(i, 1); saveData();
+                renderSettingsLists();
+            }
+        }
+
+        function selectColor(c) {
+            selectedNewStatusColor = c;
+            document.getElementById('customColorPicker').value = c;
+            document.querySelectorAll('.color-opt').forEach(e =>
+                e.classList.toggle('selected', e.dataset.col === c));
+        }
+        function addStatus() {
+            const v =
+                document.getElementById('newStatusName').value.trim(); if (v) {
+                    appData.settings.statuses.push({
+                        id: 's_' + Date.now(), name: v, color:
+                            selectedNewStatusColor
+                    }); saveData();
+                    document.getElementById('newStatusName').value = '';
+                    renderSettingsLists();
+                }
+        }
+        function startEditStatus(i) {
+            editingStatusIndex = i; renderSettingsLists();
+        }
+        function saveEditStatus(i) {
+            const v =
+                document.getElementById(`editStatusName-${i}`).value.trim(); const c =
+                    document.getElementById(`editStatusColor-${i}`).value; if (v) {
+                        appData.settings.statuses[i].name = v;
+                        appData.settings.statuses[i].color =
+                            c; saveData();
+                    } editingStatusIndex = -1; renderSettingsLists();
+        }
+        function deleteStatus(i) {
+            if (appData.settings.statuses.length > 1 &&
+                confirm("削除してよいですか？")) {
+                appData.settings.statuses.splice(i, 1); saveData();
+                renderSettingsLists();
+            }
+        }
+
+    </script>
+</body>
+
+</html>

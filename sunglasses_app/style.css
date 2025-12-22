@@ -1,0 +1,417 @@
+:root {
+    --primary-color: #ff9800;
+    /* Orange */
+    --secondary-color: #ff5722;
+    /* Deep Orange */
+    --bg-color: #f2f2f2;
+    --surface-color: #f8f9fa;
+    --text-color: #333;
+    --text-muted: #666666;
+    --font-family: 'Inter', sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    height: 100vh;
+    padding: 0;
+    overflow: hidden;
+    /* Prevent scroll on body */
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 40px 20px 20px 20px;
+    /* Increased top padding */
+}
+
+header {
+    flex-shrink: 0;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+header h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.2rem;
+}
+
+header p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-top: 15px;
+    /* Increased margin */
+}
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
+    overflow: hidden;
+    /* Contain children */
+    align-items: center;
+}
+
+.left-panel {
+    flex: 0 0 320px;
+    /* Slightly wider */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    /* Align to top */
+    gap: 2rem;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 12px;
+    height: 100%;
+    /* Removed max-height to fill container */
+    border: 1px solid #e0e0e0;
+    /* Light gray border */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.right-panel {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.upload-section {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.upload-btn {
+    background-color: #ffffff;
+    color: var(--text-color);
+    padding: 1.5rem 2rem;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: 1px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    text-align: center;
+}
+
+.upload-btn .icon {
+    font-size: 2rem;
+}
+
+.upload-section.drag-over .upload-btn {
+    border-color: var(--primary-color);
+    background-color: #fff3e0;
+    /* Light orange tint */
+    transform: scale(1.02);
+}
+
+.upload-btn:hover {
+    background-color: #fff8e1;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-color);
+}
+
+.preview-area {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: #ffffff;
+    /* Pure white */
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e0e0e0;
+    padding: 20px;
+    overflow: hidden;
+}
+
+.preview-container {
+    width: 100%;
+    flex: 1;
+    /* Take remaining space */
+    min-height: 0;
+    /* Allow shrinking */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    transition: transform 0.3s ease;
+}
+
+/* Grid Layout (<= 3 images) */
+.preview-container.grid-view {
+    flex-wrap: nowrap;
+    /* Force single row */
+    justify-content: center;
+    overflow-x: auto;
+    gap: 20px;
+}
+
+.preview-container.grid-view img {
+    max-width: 30%;
+    max-height: 350px;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Carousel Layout (>= 4 images) */
+.preview-container.carousel-view {
+    flex-wrap: nowrap;
+    justify-content: center;
+}
+
+.preview-container.carousel-view img {
+    max-width: 100%;
+    max-height: 100%;
+    /* Fill available height */
+    object-fit: contain;
+    border-radius: 8px;
+    display: none;
+    /* Hidden by default, JS toggles block */
+}
+
+.thumbnail-container {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    overflow-x: auto;
+    width: 100%;
+    padding: 5px 0;
+    /* Reduced padding */
+    justify-content: center;
+    flex-shrink: 0;
+    /* Prevent shrinking */
+    max-height: 80px;
+    /* Limit height */
+}
+
+.thumbnail {
+    width: 50px;
+    /* Slightly smaller */
+    height: 50px;
+    object-fit: cover;
+    border-radius: 6px;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+}
+
+.thumbnail:hover {
+    opacity: 0.8;
+}
+
+.thumbnail.active {
+    opacity: 1;
+    border-color: var(--primary-color);
+    transform: scale(1.1);
+}
+
+.carousel-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    z-index: 20;
+}
+
+.nav-btn {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 1.2rem;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(4px);
+}
+
+.nav-btn:hover {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(187, 134, 252, 0.5);
+}
+
+#slideCounter {
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.placeholder {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--text-muted);
+    pointer-events: none;
+}
+
+.loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 30;
+    backdrop-filter: blur(4px);
+    border-radius: 12px;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-top: 4px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.hidden {
+    display: none !important;
+}
+
+.controls {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+    justify-content: center;
+}
+
+.primary-btn {
+    background: linear-gradient(135deg, #ff9800, #ff5722, #ffc107);
+    background-size: 200% 200%;
+    animation: gradientShift 5s ease infinite;
+    color: white;
+    /* White text on orange */
+    border: none;
+    padding: 1.2rem 2rem;
+    font-size: 1.1rem;
+    border-radius: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    width: 100%;
+    box-shadow: 0 4px 6px rgba(255, 152, 0, 0.3);
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.primary-btn:disabled {
+    background: #e0e0e0;
+    color: #999;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    animation: none;
+}
+
+.primary-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(255, 87, 34, 0.4);
+}
+
+footer {
+    margin-top: 20px;
+    /* Add specific margin */
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.usage-guide {
+    margin-top: auto;
+    /* Push to bottom of left panel if space allows, or just margin */
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+    /* Light gray border */
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.usage-guide h3 {
+    font-size: 1rem;
+    margin-bottom: 10px;
+    color: var(--text-color);
+}
+
+.usage-guide ol {
+    padding-left: 20px;
+    line-height: 1.6;
+}
+
+.usage-guide li {
+    margin-bottom: 5px;
+}

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sunglasses Overlay Tool</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- face-api.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <!-- JSZip -->
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script defer src="sunglasses_data.js"></script>
+    <script defer src="script.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <main>
+            <div class="left-panel">
+                <header>
+                    <h1>Sunglasses Overlay</h1>
+                    <p>AIが自動でサングラスを装着します</p>
+                </header>
+
+                <div class="upload-section">
+                    <label for="imageUpload" class="upload-btn">
+                        <span class="icon">📷</span> 画像を選択
+                    </label>
+                    <input type="file" id="imageUpload" accept="image/*" multiple>
+                </div>
+
+                <div class="controls" id="controls">
+                    <button id="downloadBtn" class="primary-btn" disabled>画像を保存</button>
+                </div>
+
+                <div class="usage-guide">
+                    <h3>使い方</h3>
+                    <ol>
+                        <li>「画像を選択」ボタンから写真をアップロード（複数可）</li>
+                        <li>AIが自動で顔を認識し、サングラスを装着します</li>
+                        <li>プレビューで確認し、「画像を保存」ボタンでダウンロード</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="right-panel">
+                <div class="preview-area">
+                    <div id="loading" class="loading hidden">
+                        <div class="spinner"></div>
+                        <p>AI解析中...</p>
+                    </div>
+
+                    <div id="previewContainer" class="preview-container">
+                        <!-- Images will be injected here -->
+                        <div id="placeholder" class="placeholder">
+                            <p>ここに画像が表示されます</p>
+                        </div>
+                    </div>
+
+                    <div id="carouselControls" class="carousel-controls hidden">
+                        <button id="prevBtn" class="nav-btn">❮</button>
+                        <span id="slideCounter">1 / 5</span>
+                        <button id="nextBtn" class="nav-btn">❯</button>
+                    </div>
+
+                    <div id="thumbnailContainer" class="thumbnail-container hidden">
+                        <!-- Thumbnails injected here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 Michi Design</p>
+        </footer>
+    </div>
+</body>
+
+</html>

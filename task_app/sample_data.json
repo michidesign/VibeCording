@@ -1,0 +1,168 @@
+{
+    "settings": {
+        "categories": [
+            {
+                "id": "none",
+                "name": "未設定"
+            },
+            {
+                "id": "client_a",
+                "name": "A社: コーポレート刷新"
+            },
+            {
+                "id": "client_b",
+                "name": "B社: LP制作"
+            },
+            {
+                "id": "new_biz",
+                "name": "新規提案・営業"
+            },
+            {
+                "id": "internal",
+                "name": "社内業務・日報"
+            },
+            {
+                "id": "partners",
+                "name": "パートナー管理"
+            }
+        ],
+        "statuses": [
+            {
+                "id": "todo",
+                "name": "未着手",
+                "color": "#D44C47"
+            },
+            {
+                "id": "wip",
+                "name": "作業中",
+                "color": "#D9730D"
+            },
+            {
+                "id": "internal_check",
+                "name": "社内確認中",
+                "color": "#2383E2"
+            },
+            {
+                "id": "client_check",
+                "name": "クライアント確認中",
+                "color": "#9C27B0"
+            },
+            {
+                "id": "fix",
+                "name": "修正対応中",
+                "color": "#E91E63"
+            },
+            {
+                "id": "done",
+                "name": "完了",
+                "color": "#45B06C"
+            }
+        ]
+    },
+    "tasks": [
+        {
+            "id": "wd_1",
+            "name": "A社: 定例MTG資料作成",
+            "category": "client_a",
+            "status": "wip",
+            "deadline": "2025/03/10",
+            "memo": "前回の議事録を確認し、進捗報告スライドをまとめる。\nGoogle Slidesの共有リンクをチャットに貼ること。",
+            "createdAt": "2025-03-01T10:00:00.000Z",
+            "updatedAt": "2025-03-05T14:30:00.000Z",
+            "isDeleted": false,
+            "isArchived": false,
+            "subtasks": [
+                {
+                    "id": "s_wd1",
+                    "name": "WBSの更新",
+                    "isArchived": true,
+                    "status": "done",
+                    "deadline": "",
+                    "memo": ""
+                },
+                {
+                    "id": "s_wd2",
+                    "name": "課題管理表の更新",
+                    "isArchived": false,
+                    "status": "wip",
+                    "deadline": "",
+                    "memo": ""
+                },
+                {
+                    "id": "s_wd3",
+                    "name": "アジェンダ作成",
+                    "isArchived": false,
+                    "status": "todo",
+                    "deadline": "2025/03/09",
+                    "memo": ""
+                }
+            ]
+        },
+        {
+            "id": "wd_2",
+            "name": "B社: LP初稿ワイヤーフレーム提出",
+            "category": "client_b",
+            "status": "client_check",
+            "deadline": "2025/03/15",
+            "memo": "XDのリンクを送付済み。\nフィードバック期限は来週水曜日まで設定。",
+            "createdAt": "2025-03-03T09:00:00.000Z",
+            "updatedAt": "2025-03-06T11:00:00.000Z",
+            "isDeleted": false,
+            "isArchived": false,
+            "subtasks": []
+        },
+        {
+            "id": "wd_3",
+            "name": "パートナー請求書処理 (2月分)",
+            "category": "partners",
+            "status": "todo",
+            "deadline": "2025/03/05",
+            "memo": "デザイナーSさんとエンジニアKさんの分。\nクラウドサインを確認する。",
+            "createdAt": "2025-02-28T10:00:00.000Z",
+            "updatedAt": "2025-03-01T11:00:00.000Z",
+            "isDeleted": false,
+            "isArchived": false,
+            "subtasks": []
+        },
+        {
+            "id": "wd_4",
+            "name": "Cクリニック様 新規お問い合わせ対応",
+            "category": "new_biz",
+            "status": "done",
+            "deadline": "2025/03/01",
+            "memo": "初回ヒアリング完了。\n予算感: 100~200万、納期: 6月公開希望。",
+            "createdAt": "2025-02-28T15:00:00.000Z",
+            "updatedAt": "2025-03-01T16:00:00.000Z",
+            "isDeleted": false,
+            "isArchived": true,
+            "archivedAt": "2025-03-01T16:00:00.000Z",
+            "subtasks": []
+        },
+        {
+            "id": "wd_5",
+            "name": "週報提出",
+            "category": "internal",
+            "status": "todo",
+            "deadline": "2025/03/09",
+            "memo": "今週の稼働実績と来週の予定を入力。",
+            "createdAt": "2025-03-05T09:00:00.000Z",
+            "updatedAt": "2025-03-05T09:00:00.000Z",
+            "isDeleted": false,
+            "isArchived": false,
+            "subtasks": []
+        },
+        {
+            "id": "wd_6",
+            "name": "オウンドメディア記事構成案作成",
+            "category": "client_a",
+            "status": "fix",
+            "deadline": "2025/03/12",
+            "memo": "先方FB反映。\nSEOキーワード「DX人材」をもう少し盛り込むこと。",
+            "createdAt": "2025-03-04T13:00:00.000Z",
+            "updatedAt": "2025-03-06T10:00:00.000Z",
+            "isDeleted": false,
+            "isArchived": false,
+            "subtasks": []
+        }
+    ]
+}

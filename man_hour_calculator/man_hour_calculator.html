@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工数電卓</title>
+    <style>
+        :root {
+            /* Color Palette */
+            --primary: #6366f1;
+            /* Indigo-500 */
+            --primary-hover: #4f46e5;
+            /* Indigo-600 */
+            --bg-body: #f1f5f9;
+            /* Slate-100 */
+            --bg-card: #ffffff;
+            --bg-sidebar: #1e293b;
+            /* Slate-800 */
+            --text-main: #334155;
+            /* Slate-700 */
+            --text-light: #94a3b8;
+            /* Slate-400 */
+            --text-sidebar: #e2e8f0;
+            /* Slate-200 */
+            --border: #e2e8f0;
+            --input-bg: #f8fafc;
+
+            --radius-outer: 16px;
+            --radius-inner: 8px;
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans JP", Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .app-container {
+            background-color: var(--bg-card);
+            border-radius: var(--radius-outer);
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 900px;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            overflow: hidden;
+            min-height: 500px;
+            /* Ensure substantive height */
+        }
+
+        /* --- Sidebar (Left Panel) --- */
+        .sidebar {
+            background-color: var(--bg-sidebar);
+            color: var(--text-sidebar);
+            padding: 32px 24px;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .app-header {
+            margin-bottom: 32px;
+        }
+
+        .app-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .app-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+
+        .settings-section {
+            margin-top: auto;
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: var(--radius-inner);
+        }
+
+        .settings-header {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-light);
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        .setting-item {
+            margin-bottom: 20px;
+        }
+
+        .setting-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .setting-item label {
+            display: block;
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+            color: var(--text-sidebar);
+        }
+
+        .setting-input-wrapper {
+            position: relative;
+        }
+
+        .setting-input-wrapper input {
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .setting-input-wrapper input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .reset-wrapper {
+            margin-top: 30px;
+        }
+
+        .btn-reset {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-light);
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-reset:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* --- Main Content (Right Panel) --- */
+        .main-panel {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .calculator-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .calc-row {
+            display: grid;
+            gap: 20px;
+        }
+
+        .calc-row.cols-2 {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+
+        .input-box {
+            position: relative;
+            background-color: var(--input-bg);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-inner);
+            transition: all 0.2s;
+        }
+
+        .input-box:focus-within {
+            border-color: var(--primary);
+            background-color: #fff;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .input-box input {
+            width: 100%;
+            padding: 14px 16px;
+            padding-right: 50px;
+            border: none;
+            background: transparent;
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: var(--text-main);
+            outline: none;
+        }
+
+        .input-box input::placeholder {
+            color: #cbd5e1;
+        }
+
+        .input-box .unit {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            font-size: 0.85rem;
+            font-weight: 500;
+            pointer-events: none;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding-left: 4px;
+        }
+
+        .accent-bar {
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary), #a855f7);
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 768px) {
+            .app-container {
+                grid-template-columns: 1fr;
+                height: auto;
+                max-height: none;
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+            body {
+                padding: 0;
+                background-color: var(--bg-card);
+            }
+
+            .sidebar {
+                padding: 24px;
+            }
+
+            .main-panel {
+                padding: 24px;
+            }
+
+            .app-container {
+                display: flex;
+                flex-direction: column-reverse;
+                /* Put inputs on top on mobile? No, keeping layout consistent is usually better, but let's see. 
+                                                   Actually user wants settings distinguished.
+                                                   Standard mobile flow: Header -> Inputs -> Settings at bottom. */
+                flex-direction: column;
+            }
+
+            /* Since we want optimized layout, let's keep inputs visible first */
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-container">
+        <!-- Colorful accent bar at top -->
+        <div class="accent-bar"></div>
+
+        <!-- Left Panel: Sidebar -->
+        <aside class="sidebar">
+            <div class="app-header">
+                <h1 class="app-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" class="feather feather-cpu">
+                        <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+                        <rect x="9" y="9" width="6" height="6"></rect>
+                        <line x1="9" y1="1" x2="9" y2="4"></line>
+                        <line x1="15" y1="1" x2="15" y2="4"></line>
+                        <line x1="9" y1="20" x2="9" y2="23"></line>
+                        <line x1="15" y1="20" x2="15" y2="23"></line>
+                        <line x1="20" y1="9" x2="23" y2="9"></line>
+                        <line x1="20" y1="14" x2="23" y2="14"></line>
+                        <line x1="1" y1="9" x2="4" y2="9"></line>
+                        <line x1="1" y1="14" x2="4" y2="14"></line>
+                    </svg>
+                    工数電卓
+                </h1>
+                <p class="app-subtitle">
+                    時間を入力すると、人日・人月へ<br>リアルタイムに換算します。<br>
+                    どの項目からでも入力可能です。
+                </p>
+            </div>
+
+            <div class="settings-section">
+                <div class="settings-header">基準設定 (CONFIG)</div>
+                <div class="setting-item">
+                    <label for="hours-per-day">1人日 (Hours/Day)</label>
+                    <div class="setting-input-wrapper">
+                        <input type="number" id="hours-per-day" value="8" min="0">
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <label for="days-per-month">1人月 (Days/Month)</label>
+                    <div class="setting-input-wrapper">
+                        <input type="number" id="days-per-month" value="20" min="0">
+                    </div>
+                </div>
+            </div>
+
+            <div class="reset-wrapper">
+                <button id="clear-btn" class="btn-reset">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 6h18"></path>
+                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                    </svg>
+                    値をすべてクリア
+                </button>
+            </div>
+        </aside>
+
+        <!-- Right Panel: Calculator -->
+        <main class="main-panel">
+            <div class="calculator-grid">
+
+                <!-- Time Inputs Row -->
+                <div class="calc-row cols-2">
+                    <div class="input-group">
+                        <label for="hours-decimal">時間 (h)</label>
+                        <div class="input-box">
+                            <input type="text" id="hours-decimal" placeholder="1.5" autocomplete="off">
+                            <span class="unit">h</span>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="hours-colon">時間 (h:mm)</label>
+                        <div class="input-box">
+                            <input type="text" id="hours-colon" placeholder="1:30" autocomplete="off">
+                            <span class="unit">h:mm</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Man-Day Input -->
+                <div class="input-group">
+                    <label for="man-days">人日 (Man-Day)</label>
+                    <div class="input-box">
+                        <input type="text" id="man-days" placeholder="0" autocomplete="off">
+                        <span class="unit">人日</span>
+                    </div>
+                </div>
+
+                <!-- Man-Month Input -->
+                <div class="input-group">
+                    <label for="man-months">人月 (Man-Month)</label>
+                    <div class="input-box">
+                        <input type="text" id="man-months" placeholder="0" autocomplete="off">
+                        <span class="unit">人月</span>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Elements
+            const inputs = {
+                hoursDecimal: document.getElementById('hours-decimal'), // 1.5
+                hoursColon: document.getElementById('hours-colon'),     // 1:30
+                manDays: document.getElementById('man-days'),
+                manMonths: document.getElementById('man-months')
+            };
+
+            const settings = {
+                hoursPerDay: document.getElementById('hours-per-day'),
+                daysPerMonth: document.getElementById('days-per-month')
+            };
+
+            const clearBtn = document.getElementById('clear-btn');
+
+            // Constants & State
+            let currentHours = 0;
+
+            // --- Helper Functions ---
+
+            // Parse time string to hours (float)
+            function parseInputToHours(value, isColonFormat = false) {
+                if (!value) return 0;
+
+                if (isColonFormat) {
+                    if (value.includes(':')) {
+                        const parts = value.split(':');
+                        const h = parseFloat(parts[0]) || 0;
+                        const m = parseFloat(parts[1]) || 0;
+                        return h + (m / 60);
+                    }
+                    return parseFloat(value) || 0;
+                }
+
+                return parseFloat(value) || 0;
+            }
+
+            // Format hours to string
+            function formatNumber(num) {
+                if (num === 0) return '';
+                // 4 decimal places max
+                return parseFloat(num.toFixed(4)).toString();
+            }
+
+            // Format hours to H:MM
+            function formatToColon(hoursVal) {
+                if (hoursVal === 0) return '';
+
+                const h = Math.floor(hoursVal);
+                const m = Math.round((hoursVal - h) * 60);
+
+                if (m === 60) {
+                    return (h + 1) + ":00";
+                }
+
+                const mStr = m.toString().padStart(2, '0');
+                return h + ":" + mStr;
+            }
+
+            // --- Calculation Core ---
+
+            function updateAllFields(sourceId, valueStr) {
+                const hoursPerDay = parseFloat(settings.hoursPerDay.value) || 8;
+                const daysPerMonth = parseFloat(settings.daysPerMonth.value) || 20;
+
+                if (hoursPerDay <= 0 || daysPerMonth <= 0) return;
+
+                let totalHours = 0;
+                let val = 0;
+
+                // Calculate Base (Total Hours) based on source
+                if (sourceId === 'hours-colon') {
+                    totalHours = parseInputToHours(valueStr, true);
+                } else if (sourceId === 'hours-decimal') {
+                    totalHours = parseInputToHours(valueStr, false);
+                } else {
+                    val = parseFloat(valueStr) || 0;
+                    switch (sourceId) {
+                        case 'man-days':
+                            totalHours = val * hoursPerDay;
+                            break;
+                        case 'man-months':
+                            totalHours = val * daysPerMonth * hoursPerDay;
+                            break;
+                    }
+                }
+
+                currentHours = totalHours;
+                renderFields(sourceId);
+            }
+
+            function renderFields(excludeId = null) {
+                const hoursPerDay = parseFloat(settings.hoursPerDay.value) || 8;
+                const daysPerMonth = parseFloat(settings.daysPerMonth.value) || 20;
+
+                if (currentHours === 0) {
+                    if (excludeId) {
+                        Object.keys(inputs).forEach(key => {
+                            if (inputs[key].id !== excludeId) inputs[key].value = '';
+                        });
+                    } else {
+                        Object.values(inputs).forEach(el => el.value = '');
+                    }
+                    return;
+                }
+
+                // Calculate values
+                const valHours = currentHours;
+                const valManDays = currentHours / hoursPerDay;
+                const valManMonths = valManDays / daysPerMonth;
+
+                // Update DOM
+                if (excludeId !== 'hours-decimal') inputs.hoursDecimal.value = formatNumber(valHours);
+                if (excludeId !== 'hours-colon') inputs.hoursColon.value = formatToColon(valHours);
+                if (excludeId !== 'man-days') inputs.manDays.value = formatNumber(valManDays);
+                if (excludeId !== 'man-months') inputs.manMonths.value = formatNumber(valManMonths);
+            }
+
+            // --- Event Listeners ---
+
+            Object.values(inputs).forEach(input => {
+                input.addEventListener('input', (e) => {
+                    updateAllFields(e.target.id, e.target.value);
+                });
+            });
+
+            Object.values(settings).forEach(setting => {
+                setting.addEventListener('input', () => {
+                    renderFields();
+                });
+            });
+
+            clearBtn.addEventListener('click', () => {
+                currentHours = 0;
+                Object.values(inputs).forEach(input => input.value = '');
+            });
+        });
+    </script>
+</body>
+
+</html>

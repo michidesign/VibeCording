@@ -1,0 +1,342 @@
+{
+  "settings": {
+    "categories": [
+      {
+        "id": "none",
+        "name": "未設定"
+      },
+      {
+        "id": "customer",
+        "name": "顧客案件"
+      },
+      {
+        "id": "office",
+        "name": "社内業務"
+      }
+    ],
+    "statuses": [
+      {
+        "id": "not_started",
+        "name": "未着手",
+        "color": "#999999"
+      },
+      {
+        "id": "requires_action",
+        "name": "要対応",
+        "color": "#D44C47"
+      },
+      {
+        "id": "waiting",
+        "name": "待ち",
+        "color": "#2383E2"
+      }
+    ]
+  },
+  "tasks": [
+    {
+      "id": "1765771316811",
+      "name": "派遣【元】勉強会",
+      "status": "requires_action",
+      "category": "none",
+      "deadline": "",
+      "memo": "",
+      "isArchived": true,
+      "isDeleted": false,
+      "createdAt": "2025-12-15T04:01:56.811Z",
+      "updatedAt": "2025-12-16T02:40:52.765Z",
+      "archivedAt": "2025-12-16T02:40:52.765Z",
+      "subtasks": [
+        {
+          "id": "1765773690682",
+          "name": "エクセル記入",
+          "status": "requires_action",
+          "isArchived": true,
+          "deadline": "12/15",
+          "memo": ""
+        },
+        {
+          "id": "1765773605912",
+          "name": "12/16 10:00~　開催",
+          "status": "requires_action",
+          "isArchived": true,
+          "deadline": "12/16",
+          "memo": "12月16日（火）10:00～11:30\n\"＜会議URL＞https://teams.microsoft.com/meet/4329978858176?p=ZQETbfixrDsKhfGl3p\n＜会議ID＞432 997 885 817 6\n＜パスコード＞9GS7Nb2d\"\n\nhttps://transcosmos-dm.slack.com/archives/D08HGJH8ZCM/p1765774213953649\n"
+        },
+        {
+          "id": "1765773586955",
+          "name": "廣田さん返信",
+          "status": "not_started",
+          "isArchived": true,
+          "deadline": "",
+          "memo": ""
+        }
+      ]
+    },
+    {
+      "id": "1765328321446",
+      "name": "Lemino　デザイン　コンテンツガイド",
+      "status": "requires_action",
+      "category": "customer",
+      "deadline": "12/22",
+      "memo": "https://transcosmos-dm.slack.com/archives/C0A03CSVARL/p1764641078737309?thread_ts=1764288286.906879&cid=C0A03CSVARL\n\n▼スケジュール\n12/2～12/22\n∟初稿：12/2-3（監修が入るため、作品が載っているページのみ急ぎ作成する必要あり）\n∟修正①：12/9-10\n∟修正②：12/15-16\n∟修正③：12/19-22\n∟納品：12/22\n\n12/8：裏表紙以外のデザイン社内確認・先方２回目構成案ご提供\n12/9；デザイン修正対応\n12/10：社内確認・先方提出\n12/11-12/12：先方確認",
+      "isArchived": false,
+      "isDeleted": false,
+      "createdAt": "2025-12-10T00:58:41.446Z",
+      "updatedAt": "2025-12-16T04:20:43.543Z",
+      "archivedAt": "",
+      "subtasks": [
+        {
+          "id": "1765771518371",
+          "name": "修正",
+          "status": "waiting",
+          "isArchived": false,
+          "deadline": "12/15",
+          "memo": "https://transcosmos-dm.slack.com/archives/C0A03CSVARL/p1765768310800779?thread_ts=1764288286.906879&cid=C0A03CSVARL"
+        }
+      ]
+    },
+    {
+      "id": "1765849710566",
+      "name": "収支反映　コープデリ",
+      "status": "requires_action",
+      "category": "office",
+      "deadline": "12/17",
+      "memo": "",
+      "isArchived": false,
+      "isDeleted": false,
+      "createdAt": "2025-12-16T01:48:30.566Z",
+      "updatedAt": "2025-12-16T01:48:30.566Z",
+      "archivedAt": "",
+      "subtasks": []
+    },
+    {
+      "id": "1765849423865",
+      "name": " デジタルマーケティングマフィアドリル：12月第2週",
+      "status": "requires_action",
+      "category": "office",
+      "deadline": "2025年12月16日(火) 18:00",
+      "memo": "https://transcosmos-dm.slack.com/archives/D047X67JY3D/p1765847915475679",
+      "isArchived": true,
+      "isDeleted": false,
+      "createdAt": "2025-12-16T01:43:43.865Z",
+      "updatedAt": "2025-12-16T04:08:13.292Z",
+      "archivedAt": "2025-12-16T04:08:13.292Z",
+      "subtasks": []
+    },
+    {
+      "id": "1765851735924",
+      "name": "AdobeとFigma利用状況に関するアンケート",
+      "status": "requires_action",
+      "category": "office",
+      "deadline": "12/24",
+      "memo": "https://transcosmos-dm.slack.com/archives/C0A2SATULCC/p1765851163198779",
+      "isArchived": true,
+      "isDeleted": false,
+      "createdAt": "2025-12-16T02:22:15.924Z",
+      "updatedAt": "2025-12-16T02:42:50.531Z",
+      "archivedAt": "2025-12-16T02:42:50.531Z",
+      "subtasks": []
+    },
+    {
+      "id": "1765844634432",
+      "name": "Figma関連確認",
+      "status": "not_started",
+      "category": "office",
+      "deadline": "",
+      "memo": "【告知】Figma新契約へ。標準ツールとして、全員で利用しやすく。\nhttps://transcosmos-dm.slack.com/archives/CNK77T9J5/p1765843500807639",
+      "isArchived": true,
+      "isDeleted": false,
+      "createdAt": "2025-12-16T00:23:54.431Z",
+      "updatedAt": "2025-12-16T01:44:01.982Z",
+      "archivedAt": "2025-12-16T01:44:01.982Z",
+      "subtasks": []
+    },
+    {
+      "id": "1765443979212",
+      "name": "Obsidian整備",
+      "status": "not_started",
+      "category": "office",
+      "deadline": "",
+      "memo": "",
+      "isArchived": false,
+      "isDeleted": false,
+      "createdAt": "2025-12-11T09:06:19.212Z",
+      "updatedAt": "2025-12-12T02:50:02.669Z",
+      "archivedAt": "",
+      "subtasks": []
+    },
+    {
+      "id": "1765329157015",
+      "name": "ヴィアトリス",
+      "status": "waiting",
+      "category": "customer",
+      "deadline": "",
+      "memo": "■開発環境\nPRE-RELEASE\nhttps://dev21-preview.viatris-e-channel.com/viatris/pharma-history/\nRELEASE\nhttps://dev21.viatris-e-channel.com/useful-information/\n■本番環境(開発環境確認後の対応)\nPRE-RELEASE\nhttps://preview.viatris-e-channel.com/\n■Basic認証\nID\nvec1125\nPASS\ng5B8~3^D&r(a ",
+      "isArchived": false,
+      "isDeleted": false,
+      "createdAt": "2025-12-10T01:12:37.015Z",
+      "updatedAt": "2025-12-10T09:14:41.102Z",
+      "archivedAt": "",
+      "subtasks": []
+    },
+    {
+      "id": "1765328366763",
+      "name": "下期目標設定",
+      "status": "in_progress",
+      "category": "office",
+      "deadline": "",
+      "memo": "（全体案内）https://transcosmos-dm.slack.com/archives/C0165SJBKPT/p1760935152079329 \n（谷田さん案内）https://transcosmos-dm.slack.com/archives/C063G21S2T1/p1761536053228639 \n（canvas）https://transcosmos-dm.slack.com/docs/TNTFBA8R5/F09N23WS2S1",
+      "isArchived": false,
+      "isDeleted": false,
+      "createdAt": "2025-12-10T00:59:26.763Z",
+      "updatedAt": "2025-12-10T01:00:53.924Z",
+      "archivedAt": "",
+      "subtasks": [
+        {
+          "id": "1765328445584",
+          "name": "今後の状況踏まえて谷田さんと目標見直しの相談必要",
+          "status": "not_started",
+          "isArchived": false,
+          "deadline": "12/23",
+          "memo": ""
+        }
+      ]
+    },
+    {
+      "id": "1765328353531",
+      "name": "基幹業務システム権限申請　契約（委任･請負等）",
+      "status": "waiting",
+      "category": "office",
+      "deadline": "",
+      "memo": "12/8に申請済",
+      "isArchived": true,
+      "isDeleted": false,
+      "createdAt": "2025-12-10T00:59:13.530Z",
+      "updatedAt": "2025-12-15T04:30:16.718Z",
+      "archivedAt": "2025-12-15T04:30:16.718Z",
+      "subtasks": [
+        {
+          "id": "1765771594148",
+          "name": "確認返信",
+          "status": "not_started",
+          "isArchived": true,
+          "deadline": "12/15",
+          "memo": ""
+        }
+      ]
+    },
+    {
+      "id": "1765771559279",
+      "name": "健康診断　精密検査予約",
+      "status": "requires_action",
+      "category": "none",
+      "deadline": "",
+      "memo": "",
+      "isArchived": true,
+      "isDeleted": false,
+      "createdAt": "2025-12-15T04:05:59.278Z",
+      "updatedAt": "2025-12-15T10:42:16.786Z",
+      "archivedAt": "2025-12-15T10:42:16.786Z",
+      "subtasks": []
+    },
+    {
+      "id": "1765771331192",
+      "name": "下平さん　相談　15:30",
+      "status": "requires_action",
+      "category": "none",
+      "deadline": "",
+      "memo": "",
+      "isArchived": true,
+      "isDeleted": false,
+      "createdAt": "2025-12-15T04:02:11.192Z",
+      "updatedAt": "2025-12-15T10:42:18.458Z",
+      "archivedAt": "2025-12-15T10:42:18.458Z",
+      "subtasks": []
+    },
+    {
+      "id": "1765771302730",
+      "name": "契約管理　確認返信",
+      "status": "not_started",
+      "category": "none",
+      "deadline": "",
+      "memo": "",
+      "isArchived": false,
+      "isDeleted": true,
+      "createdAt": "2025-12-15T04:01:42.730Z",
+      "updatedAt": "2025-12-15T04:01:42.730Z",
+      "archivedAt": "",
+      "subtasks": []
+    },
+    {
+      "id": "1765439883832",
+      "name": "3G環境整備　不足項目検証",
+      "status": "waiting",
+      "category": "office",
+      "deadline": "12/12",
+      "memo": "https://transcosmos-dm.slack.com/docs/TNTFBA8R5/F0A2ZPZNRNG",
+      "isArchived": true,
+      "isDeleted": false,
+      "createdAt": "2025-12-11T07:58:03.832Z",
+      "updatedAt": "2025-12-15T04:01:26.697Z",
+      "archivedAt": "2025-12-15T04:01:26.697Z",
+      "subtasks": []
+    },
+    {
+      "id": "1765337189673",
+      "name": "ドコモ　工数報告",
+      "status": "requires_action",
+      "category": "office",
+      "deadline": "12/11（水）AM中",
+      "memo": "https://transcosmos-dm.slack.com/archives/C0A03CSVARL/p1765336529044129?thread_ts=1764655212.885289&cid=C0A03CSVARL",
+      "isArchived": true,
+      "isDeleted": false,
+      "createdAt": "2025-12-10T03:26:29.672Z",
+      "updatedAt": "2025-12-11T01:42:36.707Z",
+      "archivedAt": "2025-12-11T01:42:36.708Z",
+      "subtasks": []
+    },
+    {
+      "id": "1765357652959",
+      "name": "セミファン#5　",
+      "status": "requires_action",
+      "category": "office",
+      "deadline": "12/11 17:00",
+      "memo": "https://transcosmos-dm.slack.com/archives/CQKD3HC12/p1765353126484579",
+      "isArchived": true,
+      "isDeleted": false,
+      "createdAt": "2025-12-10T09:07:32.959Z",
+      "updatedAt": "2025-12-11T09:06:08.012Z",
+      "archivedAt": "2025-12-11T09:06:08.012Z",
+      "subtasks": []
+    },
+    {
+      "id": "1765329274615",
+      "name": "収支更新　コープデリ（毎週水曜日）",
+      "status": "not_started",
+      "category": "office",
+      "deadline": "12/10",
+      "memo": "",
+      "isArchived": true,
+      "isDeleted": false,
+      "createdAt": "2025-12-10T01:14:34.615Z",
+      "updatedAt": "2025-12-10T08:46:38.844Z",
+      "archivedAt": "2025-12-10T08:46:38.844Z",
+      "subtasks": []
+    },
+    {
+      "id": "1765328337660",
+      "name": "Lemino　デザイン　A4両面デザイン注釈変更",
+      "status": "in_progress",
+      "category": "customer",
+      "deadline": "12/8",
+      "memo": "▼スケジュール\n12月2日（火） ：先方から修正案連携\n12月3日（水）～4日（木）：デザイン修正・先方提出\n12月5日（金） ：先方確認、デザイン修正・先方提出\n12月8日（月） ：完成データ納品（この日に修正も発生するかも）\n12月10日（水）：使用開始（12/9-10で修正も発生するかも）",
+      "isArchived": true,
+      "isDeleted": false,
+      "createdAt": "2025-12-10T00:58:57.660Z",
+      "updatedAt": "2025-12-10T01:13:38.908Z",
+      "archivedAt": "2025-12-10T01:13:38.908Z",
+      "subtasks": []
+    }
+  ],
+  "globalMemo": ""
+}
