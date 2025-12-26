@@ -1,0 +1,3161 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Tasks</title>
+    <style>
+        :root {
+            /* Palette: Notion-like / Minimalist */
+            --bg-body: #F7F7F5;
+            --bg-card: #FFFFFF;
+            --text-main: #37352F;
+            --text-sub: #787774;
+            --border-color: #E6E6E6;
+
+            --accent-blue: #2383E2;
+            --accent-green: #45B06C;
+            --accent-red: #D44C47;
+            --accent-orange: #D9730D;
+            --accent-gray: #999999;
+            --accent-black: #333333;
+
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+            /* Round 49: Increased Radius */
+            --radius-sm: 8px;
+            /* Buttons, Inputs */
+            --radius-md: 20px;
+            /* Cards, Small Containers */
+            --radius-lg: 32px;
+            /* Modals, Large Containers */
+            --radius: var(--radius-md);
+            /* Default Backup */
+
+            --bg-sidebar: #202020;
+            /* Round 30: Defined for Overlay */
+
+            /* Round 27: Wider Sidebar */
+            --sidebar-width: 380px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Hiragino Kaku Gothic ProN", sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6;
+            font-size: 16px;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* LAYOUT STRUCTURE */
+        .layout-wrapper {
+            display: grid;
+            grid-template-columns: var(--sidebar-width) 5px 1fr;
+            min-height: 100vh;
+            gap: 0;
+            align-items: start;
+        }
+
+        /* LEFT SIDEBAR */
+        .sidebar {
+            background-color: #202020;
+            color: #FFFFFF;
+            /* Round 29: Reduced Padding and Gap for Compactness */
+            padding: 20px 20px;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            overflow-y: auto;
+            scrollbar-width: none;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            z-index: 10;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* RESIZER HANDLE */
+        .resizer {
+            width: 5px;
+            cursor: col-resize;
+            background: transparent;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            transition: background 0.2s;
+        }
+
+        .resizer:hover,
+        .resizer.resizing {
+            background: rgba(35, 131, 226, 0.5);
+        }
+
+        /* RIGHT CONTENT */
+        .content {
+            min-width: 0;
+            padding: 32px 40px;
+
+            /* Wider for 3 columns */
+            display: flex;
+            flex-direction: row;
+            gap: 24px;
+            align-items: flex-start;
+        }
+
+        /* Round 53: 3-Column Layout */
+        .main-tasks-area {
+            flex: 1;
+            min-width: 0;
+            /* Prevent flex overflow */
+            display: flex;
+            flex-direction: column;
+            gap: 0px;
+            /* Moved gap from .content flex to here if needed, but task list handles gaps */
+        }
+
+        .task-list {
+            /* Reset internal width constraints if any */
+            width: 100%;
+        }
+
+        .right-memo-column {
+            width: 320px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 32px;
+            /* Adjust based on padding */
+        }
+
+        /* Global Memo Styling Update */
+        .global-memo-area {
+            width: 100%;
+            margin-bottom: 0px;
+            /* Remove old margin */
+            background: #FAFAFA;
+            border: 1px solid #EEE;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .global-memo-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        /* Sidebar Elements */
+        h1 {
+            font-size: 28px;
+            /* Slightly Reduced */
+            font-weight: 800;
+            color: #FFFFFF;
+            margin-bottom: 0px;
+            letter-spacing: -0.5px;
+            cursor: pointer;
+        }
+
+        h1:hover {
+            opacity: 0.9;
+        }
+
+        .nav-group {
+            display: flex;
+            /* Round 43: Horizontal Scroll Layout */
+            flex-wrap: nowrap;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 6px;
+            border-radius: var(--radius-sm);
+            /* Scroll Logic */
+            overflow-x: auto;
+            scrollbar-width: none;
+            /* Firefox */
+            -ms-overflow-style: none;
+            /* IE/Edge */
+        }
+
+        .nav-group::-webkit-scrollbar {
+            display: none;
+            /* Chrome/Safari */
+        }
+
+        .nav-btn {
+            border: none;
+            background: transparent;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 500;
+            color: #AAA;
+            cursor: pointer;
+            transition: all 0.2s;
+            /* Round 43: Natural Width for Scrolling */
+            flex: 0 0 auto;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #FFF;
+        }
+
+        .nav-btn.active {
+            background: #E0E0E0;
+            color: #222;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-btn.active.btn-trash-mode {
+            color: var(--accent-red);
+        }
+
+        /* Round 28: Unified Section Labels in Sidebar */
+        .section-label {
+            font-weight: 500;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        /* INPUT AREA */
+        .input-card {
+            background: #FFFFFF;
+            /* Round 29: Reduced Padding */
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            margin-bottom: 0;
+        }
+
+        /* Round 27: Styled Labels like Footer */
+        .input-group-label {
+            font-size: 11px;
+            color: #888;
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: block;
+            margin-left: 2px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .input-row-main {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            /* Reduced from 12px */
+            flex-direction: column;
+        }
+
+        .input-row-details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            /* Reduced from 10px */
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #AAA;
+            font-style: normal;
+        }
+
+        .form-control {
+            border: 1px solid #DDD;
+            background: #FAFAFA;
+            border-radius: 4px;
+            padding: 0 10px;
+            font-size: 14px;
+            font-family: inherit;
+            width: 100%;
+            height: 36px;
+            line-height: normal;
+            color: var(--text-main);
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            background: #FFF;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 2px rgba(35, 131, 226, 0.1);
+        }
+
+        textarea.form-control {
+            height: auto;
+            padding: 8px 10px;
+            min-height: 40px;
+        }
+
+        /* Round 38: Disabled Area Utility */
+        .disabled-area {
+            opacity: 0.4;
+            pointer-events: none;
+            filter: grayscale(100%);
+        }
+
+        select.badge-select {
+            appearance: none;
+            cursor: pointer;
+            font-weight: 600;
+            text-align: left;
+            text-align-last: center;
+            border: 1px solid #DDD;
+            border-radius: 6px;
+            padding: 0 12px;
+            font-size: 13px;
+            height: 36px;
+            background-color: #FAFAFA;
+            width: 100%;
+            color: var(--text-main);
+            font-family: inherit;
+        }
+
+        select.badge-select:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            background: #FFF;
+        }
+
+        /* Round 27: Hybrid Deadline Wrapper */
+        .deadline-wrapper {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .date-picker-icon {
+            width: 32px;
+            height: 36px;
+            border: 1px solid #DDD;
+            background: #FAFAFA;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+        }
+
+        input[type="date"].date-picker-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+
+        .btn-add {
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0 20px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            transition: opacity 0.2s;
+            height: 48px;
+            font-size: 15px;
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        .btn-add:hover {
+            opacity: 0.9;
+        }
+
+        /* TASK LIST */
+        ul.task-list {
+            list-style: none;
+            /* Round 40: Reset padding */
+            padding-left: 0;
+        }
+
+        .task-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            margin-bottom: 12px;
+            padding: 16px;
+            /* Increased to 16px as requested */
+            /* Round 30: Reduced padding (was 20px) to tighten vertical space */
+            box-shadow: var(--shadow-sm);
+            transition: box-shadow 0.2s, transform 0.2s;
+            display: flex;
+            flex-direction: row;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .task-card:hover {
+            box-shadow: var(--shadow-md);
+            z-index: 1;
+        }
+
+        .task-card.dragging {
+            opacity: 0.6;
+            transform: scale(0.99);
+            box-shadow: none;
+            background: #F9F9F9;
+        }
+
+        .task-card.archived {
+            opacity: 0.7;
+            background: #FAFAFA;
+            border-left: 5px solid #CCC !important;
+        }
+
+        .task-card.deleted {
+            border: 1px solid var(--accent-red);
+            background: #FFF5F5;
+        }
+
+        .drag-handle {
+            color: #DDD;
+            cursor: grab;
+            padding-top: 6px;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .drag-handle:hover {
+            color: #999;
+        }
+
+        .task-content-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .task-title-input {
+            width: 100%;
+            font-size: 18px;
+            font-weight: 600;
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--text-main);
+            padding: 4px;
+            border-radius: var(--radius-sm);
+        }
+
+        .task-title-input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.8);
+            border-color: #EEE;
+        }
+
+        .task-meta-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            /* Allow wrapping to prevent scroll */
+        }
+
+        .meta-input {
+            font-size: 14px;
+            color: var(--text-sub);
+            border: 1px solid transparent;
+            background: #FFF;
+            /* White background */
+            border-radius: var(--radius-sm);
+            padding: 4px 8px;
+            width: 120px;
+            flex-shrink: 0;
+            height: 32px;
+            font-family: inherit;
+        }
+
+        .meta-input:focus {
+            background: white;
+            border-color: var(--accent-blue);
+            outline: none;
+        }
+
+        .task-meta-row .badge-select {
+            height: 32px;
+            padding: 0 10px;
+            font-size: 13px;
+            width: auto;
+            flex-shrink: 0;
+            background: #FFF;
+        }
+
+        /* Round 32: Date Picker Side-by-Side (Hamburger Style) */
+        .date-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            /* Gap between input and button */
+        }
+
+        .meta-input.has-picker {
+            padding-right: 8px;
+            /* Reset padding */
+            width: 120px;
+            /* Standard width */
+            flex: 1;
+        }
+
+        .btn-calendar {
+            position: static;
+            /* No longer absolute */
+            transform: none;
+            background: #FFF;
+            border: 1px solid #CCC;
+            border-radius: 6px;
+            width: 32px;
+            /* Match input height */
+            height: 32px;
+            /* Match input height */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            color: #555;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+
+        .btn-calendar:hover {
+            background: #F7F7F7;
+            border-color: #BBB;
+        }
+
+        .memo-area {
+            width: 100%;
+            font-size: 14px;
+            color: var(--text-main);
+            resize: none;
+            line-height: 1.5;
+            margin-top: 4px;
+            border: 1px solid #E0E0E0;
+            background: rgba(255, 255, 255, 0.6);
+            padding: 10px;
+            border-radius: 6px;
+            overflow: hidden;
+            font-family: inherit;
+        }
+
+        .memo-area:focus {
+            background: #FFFFFF;
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        /* SUBTASKS */
+        .subtasks-wrapper {
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .subtask-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 12px;
+            border: 1px solid #EEE;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+        }
+
+        .subtask-row.completed-sub {
+            opacity: 0.7;
+            border-color: #DDD;
+            border-left-color: #AAA !important;
+            background: #FAFAFA !important;
+        }
+
+        .sub-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .sub-top-line {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .sub-input-name {
+            flex: 1;
+            border: none;
+            font-size: 15px;
+            font-weight: 700;
+            background: transparent;
+            color: var(--text-main);
+        }
+
+        .sub-input-name:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 4px;
+            padding: 2px;
+        }
+
+        .sub-footer-line {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        /* Round 52: Subtask Alignment & Styling */
+        .sub-meta-line {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .meta-input {
+            border: 1px solid #DDD;
+            background: white;
+            border-radius: 6px;
+            padding: 0 8px;
+            font-size: 13px;
+            color: #555;
+            height: 30px;
+            width: 140px;
+        }
+
+        .btn-calendar {
+            height: 30px;
+            width: 30px;
+            border: 1px solid #DDD;
+            background: white;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #555;
+        }
+
+        .btn-calendar:hover {
+            background: #F7F7F7;
+        }
+
+        .sub-memo-area {
+            flex: 1;
+            font-size: 13px;
+            color: var(--text-sub);
+            border: 1px solid #DDD;
+            /* Explicit border */
+            background: white;
+            /* Explicit white bg */
+            padding: 6px 8px;
+            border-radius: 6px;
+            resize: none;
+            line-height: 1.4;
+            min-height: 60px;
+            /* Slightly taller default */
+        }
+
+        /* Update btn-mini to match height */
+        .btn-mini {
+            border: 1px solid #DDD;
+            background: white;
+            font-size: 13px;
+            color: #777;
+            cursor: pointer;
+            padding: 0 12px;
+            /* Adjusted padding */
+            border-radius: 6px;
+            font-weight: 700;
+            height: 30px;
+            /* Fixed Height */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-mini:hover {
+            color: var(--text-main);
+            background: #F7F7F7;
+        }
+
+        .btn-mini.del {
+            color: var(--accent-red);
+            border-color: #ffcccc;
+            background: #fffdfd;
+        }
+
+        /* Round 29: Green Complete Button */
+        .btn-mini-complete {
+            border: none;
+            background: var(--accent-green);
+            font-size: 13px;
+            color: white;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+        }
+
+        .btn-mini-complete:hover {
+            opacity: 0.9;
+        }
+
+        .btn-add-sub {
+            background: transparent;
+            border: 2px dashed #DDD;
+            color: var(--text-sub);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            align-self: flex-start;
+        }
+
+        .btn-add-sub:hover {
+            background: rgba(0, 0, 0, 0.02);
+            border-color: #bdc3c7;
+            color: var(--text-main);
+        }
+
+        .btn-sub-toggle {
+            background: transparent;
+            border: none;
+            color: #787774;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 8px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            align-self: flex-start;
+        }
+
+        .btn-sub-toggle:hover {
+            background: rgba(0, 0, 0, 0.05);
+            color: #37352F;
+        }
+
+        /* Actions - Round 27: Wider Column & No Wrap Timestamps */
+        .task-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 12px;
+            width: 170px;
+            flex-shrink: 0;
+            padding-top: 4px;
+        }
+
+        .action-block {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            width: 100%;
+        }
+
+        .action-row-buttons {
+            display: flex;
+            gap: 6px;
+            justify-content: space-between;
+        }
+
+        .btn-complete-action {
+            background-color: var(--accent-green);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 0;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            width: 100%;
+            text-align: center;
+        }
+
+        .btn-complete-action:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .btn-complete-action.clean {
+            background: white;
+            border: 1px solid #ddd;
+            color: #555;
+        }
+
+        .icon-action-btn {
+            background: white;
+            border: 1px solid #DDD;
+            color: #777;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            flex: 1;
+            /* Ensure equal width in row */
+        }
+
+        .icon-action-btn:hover {
+            color: var(--text-main);
+            background: #F7F7F7;
+            border-color: #CCC;
+        }
+
+        .icon-action-btn.btn-del:hover {
+            color: var(--accent-red);
+            background: #FFF5F5;
+            border-color: #FEB;
+        }
+
+        /* Timestamps Styling - Round 27: No Wrap */
+        .timestamps {
+            margin-top: 12px;
+            font-size: 11px;
+            color: #AAA;
+            text-align: right;
+            line-height: 1.4;
+            /* Round 44: Flex Layout */
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0;
+        }
+
+        .ts-label {
+            font-weight: 600;
+            color: #999;
+            margin-right: 4px;
+        }
+
+        /* SIDEBAR FOOTER (2x2 Grid) */
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .backup-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .footer-label {
+            font-weight: 500;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        /* Used as base for .section-label */
+
+        .footer-btn-grid {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-footer {
+            background: transparent;
+            border: 1px solid #555;
+            color: #AAA;
+            border-radius: var(--radius-sm);
+            padding: 6px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            flex: 1;
+            white-space: nowrap;
+        }
+
+        .btn-footer:hover {
+            border-color: #888;
+            color: #FFF;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* MODALS */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            /* Round 39: Ensure modal is above mobile sidebar (9999) */
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-container {
+            background: white;
+            width: 90%;
+            max-width: 600px;
+            /* Wider for 2-col */
+            border-radius: var(--radius-lg);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-height: 85vh;
+            /* Reduced max-height */
+            overflow-y: hidden;
+            /* Main container hidden overflow */
+        }
+
+        .sub-header {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            gap: 8px;
+        }
+
+        .sub-input-name {
+            flex: 1;
+            /* Always auto-expand name */
+            min-width: 0;
+        }
+
+        .sub-top-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #EEE;
+            padding-bottom: 8px;
+            flex-shrink: 0;
+        }
+
+        .modal-title {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        /* Compact Settings Grid */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            overflow-y: auto;
+            padding-right: 4px;
+            /* Internal Scroll */
+            flex: 1;
+            /* Take remaining space */
+            min-height: 0;
+            /* Necessary for flex child scroll */
+        }
+
+        .settings-section {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .settings-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .settings-list {
+            list-style: none;
+            border: 1px solid #EEE;
+            border-radius: 6px;
+            overflow-y: auto;
+            max-height: 180px;
+            /* Limit list height */
+        }
+
+        .settings-item {
+            display: flex;
+            align-items: center;
+            padding: 6px 10px;
+            border-bottom: 1px solid #EEE;
+            gap: 8px;
+        }
+
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+
+        .settings-item-name {
+            flex: 1;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .settings-item-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .add-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 4px;
+            align-items: center;
+        }
+
+        .add-input {
+            flex: 1;
+            height: 32px;
+            font-size: 12px;
+        }
+
+        .btn-add-setting {
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 0 12px;
+            height: 32px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .color-selector-wrapper {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 6px;
+            align-items: center;
+        }
+
+        .color-opt {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+        }
+
+        .color-opt.selected {
+            border-color: #333;
+            transform: scale(1.1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        input[type="color"] {
+            border: none;
+            color: #FFF;
+            font-weight: 700;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: opacity 0.2s;
+            padding: 0;
+            background: transparent;
+        }
+
+        .edit-row {
+            display: flex;
+            gap: 6px;
+            flex: 1;
+            align-items: center;
+        }
+
+        .edit-input {
+            flex: 1;
+            font-size: 12px;
+            padding: 4px 6px;
+            border: 1px solid #DDD;
+            border-radius: 4px;
+            height: 28px;
+        }
+
+        .modal-content {
+            font-size: 13px;
+            line-height: 1.5;
+            color: #333;
+            overflow-y: auto;
+        }
+
+        .modal-content h3 {
+            font-size: 15px;
+            margin-top: 10px;
+            margin-bottom: 4px;
+            color: #222;
+        }
+
+        .modal-content ul {
+            padding-left: 18px;
+            margin-bottom: 10px;
+        }
+
+        .modal-content li {
+            margin-bottom: 2px;
+            color: #555;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            border-top: 1px solid #EEE;
+            padding-top: 10px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .btn-primary-modal {
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            transition: opacity 0.2s;
+            margin-left: auto;
+            font-size: 13px;
+        }
+
+        .btn-primary-modal:hover {
+            opacity: 0.9;
+        }
+
+        .btn-danger-modal {
+            background: transparent;
+            color: #d9534f;
+            border: 1px solid #d9534f;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-danger-modal:hover {
+            background: #fff5f5;
+        }
+
+        .btn-danger-strong {
+            background: #d9534f;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-danger-strong:hover {
+            background: #c9302c;
+        }
+
+        /* Global Subtask Grid Layout (Desktop Default) */
+        .sub-content {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            grid-template-areas:
+                "name actions"
+                "details details";
+            gap: 8px;
+            align-items: center;
+            width: 100%;
+        }
+
+        .sub-name-row {
+            grid-area: name;
+            width: 100%;
+        }
+
+        .sub-actions-row {
+            grid-area: actions;
+            display: flex;
+            gap: 4px;
+        }
+
+        .sub-details-row {
+            grid-area: details;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .sub-meta-line {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            width: 100%;
+        }
+
+        .sub-meta-line .date-input-wrapper {
+            flex: 1;
+        }
+
+        /* 200px wide complete button on Desktop */
+        .btn-mini-complete {
+            min-width: 120px;
+            text-align: center;
+            justify-content: center;
+            display: inline-flex;
+            /* Ensure flex centering works if used */
+            align-items: center;
+        }
+
+        /* Intermediate Tablet/Wide Mobile (600px - 900px) */
+        @media (max-width: 900px) {
+            .layout-wrapper {
+                display: flex;
+                flex-direction: column;
+                height: auto;
+                overflow: auto;
+            }
+
+            .sidebar {
+                /* Round 43: Fixed Header */
+                position: fixed !important;
+                top: 0;
+                left: 0;
+                width: 100% !important;
+                z-index: 1000;
+                height: auto;
+                max-height: none;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            }
+
+            .resizer {
+                display: none;
+            }
+
+            .content {
+                /* Round 43: Offset for Fixed Header */
+                margin-top: 80px;
+                padding: 16px;
+                overflow-y: visible;
+                height: auto;
+                width: 100%;
+                /* Ensure full width but bounded */
+                max-width: 100vw;
+                /* Hard limit */
+                box-sizing: border-box;
+                /* Include padding in width */
+            }
+
+            /* Enhanced Flex for wider mobile screens (600px+) */
+            .task-title-input {
+                flex: 1;
+                /* Auto-expand title */
+                min-width: 0;
+            }
+        }
+
+        /* Strict Mobile View (Phone Vertical) < 600px */
+        @media (max-width: 600px) {
+
+            /* Task Card Stacking */
+            .task-card {
+                flex-direction: column;
+                gap: 12px;
+                width: 100%;
+                /* Ensure card fits container */
+                max-width: 100%;
+                /* Round 40: Force stretch to fill width */
+                align-items: stretch;
+                /* prevent overflow */
+                box-sizing: border-box;
+                /* Include padding */
+            }
+
+            /* Mobile: Stack Action Buttons & Timestamp */
+            .task-actions {
+                width: 100%;
+                flex-direction: column;
+                /* Stack vertically */
+                align-items: stretch;
+                /* Full width */
+                gap: 8px;
+                border-top: 1px solid #EEE;
+            }
+
+            /* Mobile Subtask Layout: Stack Vertically */
+            .sub-content {
+                display: flex !important;
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .sub-details-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .sub-actions-row {
+                justify-content: space-between;
+                width: 100%;
+                margin-top: 4px;
+                gap: 8px;
+                /* Consistent gap */
+            }
+
+            .sub-actions-row .btn-mini-complete {
+                flex: 1;
+                /* Expand to fill width */
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                /* Round 41: Allow shrinking */
+                min-width: 0;
+            }
+
+            .sub-actions-row .btn-mini {
+                flex: 0 0 auto;
+                /* Keep others fixed */
+            }
+
+            .action-block {
+                flex-direction: row;
+                justify-content: space-between;
+                /* Spread content */
+                width: 100%;
+                gap: 8px;
+            }
+
+            /* Big Complete Button on Top */
+            .btn-complete-action {
+                flex: 1;
+                /* Take available space */
+                height: 40px;
+                /* Taller touch target */
+                width: 100%;
+                text-align: center;
+            }
+
+            .action-row-buttons {
+                display: flex;
+                /* Ensure flex for icons */
+                gap: 8px;
+            }
+
+            .action-row-buttons button {
+                height: 40px;
+                /* Match main complete button height */
+                width: 40px;
+                /* Square touch targets */
+            }
+
+            .timestamps {
+                margin-top: 4px;
+                text-align: right;
+                width: 100%;
+                font-size: 10px;
+                /* Slightly smaller */
+            }
+
+            /* Subtask Mobile Fixes */
+            .sub-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+                padding: 8px;
+            }
+
+            /* Responsive Subtask Header */
+            .sub-header {
+                display: flex;
+                flex-direction: column;
+                /* Stack vertically on mobile */
+                align-items: flex-start;
+                width: 100%;
+                gap: 8px;
+            }
+
+            /* Subtask Input Name - Full Width */
+            .sub-input-name {
+                width: 100%;
+                flex: none;
+                /* Disable flex shrinking */
+            }
+
+            /* Controls Container - Right aligned */
+            .sub-controls-mini {
+                display: flex;
+                gap: 6px;
+                flex-shrink: 0;
+                width: 100%;
+                justify-content: flex-end;
+                /* Align to right */
+                margin-left: 0;
+            }
+
+            /* Round 30: Split Alignment (Status Left / Others Right) */
+            .sub-controls-mini> :first-child {
+                margin-right: auto;
+            }
+
+            .drag-handle {
+                display: none;
+            }
+
+            .btn-mini {
+                max-width: 100px;
+                /* Constrain status width on mobile */
+                text-overflow: ellipsis;
+                overflow: hidden;
+            }
+
+            .sub-status-line {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .btn-mini {
+                padding: 4px 12px;
+                border-radius: var(--radius-sm);
+                border: 1px solid #ddd;
+                background: white;
+                cursor: pointer;
+                font-size: 11px;
+                color: #555;
+                transition: all 0.2s;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                line-height: 1;
+                height: 28px;
+            }
+
+            .btn-mini-complete {
+                padding: 4px 12px;
+                /* Adjusted for new radius */
+                border-radius: var(--radius-sm);
+                /* Round 49 */
+                border: 1px solid var(--accent-green);
+                background: var(--accent-green);
+                cursor: pointer;
+                font-size: 11px;
+                color: white;
+                transition: all 0.2s;
+                /* Fix Icon Alignment */
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                line-height: 1;
+                height: 28px;
+                /* Ensure consistent height */
+            }
+
+            .timestamps {
+                width: auto;
+                /* Round 44: Single Line Display */
+                flex-direction: row;
+                gap: 12px;
+                /* User requested "appropriate space" */
+                justify-content: flex-end;
+                align-items: center;
+                margin-top: 12px;
+            }
+
+            .timestamps br {
+                display: none;
+            }
+
+            .task-meta-row {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+                width: 100%;
+            }
+
+            .task-meta-row>*:last-child {
+                grid-column: 1 / -1;
+                /* Deadline takes full width */
+            }
+
+            .meta-input,
+            .task-meta-row .badge-select {
+                width: 100%;
+                min-width: 0;
+                /* Allow shrinking */
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+            }
+
+            .settings-grid {
+                grid-template-columns: 1fr;
+                max-height: 60vh;
+            }
+
+            .modal-container {
+                max-height: 95vh;
+                padding: 16px;
+            }
+
+            /* Input Area Mobile */
+            .input-row-main {
+                flex-direction: column;
+            }
+
+            .btn-add {
+                margin-top: 8px;
+            }
+
+            .footer-btn-grid {
+                grid-template-columns: 1fr 1fr;
+                /* Round 30: 2x2 Grid for Mobile */
+            }
+
+            /* Subtask Footer Vertical Stack */
+            .sub-footer-line {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .sub-footer-line input,
+            .sub-footer-line textarea {
+                width: 100%;
+            }
+
+            /* Fix Main Task Date Picker Button Position */
+            .meta-input.has-picker {
+                flex: none;
+                width: 150px;
+                /* Fixed width to keep button close */
+            }
+
+            /* Round 41: Fix Subtask Overflow */
+            .sub-meta-line .date-input-wrapper {
+                flex: 1;
+                /* Allow wrapper to take remaining space */
+                min-width: 0;
+                /* Enable shrinking */
+            }
+
+            .sub-meta-line .meta-input.has-picker {
+                width: 100% !important;
+                /* Fill wrapper */
+                min-width: 0;
+                flex: 1;
+            }
+        }
+
+        /* Sidebar Toggle Styles */
+        .sidebar-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .btn-sidebar-toggle {
+            display: none;
+            /* Hidden on Desktop */
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 32px;
+            /* Round 30: Larger Icon */
+            cursor: pointer;
+            padding: 0;
+            width: 48px;
+            /* Round 30: Larger Touch Target */
+            height: 48px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Global Memo Area */
+        .global-memo-area {
+            width: 100%;
+            margin-bottom: 20px;
+            background: #EEEEEE;
+            /* Matches body bg or slightly darker */
+            border: 1px solid #e0e0e0;
+            border-radius: var(--radius-md);
+            padding: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Round 36: Match Section Label Style */
+        .global-memo-label {
+            font-weight: 500;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        #globalMemo {
+            width: 100%;
+            border: 2px solid #E6E6E6;
+            border-radius: var(--radius-sm);
+            padding: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+            min-height: 120px;
+            /* Round 49: Expanded default height */
+            resize: vertical;
+            font-family: inherit;
+            background: #FFFFFF;
+            color: #333;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        #globalMemo:focus {
+            outline: none;
+            border-color: #333;
+            background: #fff;
+        }
+
+
+
+        /* Round 50: Horizontal Scroll Controls (Generic) */
+        .nav-scroll-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .scroll-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(50, 50, 50, 0.9);
+            border: 1px solid #555;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            font-size: 14px;
+            line-height: 1;
+            opacity: 0;
+            transition: opacity 0.2s, background 0.2s;
+        }
+
+        /* Show on hover of the wrapper */
+        .nav-scroll-wrapper:hover .scroll-btn {
+            opacity: 1;
+        }
+
+        .scroll-btn:hover {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .scroll-btn.left {
+            left: -8px;
+        }
+
+        .scroll-btn.right {
+            right: -8px;
+        }
+
+        @media (max-width: 900px) {
+
+            /* Hide scroll buttons on mobile */
+            .nav-scroll-wrapper .scroll-btn {
+                display: none !important;
+            }
+
+            /* Round 53: Stack Columns on Mobile (Memo on Top) */
+            /* NOTE: This mobile block inherits from the rule below (max-width: 1600px) */
+            .global-memo-area {
+                margin: 0;
+            }
+        }
+
+        /* Round 54: Responsive 2-Column Fallback (< 1400px) */
+        @media (max-width: 1400px) {
+            .content {
+                flex-direction: column;
+                /* Stack Vertical */
+                padding: 24px 32px;
+                /* Adjust Padding */
+                gap: 20px;
+            }
+
+            .main-tasks-area {
+                width: 100%;
+            }
+
+            .right-memo-column {
+                width: 100%;
+                position: static;
+                /* Disable Sticky */
+                order: -1;
+                /* Force to Top */
+            }
+
+            .global-memo-area {
+                margin: 0;
+            }
+        }
+
+        @media (max-width: 900px) {
+
+            /* Round 43: Increase top margin to match bottom visual spacing */
+            .global-memo-area {
+                margin-top: 12px;
+            }
+
+            .btn-sidebar-toggle {
+                display: flex;
+                /* Show on Mobile/Tablet */
+            }
+
+            .sidebar-content {
+                display: none;
+                /* HIDE CONTENT DEFAULT ON MOBILE */
+                margin-top: 12px;
+            }
+
+            /* Full Screen Overlay Mode */
+            .sidebar.expanded {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100% !important;
+                /* Safer than 100vw */
+                height: 100vh !important;
+                max-height: none !important;
+                z-index: 9999;
+                padding: 20px 20px;
+                /* Round 30: Match default sidebar padding to prevent shift */
+                overflow-y: auto;
+                background-color: var(--bg-sidebar);
+                /* Ensure opacity */
+                animation: sidebarContainerFade 0.3s ease forwards;
+            }
+
+            @keyframes sidebarContainerFade {
+                from {
+                    opacity: 0;
+                }
+
+                to {
+                    opacity: 1;
+                }
+            }
+
+            .sidebar.expanded .sidebar-content {
+                display: block;
+                /* SHOW WHEN EXPANDED */
+                animation: softReveal 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+                /* Round 35: Softer Opening (0.6s) */
+            }
+
+            /* Closing Animation Override */
+            .sidebar.expanded.closing .sidebar-content {
+                animation: softHide 0.15s ease-in forwards;
+                /* Round 33: Faster (0.15s) */
+            }
+
+            @keyframes softReveal {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes softHide {
+                from {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+
+                to {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+            }
+
+            .sidebar-content.active {
+                display: block;
+                /* SHOW WHEN ACTIVE */
+                animation: slideDown 0.3s ease-out;
+            }
+
+            @keyframes slideDown {
+                from {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="layout-wrapper">
+        <!-- LEFT SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header-row">
+                <h1 onclick="resetView()">My Tasks</h1>
+                <button class="btn-sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">≡</button>
+            </div>
+
+            <!-- Collapsible Content Wrapper -->
+            <div class="sidebar-content" id="sidebarContent">
+                <!-- Round 29: Label Adjustment -->
+                <span class="section-label" style="margin-top:0px;">New Task</span>
+                <div class="input-card" id="inputFormSection">
+                    <div class="input-row-main">
+                        <!-- Round 29: Japanese Label -->
+                        <label class="input-group-label" for="inputName">タスク名</label>
+                        <input type="text" id="inputName" class="form-control" placeholder="タスク名を入力"
+                            style="font-weight:700;">
+                    </div>
+
+                    <div style="display:flex; flex-direction:row; gap:8px;">
+                        <div style="flex:1;">
+                            <!-- Round 29: Japanese Label -->
+                            <label class="input-group-label" for="inputCategory">カテゴリ</label>
+                            <select id="inputCategory" class="badge-select" onchange="updateSelectColor(this)"></select>
+                        </div>
+                        <div style="flex:1;">
+                            <!-- Round 29: Japanese Label -->
+                            <label class="input-group-label" for="inputStatus">ステータス</label>
+                            <select id="inputStatus" class="badge-select" onchange="updateSelectColor(this)"></select>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:10px;">
+                        <!-- Round 29: Japanese Label -->
+                        <label class="input-group-label" for="inputDeadline">期限</label>
+                        <!-- Round 27: Hybrid Input -->
+                        <div class="deadline-wrapper">
+                            <!-- Round 28: "期限を入力" -->
+                            <input type="text" id="inputDeadline" class="form-control" placeholder="期限を入力"
+                                style="flex:1;">
+                            <div class="date-picker-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                                <input type="date" class="date-picker-overlay"
+                                    onchange="document.getElementById('inputDeadline').value = this.value.replace(/-/g, '/')">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:10px;">
+                        <!-- Round 29: Japanese Label -->
+                        <label class="input-group-label" for="inputMemo">メモ</label>
+                        <textarea id="inputMemo" class="form-control memo-area" placeholder="詳細を入力" rows="1"
+                            oninput="autoResize(this)"
+                            style="resize:none; background:#FAFAFA; border-color:#DDD;"></textarea>
+                    </div>
+
+                    <button class="btn-add" onclick="addTask()">タスクを登録</button>
+                </div>
+
+                <div style="flex:1;"></div>
+
+                <div style="display:flex; flex-direction:column; gap:8px;"> <!-- Reduced Gap -->
+                    <!-- Round 28: VIEWS Label -->
+                    <div style="margin-top: 24px;"> <!-- Round 30: Added Spacing -->
+                        <span class="section-label">VIEWS</span>
+                        <!-- Round 51: View Scroll Wrapper -->
+                        <div class="nav-scroll-wrapper">
+                            <button class="scroll-btn left"
+                                onclick="scrollNav('view-buttons-container', 'left')">‹</button>
+                            <div class="nav-group" id="view-buttons-container">
+                                <button class="nav-btn active" id="btn-view-active"
+                                    onclick="setViewMode('active')">すべて</button>
+                                <button class="nav-btn" id="btn-view-archived"
+                                    onclick="setViewMode('archived')">完了</button>
+                                <button class="nav-btn btn-trash-mode" id="btn-view-trash"
+                                    onclick="setViewMode('trash')">ゴミ箱</button>
+                            </div>
+                            <button class="scroll-btn right"
+                                onclick="scrollNav('view-buttons-container', 'right')">›</button>
+                        </div>
+                    </div>
+
+                    <!-- Round 28: FILTERS Label -->
+                    <div>
+                        <span class="section-label">FILTERS</span>
+                        <!-- Round 50: Scroll Wrapper -->
+                        <div class="nav-scroll-wrapper">
+                            <button class="scroll-btn left"
+                                onclick="scrollNav('filter-buttons-container', 'left')">‹</button>
+                            <div class="nav-group" id="filter-buttons-container"></div>
+                            <button class="scroll-btn right"
+                                onclick="scrollNav('filter-buttons-container', 'right')">›</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="trashControls"
+                    style="display:none; padding:12px; background:#333; border-radius:8px; border:1px dashed #555; color:white;">
+                    <div class="trash-header" style="display:flex; justify-content:space-between; align-items:center;">
+                        <span>ゴミ箱編集</span>
+                        <button class="btn-empty-trash" onclick="emptyTrash()"
+                            style="background:#440000; color:#ff9999; border:1px solid #773333; border-radius:4px; padding:4px 8px; cursor:pointer;">空にする</button>
+                    </div>
+                </div>
+
+                <!-- Sidebar Footer -->
+                <div class="sidebar-footer">
+                    <div class="backup-controls">
+                        <span class="footer-label">DATA MANAGEMENT</span>
+                        <div class="footer-btn-grid">
+                            <button class="btn-footer" onclick="exportData()">保存</button>
+                            <button class="btn-footer" onclick="triggerImport()">読込</button>
+                            <button class="btn-footer" id="btnOpenSettings">設定</button>
+                            <button class="btn-footer" id="btnOpenHelp">使い方</button>
+                        </div>
+                        <input type="file" id="importFile" accept=".json" style="display:none"
+                            onchange="importData(this)">
+                    </div>
+                </div>
+            </div><!-- End Sidebar Content -->
+        </aside>
+
+        <div class="resizer" id="resizer"></div>
+
+        <main class="content">
+            <!-- Center: Task List Area -->
+            <div class="main-tasks-area">
+                <ul id="taskList" class="task-list"></ul>
+            </div>
+
+            <!-- Right: Global Memo Area -->
+            <div class="right-memo-column">
+                <div class="global-memo-area">
+                    <label class="global-memo-label" for="globalMemo">Global Memo</label>
+                    <textarea id="globalMemo" placeholder="自由記述のメモエリアです。タスク全体の概略や備忘録にお使いください。"></textarea>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- SETTINGS MODAL -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <div class="modal-title">設定 (Settings)</div>
+            </div>
+
+            <!-- Compact Grid Layout -->
+            <div class="settings-grid">
+                <div class="settings-section">
+                    <div class="settings-label">カテゴリ (Categories)</div>
+                    <ul class="settings-list" id="settingsCatList"></ul>
+                    <div class="add-row">
+                        <!-- Round 28: Clean Placeholder -->
+                        <input type="text" id="newCatName" class="form-control add-input" placeholder="新しいカテゴリ名">
+                        <button class="btn-add-setting" onclick="addCategory()">追加</button>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-label">ステータス (Statuses)</div>
+                    <ul class="settings-list" id="settingsStatusList"></ul>
+                    <div style="background:#F9F9F9; padding:10px; border-radius:6px; border:1px solid #EEE;">
+                        <div class="color-selector-wrapper" id="newStatusColorSelector">
+                            <div class="color-opt" style="background:#D44C47" onclick="selectColor('#D44C47')"
+                                data-col="#D44C47"></div>
+                            <div class="color-opt" style="background:#2383E2" onclick="selectColor('#2383E2')"
+                                data-col="#2383E2"></div>
+                            <div class="color-opt" style="background:#45B06C" onclick="selectColor('#45B06C')"
+                                data-col="#45B06C"></div>
+                            <div class="color-opt" style="background:#D9730D" onclick="selectColor('#D9730D')"
+                                data-col="#D9730D"></div>
+                            <div class="color-opt" style="background:#999999" onclick="selectColor('#999999')"
+                                data-col="#999999"></div>
+                            <div class="color-opt" style="background:#333333" onclick="selectColor('#333333')"
+                                data-col="#333333"></div>
+                            <span style="border-left:1px solid #DDD; margin:0 4px;"></span>
+                            <input type="color" id="customColorPicker" onchange="selectColor(this.value)">
+                        </div>
+                        <div class="add-row">
+                            <!-- Round 28: Clean Placeholder -->
+                            <input type="text" id="newStatusName" class="form-control add-input"
+                                placeholder="新しいステータス名">
+                            <button class="btn-add-setting" onclick="addStatus()">追加</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Round 28: Factory Reset in Danger Zone -->
+                <!-- Spans 2 columns on grid -->
+                <div
+                    style="grid-column: 1 / -1; background:#ffecec; border:1px solid #ffcccc; padding:10px; border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:11px; font-weight:700; color:#d9534f;">危険な操作 (Danger Zone)</span>
+                    <button class="btn-danger-strong" onclick="factoryReset()">全データを削除して初期化</button>
+                </div>
+            </div>
+
+            <!-- Task List -->
+            <div class="modal-footer">
+                <button class="btn-danger-modal" onclick="resetSettings()">設定のみリセット</button>
+                <button class="btn-primary-modal" onclick="closeSettingsModal()">設定を保存して閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HELP MODAL -->
+    <div class="modal-overlay" id="helpModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <div class="modal-title">使い方 (How to Use)</div>
+            </div>
+            <div class="modal-content">
+                <h3>📌 基本操作 (Basic)</h3>
+                <ul>
+                    <li><strong>追加</strong>: 左サイドバーからタスク名・期限・メモを入力して登録します。</li>
+                    <li><strong>編集</strong>: タスク名やメモはクリックして直接編集できます（インライン編集）。</li>
+                    <li><strong>移動</strong>: カードの左端（⋮⋮）をドラッグして並び替えられます。</li>
+                    <li><strong>完了/削除</strong>: 「完了」でアーカイブ、「削除」でゴミ箱へ移動します。</li>
+                </ul>
+
+                <h3>📂 サブタスク (Subtasks)</h3>
+                <ul>
+                    <li>タスク内の「＋」ボタンでサブタスクを追加できます。</li>
+                    <li>親タスクとは独立して期限やステータスを管理可能です。</li>
+                </ul>
+
+                <h3>⚙️ 設定・データ (Settings & Data)</h3>
+                <ul>
+                    <li><strong>カスタマイズ</strong>: 「設定」からカテゴリやステータスの名称・色（カラーピッカー）を自由に変更できます。</li>
+                    <li><strong>データ管理</strong>: データはブラウザに自動保存されます。「保存/読込」でJSONバックアップが可能です。</li>
+                </ul>
+
+                <h3>📱 レイアウト (Layout)</h3>
+                <ul>
+                    <li><strong>PC</strong>: 画面幅に応じて3カラム（メモ常駐）または2カラムに自動調整されます。</li>
+                    <li><strong>スマホ</strong>: 左上のメニューボタン（≡）でサイドバーを開閉できます。</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <div style="flex:1;"></div>
+                <button class="btn-primary-modal" onclick="closeHelpModal()">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUBTASK MODAL (Replacing Prompt) -->
+    <div class="modal-overlay" id="subtaskModal">
+        <div class="modal-container" style="max-width: 400px;">
+            <div class="modal-header">
+                <div class="modal-title">サブタスクを追加</div>
+            </div>
+            <div class="modal-content" style="overflow: visible;">
+                <div style="margin-bottom: 16px;">
+                    <label
+                        style="display:block; font-size:12px; font-weight:600; color:#555; margin-bottom:6px;">サブタスク名</label>
+                    <input type="text" id="newSubtaskInput" class="form-control" placeholder="例: 資料の構成案を作成"
+                        style="width: 100%; box-sizing: border-box;">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-danger-modal" onclick="closeSubtaskModal()"
+                    style="color:#555; border-color:#DDD;">キャンセル</button>
+                <button class="btn-primary-modal" onclick="submitNewSubtask()">追加する</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONFIRMATION MODAL (For file import) -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-container" style="max-width: 400px;">
+            <div class="modal-header">
+                <div class="modal-title">データの読み込み</div>
+            </div>
+            <div class="modal-content">
+                <p style="font-size:14px; color:#555; line-height:1.6;">
+                    現在のデータはすべて上書きされます。<br>この操作は取り消せません。<br>実行してよろしいですか？
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-danger-modal" onclick="closeConfirmModal()"
+                    style="color:#555; border-color:#DDD;">キャンセル</button>
+                <button class="btn-primary-modal" onclick="executeImport()">読み込む (上書き)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUCCESS MODAL (Task Registered) -->
+    <div class="modal-overlay" id="successModal">
+        <div class="modal-container" style="max-width: 400px;">
+            <div class="modal-header">
+                <div class="modal-title">登録完了</div>
+            </div>
+            <div class="modal-content">
+                <p style="font-size:14px; color:#555; line-height:1.6; text-align:center; padding: 10px 0;">
+                    タスクが登録されました
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary-modal" onclick="closeSuccessModal()">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'task_app_data_v26_final';
+        let pendingImportData = null; // Store data pending confirmation
+
+        // Round 26 Defaults
+        const DEFAULT_SETTINGS = {
+            categories: [
+                { id: 'none', name: '未設定' },
+                { id: 'customer', name: '顧客案件' },
+                { id: 'office', name: '社内業務' }
+            ],
+            statuses: [
+                { id: 'not_started', name: '未着手', color: '#999999' },
+                { id: 'in_progress', name: '進行中', color: '#2383E2' },
+                { id: 'waiting', name: '確認待ち', color: '#D9730D' }
+            ]
+        };
+
+        let appData = { settings: JSON.parse(JSON.stringify(DEFAULT_SETTINGS)), tasks: [], globalMemo: '' };
+
+        let filterCategory = 'all';
+        let viewMode = 'active';
+        let draggedItem = null;
+        let expandedSubtasksMap = {};
+        let selectedNewStatusColor = '#999999';
+        let editingCatIndex = -1;
+        let editingStatusIndex = -1;
+
+        const LEGACY_COLORS = { red: '#D44C47', blue: '#2383E2', green: '#45B06C', orange: '#D9730D', gray: '#999999', black: '#333333' };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            try {
+                loadData();
+                initResizer();
+                selectColor('#999999');
+
+                // Stats Toggle Listener
+                const btnToggleStats = document.getElementById('btnToggleStats');
+                if (btnToggleStats) {
+                    btnToggleStats.addEventListener('click', () => {
+                        const statsPanel = document.getElementById('statsPanel');
+                        if (statsPanel.style.display === 'none') {
+                            statsPanel.style.display = 'block';
+                            renderStats();
+                        } else {
+                            statsPanel.style.display = 'none';
+                        }
+                    });
+                }
+
+                // Global Memo Auto-Save Listener
+                const globalMemoEl = document.getElementById('globalMemo');
+                if (globalMemoEl) {
+                    globalMemoEl.addEventListener('input', () => {
+                        saveData(); // Auto-save on every input
+                    });
+                }
+
+                // Modal Triggers (Robust Event Binding - Direct Property)
+                const btnSettings = document.getElementById('btnOpenSettings');
+                const btnHelp = document.getElementById('btnOpenHelp');
+
+                // Force log to check execution
+                console.log('Attaching Event Listeners to:', btnSettings, btnHelp);
+
+                if (document.getElementById('btnOpenSettings')) {
+                    document.getElementById('btnOpenSettings').onclick = function (e) {
+                        console.log('Settings Clicked');
+                        e.preventDefault(); e.stopPropagation();
+                        openSettingsModal();
+                    };
+                }
+                if (document.getElementById('btnOpenHelp')) {
+                    document.getElementById('btnOpenHelp').onclick = function (e) {
+                        console.log('Help Clicked');
+                        e.preventDefault(); e.stopPropagation();
+                        openHelpModal();
+                    };
+                }
+
+                // Subtask Input Enter Key
+                const subInput = document.getElementById('newSubtaskInput');
+                if (subInput) {
+                    subInput.addEventListener('keypress', function (e) {
+                        if (e.key === 'Enter') {
+                            submitNewSubtask();
+                        }
+                    });
+                }
+            } catch (err) {
+                console.error('DOMContentLoaded Critical Error:', err);
+                alert('アプリの初期化に失敗しました。データをリセットする必要があるかもしれません。');
+            }
+        });
+
+        function loadData() {
+            try {
+                let saved = localStorage.getItem(STORAGE_KEY);
+                if (!saved) {
+                    // Fallback chain
+                    saved = localStorage.getItem('task_app_data_v25_ux');
+                    if (!saved) saved = localStorage.getItem('task_app_data_v24_settings');
+
+                    if (saved) {
+                        try {
+                            const old = JSON.parse(saved);
+                            if (old.settings && old.tasks) {
+                                appData = old;
+                                // Initialize globalMemo if missing (migration)
+                                if (typeof appData.globalMemo === 'undefined') {
+                                    appData.globalMemo = '';
+                                }
+
+                                const noneCat = appData.settings.categories.find(c => c.id === 'none');
+                                if (noneCat && noneCat.name.includes('カテゴリなし')) noneCat.name = '未設定';
+                                appData.settings.statuses.forEach(s => { if (LEGACY_COLORS[s.color]) s.color = LEGACY_COLORS[s.color]; });
+                                saveData();
+                            }
+                        } catch (e) {
+                            console.error('Migration Data Parse Error:', e);
+                        }
+                    }
+                } else {
+                    try { appData = JSON.parse(saved); } catch (e) { console.error('Data Parse Error:', e); }
+                }
+            } catch (e) {
+                console.error('LoadData Critical Error:', e);
+            }
+            renderApp();
+        }
+
+        // Sidebar Toggle Logic
+        let isSidebarAnimating = false;
+
+        function toggleSidebar() {
+            if (isSidebarAnimating) return; // Prevent rapid clicks breaking state
+
+            const sidebar = document.getElementById('sidebar');
+            const btn = document.getElementById('sidebarToggle');
+
+            if (sidebar.classList.contains('expanded')) {
+                // Closing Sequence
+                isSidebarAnimating = true;
+                sidebar.classList.add('closing');
+                btn.textContent = '≡';
+                document.body.style.overflow = '';
+
+                // Wait for closing animation (0.15s)
+                setTimeout(() => {
+                    sidebar.classList.remove('expanded');
+                    sidebar.classList.remove('closing');
+                    isSidebarAnimating = false;
+                }, 150);
+            } else {
+                // Opening Sequence
+                isSidebarAnimating = true;
+                sidebar.classList.remove('closing');
+                sidebar.classList.add('expanded');
+                btn.textContent = '×';
+                document.body.style.overflow = 'hidden';
+
+                // Wait for opening animation (0.3s)
+                setTimeout(() => {
+                    isSidebarAnimating = false;
+                    document.getElementById('globalMemo').value = appData.globalMemo || '';
+                    renderApp();
+                    renderStats();
+                }, 150);
+            }
+        }
+
+        function saveData() {
+            // Update global memo from textarea before saving
+            const memoEl = document.getElementById('globalMemo');
+            if (memoEl) {
+                appData.globalMemo = memoEl.value;
+            }
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+        }
+        function exportData() {
+            const str = JSON.stringify(appData, null, 2);
+            const url = URL.createObjectURL(new Blob([str], { type: "application/json" }));
+
+            // Generate Filename: mytasks_backup_yyyymmdd_hhmm.json
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            const hh = String(now.getHours()).padStart(2, '0');
+            const min = String(now.getMinutes()).padStart(2, '0');
+            const filename = `mytasks_backup_${yyyy}${mm}${dd}${hh}${min}.json`;
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+        function triggerImport() { document.getElementById('importFile').click(); }
+        function importData(input) {
+            if (!input.files[0]) return;
+            const r = new FileReader();
+            r.onload = e => {
+                try {
+                    const l = JSON.parse(e.target.result);
+                    // Validate Structure
+                    if (l.settings && l.tasks) {
+                        pendingImportData = l;
+                        openConfirmModal();
+                    } else {
+                        alert("無効なデータ形式です。");
+                        input.value = '';
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert("読込失敗: ファイルが破損している可能性があります。");
+                    input.value = '';
+                }
+            };
+            r.readAsText(input.files[0]);
+        }
+
+        function renderApp() { renderInputOptions(); renderFilters(); renderTasks(); }
+
+        function renderInputOptions() {
+            const cat = document.getElementById('inputCategory');
+            const st = document.getElementById('inputStatus');
+            const currentCat = cat.value; const currentSt = st.value;
+            cat.innerHTML = appData.settings.categories.map(c => `<option value="${c.id}">${c.name}</option>
+                        `).join('');
+            st.innerHTML = appData.settings.statuses.map(s => `<option value="${s.id}">${s.name}</option>
+                        `).join('');
+            // Restore value if exists
+            if (appData.settings.categories.some(c => c.id === currentCat)) cat.value = currentCat;
+            if (appData.settings.statuses.some(s => s.id === currentSt)) st.value = currentSt;
+            updateSelectColor(cat); updateSelectColor(st);
+        }
+
+        function renderFilters() {
+            const container = document.getElementById('filter-buttons-container');
+            let html = `<button class="nav-btn ${filterCategory === 'all' ? 'active' : ''}"
+                            onclick="setFilter('all')">すべて</button>`;
+            appData.settings.categories.forEach(c => {
+                let label = c.name.replace(/^[\uD800-\uDBFF][\uDC00-\uDFFF]\s*/, '');
+                if (label.length === 0) label = c.name;
+                html += `<button class="nav-btn ${filterCategory === c.id ? 'active' : ''}"
+                            onclick="setFilter('${c.id}')">${label}</button>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderTasks() {
+            const list = document.getElementById('taskList');
+            list.innerHTML = '';
+            const showActive = viewMode === 'active';
+            const showArchived = viewMode === 'archived';
+            const showTrash = viewMode === 'trash';
+
+            const filtered = appData.tasks.filter(t => {
+                if (filterCategory !== 'all' && t.category !== filterCategory) return false;
+                if (viewMode === 'active') return !t.isDeleted && !t.isArchived;
+                if (viewMode === 'archived') return !t.isDeleted && t.isArchived;
+                if (viewMode === 'trash') return t.isDeleted;
+                return false;
+            });
+
+            if (filtered.length === 0) {
+                list.innerHTML = `<li
+                            style="text-align:center; padding:32px; color:#bbb;">タスクはありません</li>`; return;
+            }
+
+            filtered.forEach(task => {
+                const li = document.createElement('li'); li.className = `task-card`;
+                const sConfig = appData.settings.statuses.find(s => s.id === task.status) || { color: '#999' };
+
+                if (task.isDeleted) li.classList.add('deleted');
+                else if (task.isArchived) li.classList.add('archived');
+                else {
+                    li.style.backgroundColor = `color-mix(in srgb, ${sConfig.color} 5%, white)`;
+                    li.style.borderLeft = `5px solid ${sConfig.color}`;
+                }
+
+                if (showActive) {
+                    li.classList.add('draggable'); li.draggable = true; li.dataset.id = task.id;
+                    li.addEventListener('dragstart', handleDragStart); li.addEventListener('dragover',
+                        handleDragOver); li.addEventListener('drop', handleDrop); li.addEventListener('dragend',
+                            handleDragEnd);
+                }
+                const ro = showTrash || showArchived;
+
+                let subHtml = '';
+                if (task.subtasks && task.subtasks.length) {
+                    const active = task.subtasks.filter(s => !s.isArchived);
+                    const compl = task.subtasks.filter(s => s.isArchived);
+                    const genRow = (s) => {
+                        const st = appData.settings.statuses.find(x => x.id === s.status) || { color: '#999' };
+                        const rowCls = s.isArchived ? 'subtask-row completed-sub' : 'subtask-row';
+                        const style = s.isArchived ? '' : `border-left: 4px solid ${st.color}; background: color-mix(in
+                        srgb, ${st.color} 5%, white);`;
+                        const sOpts = appData.settings.statuses.map(o => `<option value="${o.id}" ${s.status === o.id
+                            ? 'selected' : ''}>${o.name}</option>`).join('');
+                        return `<div class="${rowCls}" style="${style}">
+                            <div class="sub-content">
+                                <div class="sub-name-row">
+                                    <input type="text" class="sub-input-name" value="${escape(s.name)}"
+                                        onchange="updateSubtask('${task.id}','${s.id}','name',this.value)" ${ro
+                                ? 'disabled' : ''}>
+                                </div>
+                                <div class="sub-details-row">
+                                    <div class="sub-meta-line">
+                                        <select class="btn-mini"
+                                            onchange="updateSubtask('${task.id}','${s.id}','status',this.value)" ${ro
+                                ? 'disabled' : ''}>${sOpts}</select>
+                                        <div class="date-input-wrapper">
+                                            <input type="text" class="meta-input has-picker" value="${escape(s.deadline)}" placeholder="期限を入力"
+                                                id="sub-deadline-${task.id}-${s.id}"
+                                                onchange="updateSubtask('${task.id}','${s.id}','deadline',this.value)" ${ro
+                                ? 'disabled' : ''}>
+                                            ${!ro ? `<button class="btn-calendar" onclick="document.getElementById('sub-dp-${task.id}-${s.id}').showPicker()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></button>
+                                            <input type="date" id="sub-dp-${task.id}-${s.id}" style="visibility:hidden; position:absolute; width:0; height:0;"
+                                                onchange="document.getElementById('sub-deadline-${task.id}-${s.id}').value = this.value; updateSubtask('${task.id}', '${s.id}', 'deadline', this.value)">` : ''}
+                                        </div>
+                                    </div>
+                                    <textarea class="sub-memo-area" placeholder="詳細を入力" oninput="autoResize(this)"
+                                        onchange="updateSubtask('${task.id}','${s.id}','memo',this.value)" ${ro
+                                ? 'disabled' : ''}>${escape(s.memo)}</textarea>
+                                </div>
+                                <div class="sub-actions-row">
+                                    ${!ro ? `<button class="btn-mini-complete"
+                                        onclick="toggleSubtaskComplete('${task.id}','${s.id}')">${s.isArchived ?
+                                    '戻す' : '完了'}</button>
+                                        <button class="btn-mini" onclick="moveSubtask('${task.id}','${s.id}','up')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg></button>
+                                        <button class="btn-mini" onclick="moveSubtask('${task.id}','${s.id}','down')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+                                        <button class="btn-mini del"
+                                        onclick="deleteSubtask('${task.id}','${s.id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>` : ''}
+                                </div>
+                            </div>
+                        </div>`;
+                    };
+                    active.forEach(s => subHtml += genRow(s));
+                    if (compl.length) {
+                        if (expandedSubtasksMap[task.id]) {
+                            compl.forEach(s => subHtml += genRow(s)); subHtml +=
+                                `<button class="btn-sub-toggle"
+                            onclick="toggleSubtaskVisibility('${task.id}')">完了したサブタスクを隠す</button>`;
+                        }
+                        else subHtml += `<button class="btn-sub-toggle"
+                            onclick="toggleSubtaskVisibility('${task.id}')">完了したサブタスクを表示 (${compl.length})</button>`;
+                    }
+                }
+
+                const cOpts = appData.settings.categories.map(c => `<option value="${c.id}"
+                            ${task.category === c.id ? 'selected' : ''}>${c.name}</option>`).join('');
+                const sOpts = appData.settings.statuses.map(s => `<option value="${s.id}" ${task.status === s.id
+                    ? 'selected' : ''
+                    }>${s.name}</option>`).join('');
+
+                let btns = '';
+                if (showActive) btns = `<div class="action-block"><button class="btn-complete-action"
+                                onclick="toggleComplete('${task.id}')">完了</button>
+                            <div class="action-row-buttons"><button class="icon-action-btn"
+                                    onclick="moveTask('${task.id}','up')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg></button><button class="icon-action-btn"
+                                    onclick="moveTask('${task.id}','down')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button><button
+                                    class="icon-action-btn btn-del" onclick="deleteTask('${task.id}')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
+                            </div>
+                        </div>`;
+                else if (showArchived) btns = `<div class="action-block"><button
+                                class="btn-complete-action clean" onclick="toggleComplete('${task.id}')">戻す</button>
+                            <div class="action-row-buttons"><button class="icon-action-btn btn-del"
+                                    onclick="deleteTask('${task.id}')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button></div>
+                        </div>`;
+                else if (showTrash) btns = `<div class="action-block"><button class="btn-complete-action clean"
+                                onclick="restoreTask('${task.id}')">復元</button>
+                            <div class="action-row-buttons"><button class="icon-action-btn btn-del"
+                                    onclick="deleteTask('${task.id}')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div>
+                        </div>`;
+
+                const tsCreated = `<span class="ts-item"><span class="ts-label">作成日:</span>${formatDate(task.createdAt)}</span>`;
+                const tsUpdated = task.updatedAt !== task.createdAt ? `<span class="ts-item"><span class="ts-label">更新日:</span>${formatDate(task.updatedAt)}</span>` : '';
+                const tsCompleted = task.isArchived && task.archivedAt ? `<span class="ts-item"><span class="ts-label" style="color:#45B06C">完了日:</span>${formatDate(task.archivedAt)}</span>` : '';
+
+                li.innerHTML = `
+                        ${showActive ? `<div class="drag-handle">⋮⋮</div>` : ''}
+                        <div class="task-content-wrapper">
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                <input type="text" class="task-title-input" value="${escape(task.name)}"
+                                    onchange="updateTask('${task.id}','name',this.value)" ${ro ? 'disabled' : ''}>
+                            </div>
+                            <div class="task-meta-row">
+                                <select class="badge-select" onchange="updateTask('${task.id}','category',this.value)"
+                                    ${ro ? 'disabled' : ''}>${cOpts}</select>
+                                <select class="badge-select" onchange="updateTask('${task.id}','status',this.value)"
+                                    style="color:${sConfig.color}" ${ro ? 'disabled' : ''}>${sOpts}</select>
+                                <div class="date-input-wrapper">
+                                    <input type="text" class="meta-input has-picker" value="${escape(task.deadline)}" placeholder="期限を入力"
+                                        id="deadline-${task.id}"
+                                    onchange="updateTask('${task.id}','deadline',this.value)" ${ro
+                        ? 'disabled' : ''}>
+                                    ${!ro ? `<button class="btn-calendar" onclick="document.getElementById('dp-${task.id}').showPicker()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></button>
+                                    <input type="date" id="dp-${task.id}" style="visibility:hidden; position:absolute; width:0; height:0;"
+                                        onchange="document.getElementById('deadline-${task.id}').value = this.value; updateTask('${task.id}', 'deadline', this.value)">` : ''}
+                                </div>
+                            </div>
+                            <textarea class="memo-area" rows="1" placeholder="詳細を入力" oninput="autoResize(this)"
+                                onchange="updateTask('${task.id}','memo',this.value)" ${ro ? 'disabled' : ''
+                    }>${escape(task.memo)}</textarea>
+                            <div class="subtasks-wrapper">
+                                ${subHtml}
+                                ${!ro ? `<button class="btn-add-sub" onclick="addSubtask('${task.id}')">＋
+                                    サブタスクを追加</button>` : ''}
+                            </div>
+                        </div>
+                        <div class="task-actions">
+                            ${btns}
+                            <div class="timestamps">
+                                ${tsCreated}
+                                ${tsUpdated}
+                                ${tsCompleted}
+                            </div>
+                        </div>
+                    `;
+                list.appendChild(li);
+            });
+
+            // Round 28: Auto-Resize Memo after Render
+            setTimeout(() => {
+                document.querySelectorAll('textarea').forEach(el => autoResize(el));
+            }, 0);
+        }
+
+        function updateSelectColor(sel) {
+            const s = appData.settings.statuses.find(x => x.id === sel.value);
+            if (s) { sel.style.color = s.color; sel.style.fontWeight = '700'; } else sel.style.color =
+                '#333';
+        }
+
+        // CRUD
+        function autoResize(el) { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; }
+        function escape(s) {
+            return s ? s.replace(/[&<>"']/g, m => ({
+                '&': '&amp;', '<': '&lt;', '>'
+                    : '&gt;', '\"': '&quot;', '\'': ' &#039;'
+            }[m])) : '';
+        } function formatDate(is) {
+            if (!is) return ''; const d = new Date(is); return `${d.getFullYear()}/${d.getMonth() +
+                1
+                }/${d.getDate()} ${d.getHours()}:${d.getMinutes().toString().padStart(2, '0')}`;
+        }
+        function resetView() {
+            setViewMode('active');
+            setFilter('all');
+        }
+
+        function setFilter(c) {
+            filterCategory = c;
+            renderApp();
+        }
+
+        function setViewMode(m) {
+            viewMode = m;
+            const f = document.getElementById('inputFormSection');
+            const t = document.getElementById('trashControls');
+
+            // Always show form, but disable it if not active
+            f.style.display = 'block';
+            if (m === 'active') {
+                f.classList.remove('disabled-area');
+            } else {
+                f.classList.add('disabled-area');
+            }
+
+            // Toggle Trash Controls (below disabled form)
+            if (m === 'trash') {
+                t.style.display = 'block';
+            } else {
+                t.style.display = 'none';
+            }
+
+            // Update active button state
+            ['active', 'archived', 'trash'].forEach(mode => {
+                const btn = document.getElementById('btn-view-' + mode);
+                if (btn) btn.classList.toggle('active', mode === m);
+            });
+
+            renderTasks();
+        }
+
+        // Initial Render call
+        renderTasks();
+
+
+        function addTask() {
+            const n = document.getElementById('inputName'); if (!n.value.trim()) {
+                alert('入力してください'); return;
+            }
+            const now = new Date().toISOString();
+            appData.tasks.unshift({
+                id: Date.now().toString(), name: n.value, status:
+                    document.getElementById('inputStatus').value, category:
+                    document.getElementById('inputCategory').value, deadline:
+                    document.getElementById('inputDeadline').value, memo:
+                    document.getElementById('inputMemo').value, isArchived: false, isDeleted: false,
+                createdAt: now, updatedAt: now, archivedAt: '', subtasks: []
+            });
+            saveData(); renderTasks(); n.value = ''; document.getElementById('inputDeadline').value
+                = ''; document.getElementById('inputMemo').value = '';
+
+            // Round 55: Success Modal
+            openSuccessModal();
+        }
+        function updateTask(id, f, v) {
+            const t = appData.tasks.find(x => x.id === id); if (t) {
+                t[f] = v; t.updatedAt = new Date().toISOString(); saveData(); if (['status',
+                    'category'].includes(f)) renderTasks();
+            }
+        }
+
+        function toggleComplete(id) {
+            const t = appData.tasks.find(x => x.id === id);
+            if (t) {
+                t.isArchived = !t.isArchived;
+                t.updatedAt = new Date().toISOString();
+                if (t.isArchived) t.archivedAt = new Date().toISOString();
+                else t.archivedAt = '';
+                saveData(); renderTasks();
+            }
+        }
+
+        function deleteTask(id) {
+            if (viewMode === 'trash') {
+                if (confirm('完全削除?'))
+                    appData.tasks = appData.tasks.filter(x => x.id !== id);
+            } else {
+                const t =
+                    appData.tasks.find(x => x.id === id); if (t) t.isDeleted = true;
+            } saveData();
+            renderTasks();
+        }
+        function restoreTask(id) {
+            const t = appData.tasks.find(x => x.id === id); if (t)
+                t.isDeleted = false; saveData(); renderTasks();
+        }
+        function emptyTrash() {
+            if (confirm('空にする?')) appData.tasks = appData.tasks.filter(x =>
+                !x.isDeleted); saveData(); renderTasks();
+        }
+        function moveTask(id, d) {
+            const i = appData.tasks.findIndex(x => x.id === id); if (i <
+                0) return; if (d === 'up' && i > 0) [appData.tasks[i], appData.tasks[i - 1]] =
+                    [appData.tasks[i - 1], appData.tasks[i]]; else if (d === 'down' && i <
+                        appData.tasks.length - 1) [appData.tasks[i], appData.tasks[i +
+                            1]] = [appData.tasks[i + 1], appData.tasks[i]]; saveData(); renderTasks();
+        }
+        function addSubtask(tid) {
+            // Round 48: Use Custom Modal instead of prompt
+            openSubtaskModal(tid);
+        }
+        function updateSubtask(tid, sid, f, v) {
+            const t = appData.tasks.find(x => x.id
+                === tid); if (t) {
+                    const s = t.subtasks.find(y => y.id === sid); if (s) {
+                        s[f] =
+                            v; saveData(); if (f === 'status') renderTasks();
+                    }
+                }
+        }
+        function toggleSubtaskComplete(tid, sid) {
+            const t = appData.tasks.find(x =>
+                x.id === tid); if (t) {
+                    const s = t.subtasks.find(y => y.id === sid); if (s) {
+                        s.isArchived = !s.isArchived; saveData(); renderTasks();
+                    }
+                }
+        }
+        function deleteSubtask(tid, sid) {
+            const t = appData.tasks.find(x => x.id ===
+                tid); if (t) {
+                    t.subtasks = t.subtasks.filter(y => y.id !== sid); saveData();
+                    renderTasks();
+                }
+        }
+        function toggleSubtaskVisibility(tid) {
+            expandedSubtasksMap[tid] =
+                !expandedSubtasksMap[tid]; renderTasks();
+        }
+
+        function moveSubtask(taskId, subtaskId, direction) {
+            const t = appData.tasks.find(x => x.id === taskId);
+            if (!t || !t.subtasks) return;
+            const idx = t.subtasks.findIndex(s => s.id === subtaskId);
+            if (idx === -1) return;
+
+            if (direction === 'up') {
+                if (idx > 0) {
+                    const temp = t.subtasks[idx];
+                    t.subtasks[idx] = t.subtasks[idx - 1];
+                    t.subtasks[idx - 1] = temp;
+                    saveData(); renderTasks();
+                }
+            } else {
+                if (idx < t.subtasks.length - 1) {
+                    const temp = t.subtasks[idx];
+                    t.subtasks[idx] = t.subtasks[idx + 1];
+                    t.subtasks[idx + 1] = temp;
+                    saveData(); renderTasks();
+                }
+            }
+        }
+
+        // Resizer
+        function initResizer() {
+            const r = document.getElementById('resizer');
+            r.addEventListener('mousedown', e => {
+                e.preventDefault();
+                r.classList.add('resizing'); document.body.style.cursor = 'col-resize'; const mv
+                    = me => {
+                        const w = me.clientX;
+                        // Added checks for min/max width
+                        if (w < 200) return; // Min width
+                        if (w > 600) return; // Max width
+                        document.documentElement.style.setProperty('--sidebar-width', w + 'px');
+                    };
+                const up = () => {
+                    r.classList.remove('resizing'); document.body.style.cursor =
+                        'default'; document.removeEventListener('mousemove', mv);
+                    document.removeEventListener('mouseup', up);
+                };
+                document.addEventListener('mousemove', mv);
+                document.addEventListener('mouseup', up);
+            });
+        }
+        // DnD
+        function handleDragStart(e) {
+            draggedItem = this;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            // Set data to ensure drag works on some browsers
+            e.dataTransfer.setData('text/plain', this.dataset.id);
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+
+            const target = this;
+            if (target === draggedItem) return;
+
+            // Calculate position to decide insertion (Before or After)
+            const rect = target.getBoundingClientRect();
+            const offset = e.clientY - rect.top;
+            const midY = rect.height / 2;
+
+            const list = document.getElementById('taskList');
+
+            // If mouse is upper half, insert before target. 
+            // If lower half, insert after target (before next sibling).
+            if (offset < midY) {
+                list.insertBefore(draggedItem, target);
+            } else {
+                list.insertBefore(draggedItem, target.nextSibling);
+            }
+        }
+
+        function handleDrop(e) {
+            e.stopPropagation();
+            draggedItem.classList.remove('dragging');
+
+            // Reorder appData.tasks based on current DOM order
+            const newOrder = [];
+            const taskCards = document.querySelectorAll('.task-list .task-card');
+
+            taskCards.forEach(card => {
+                const id = card.dataset.id;
+                const task = appData.tasks.find(t => t.id === id);
+                if (task) {
+                    newOrder.push(task);
+                }
+            });
+
+            // Keep filtered out tasks (e.g. if we are only viewing a category)
+            // Note: Current viewMode 'active' shows all non-deleted, non-archived. 
+            // If filterCategory is set, hidden tasks might be lost if we just use DOM.
+            // Safe approach: Reconstruct active list order, then merge with others.
+
+            // However, simplicity: The list contains ALL active tasks that match filter.
+            // If filter is active, we only reorder visible tasks relative to each other.
+            // Hidden tasks remain where they were? This is tricky.
+            // Better approach for filtered views: only reorder if filterCategory is 'all'.
+            // Or, just re-map the sorted ones and splice them back.
+
+            if (filterCategory !== 'all') {
+                // If filtered, simple sort might be confusing. 
+                // For now, let's assume we allow reordering even in filtered view, 
+                // but strictly speaking updating the whole array based on partial DOM is risky.
+                // Let's implement a safe merge.
+                const domIds = Array.from(taskCards).map(el => el.dataset.id);
+
+                // Create a map for quick lookup of new index
+                const idToIndex = {};
+                domIds.forEach((id, index) => { idToIndex[id] = index; });
+
+                // Sort the entire appData.tasks based on their presence in DOM
+                // Tasks NOT in DOM (filtered out) should ideally stay relative to each other or be ignored.
+                // Re-creating the whole array:
+
+                // Strategy: Extract all tasks that are currently visible (in DOM).
+                // Re-insert them in order.
+                // This preserves unseen tasks.
+
+                // 1. Remove all visible tasks from appData.tasks
+                const visibleIds = new Set(domIds);
+                const hiddenTasks = appData.tasks.filter(t => !visibleIds.has(t.id));
+
+                // 2. Create ordered array of visible tasks
+                const orderedVisibleTasks = domIds.map(id => appData.tasks.find(t => t.id === id)).filter(Boolean);
+
+                // 3. Merge? If we just append hidden tasks, order is lost for mixed content.
+                // BUT, typically reordering is done in "All" view.
+                // If user reorders in "Client A", those tasks should be grouped?
+                // Let's stick to simple "All" view reorder for robustness, OR just update index.
+
+                // Let's try to do it right:
+                // We want to update the order of the tasks that WERE moved.
+                // Actually, simply reconstructing appData.tasks with [OrderedVisible] + [Hidden] might change global order unexpectedly.
+                // Ideally: splice out moved items and splice them back in?
+                // Simplest robust way for now: 
+                // Rebuild `appData.tasks` by putting `orderedVisibleTasks` first or last? No.
+
+                // Current Implementation Plan:
+                // Just map DOM order to data.
+                // If filtered, this effectively groups filtered items together in the data array.
+                // That is acceptable behavior for a sort.
+
+                appData.tasks = [...orderedVisibleTasks, ...hiddenTasks];
+
+            } else {
+                // In 'all' view (assuming no other complex filters), DOM represents the Main List.
+                // But wait, archived/trash are excluded.
+                const domIds = Array.from(taskCards).map(el => el.dataset.id);
+                const visibleIds = new Set(domIds);
+
+                // Active visible tasks ordered
+                const orderedVisible = domIds.map(id => appData.tasks.find(t => t.id === id)).filter(Boolean);
+
+                // Tasks not in current view (like archived, trash)
+                const others = appData.tasks.filter(t => !visibleIds.has(t.id));
+
+                // Concatenate: New Visible Order + Others
+                appData.tasks = [...orderedVisible, ...others];
+            }
+
+            saveData();
+            renderTasks(); // Re-render to ensure clean state
+            return false;
+        }
+
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+            // Clean up any remaining visual artifacts if needed
+            const list = document.getElementById('taskList');
+            Array.from(list.children).forEach(item => {
+                item.classList.remove('over'); // if we used this class
+            });
+        }
+        function submitNewSubtask() {
+            if (!currentHeaderSubtaskTaskId) return;
+            const input = document.getElementById('newSubtaskInput');
+            const name = input.value.trim();
+            if (!name) return;
+
+            const t = appData.tasks.find(x => x.id === currentHeaderSubtaskTaskId);
+            if (t) {
+                t.subtasks.push({
+                    id: Date.now().toString(),
+                    name: name,
+                    status: appData.settings.statuses[0].id,
+                    isArchived: false,
+                    // Round 29 Support
+                    deadline: '',
+                    memo: ''
+                });
+                saveData();
+                renderTasks();
+                closeSubtaskModal();
+            }
+        }
+
+        // Modal Management - Success
+        function openSuccessModal() {
+            const m = document.getElementById('successModal');
+            if (m) m.classList.add('open');
+        }
+        function closeSuccessModal() {
+            const m = document.getElementById('successModal');
+            if (m) m.classList.remove('open');
+        }
+
+        // Modal Global Functions
+        window.openSettingsModal = function () {
+            console.log('Open Settings Modal Triggered');
+            const m = document.getElementById('settingsModal');
+            if (m) { m.classList.add('open'); renderSettingsLists(); }
+        }
+        window.closeSettingsModal = function () {
+            const m = document.getElementById('settingsModal');
+            if (m) { m.classList.remove('open'); renderApp(); }
+        }
+        window.openHelpModal = function () {
+            console.log('Open Help Modal Triggered');
+            const m = document.getElementById('helpModal');
+            if (m) m.classList.add('open');
+        }
+        window.closeHelpModal = function () {
+            const m = document.getElementById('helpModal');
+            if (m) m.classList.remove('open');
+        }
+        window.closeSubtaskModal = function () {
+            const m = document.getElementById('subtaskModal');
+            if (m) m.classList.remove('open');
+            // Cleanup input
+            const i = document.getElementById('newSubtaskInput');
+            if (i) i.value = '';
+        }
+
+        // Import Confirmation Modal Logic
+        window.openConfirmModal = function () {
+            const m = document.getElementById('confirmModal');
+            if (m) m.classList.add('open');
+        }
+        window.closeConfirmModal = function () {
+            const m = document.getElementById('confirmModal');
+            if (m) m.classList.remove('open');
+            pendingImportData = null; // Clear pending data
+            document.getElementById('importFile').value = ''; // Reset input
+        }
+        window.executeImport = function () {
+            if (pendingImportData) {
+                appData = pendingImportData;
+                saveData();
+                renderApp();
+                closeConfirmModal();
+                alert('データを読み込みました。');
+            }
+        }
+
+        // Round 51: Generic Horizontal Scroll Logic
+        window.scrollNav = function (elementId, direction) {
+            const container = document.getElementById(elementId);
+            if (container) {
+                const scrollAmount = 150; // Increased responsiveness
+                if (direction === 'left') {
+                    container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+                } else {
+                    container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                }
+            }
+        }
+
+        function renderSettingsLists() {
+            const cl = document.getElementById('settingsCatList'), sl =
+                document.getElementById('settingsStatusList');
+            cl.innerHTML = appData.settings.categories.map((c, i) => {
+                if (editingCatIndex === i) return `<li class="settings-item"><input
+                                                    type="text" class="edit-input" id="editCatInput-${i}"
+                                                    value="${escape(c.name)}"><button class="btn-mini"
+                                                    onclick="saveEditCategory(${i})">保存</button></li>`;
+                return `<li class="settings-item"><span
+                                                    class="settings-item-name">${c.name}</span><button class="btn-mini"
+                                                    onclick="startEditCategory(${i})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></button><button
+                                                    class="btn-mini del" onclick="deleteCategory(${i})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
+                                            </li>`;
+            }).join('');
+            sl.innerHTML = appData.settings.statuses.map((s, i) => {
+                if (editingStatusIndex === i) return `<li class="settings-item"
+                                                style="background:#f0f0f0;"><input type="color"
+                                                    id="editStatusColor-${i}" value="${s.color}"
+                                                    style="border:none;width:24px;height:24px;margin-right:4px;"><input
+                                                    type="text" class="edit-input" id="editStatusName-${i}"
+                                                    value="${escape(s.name)}"><button class="btn-mini"
+                                                    onclick="saveEditStatus(${i})">保存</button></li>`;
+                return `<li class="settings-item">
+                                                <div class="settings-item-dot" style="background:${s.color}"></div><span
+                                                    class="settings-item-name">${s.name}</span><button class="btn-mini"
+                                                    onclick="startEditStatus(${i})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></button><button
+                                                    class="btn-mini del" onclick="deleteStatus(${i})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
+                                            </li>`;
+            }).join('');
+        }
+
+        // Round 28: Initial Version (Soft Reset)
+        function resetSettings() {
+            if
+                (confirm("カスタム設定（カテゴリ・ステータス）をすべてリセットし、初期状態に戻しますか？\n※既存のタスクデータは削除されませんが、カテゴリの割り当てなどが無効になる可能性があります。")) {
+                appData.settings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+                saveData();
+                closeSettingsModal();
+            }
+        }
+
+        // Round 28: Factory Reset (Hard Reset)
+        function factoryReset() {
+            if
+                (confirm("【警告】\nタスクを含むすべてのデータを完全に削除し、アプリを初期状態に戻します。\n削除されたデータは復元できません。\n\n本当によろしいですか？")) {
+                localStorage.removeItem(STORAGE_KEY);
+                // Also remove legacy keys if any
+                localStorage.removeItem('task_app_data_v25_ux');
+                localStorage.removeItem('task_app_data_v24_settings');
+                location.reload();
+            }
+        }
+
+        function addCategory() {
+            const v =
+                document.getElementById('newCatName').value.trim(); if (v) {
+                    appData.settings.categories.push({ id: 'c_' + Date.now(), name: v });
+                    saveData(); document.getElementById('newCatName').value = '';
+                    renderSettingsLists();
+                }
+        }
+        function startEditCategory(i) {
+            editingCatIndex = i; renderSettingsLists();
+        }
+        function saveEditCategory(i) {
+            const v =
+                document.getElementById(`editCatInput-${i}`).value.trim(); if (v) {
+                    appData.settings.categories[i].name = v; saveData();
+                } editingCatIndex = -1;
+            renderSettingsLists();
+        }
+        function deleteCategory(i) {
+            if (appData.settings.categories.length > 1 &&
+                confirm("削除?")) {
+                appData.settings.categories.splice(i, 1); saveData();
+                renderSettingsLists();
+            }
+        }
+
+        function selectColor(c) {
+            selectedNewStatusColor = c;
+            document.getElementById('customColorPicker').value = c;
+            document.querySelectorAll('.color-opt').forEach(e =>
+                e.classList.toggle('selected', e.dataset.col === c));
+        }
+        function addStatus() {
+            const v =
+                document.getElementById('newStatusName').value.trim(); if (v) {
+                    appData.settings.statuses.push({
+                        id: 's_' + Date.now(), name: v, color:
+                            selectedNewStatusColor
+                    }); saveData();
+                    document.getElementById('newStatusName').value = ''; renderSettingsLists();
+                }
+        }
+        function startEditStatus(i) {
+            editingStatusIndex = i; renderSettingsLists();
+        }
+        function saveEditStatus(i) {
+            const v =
+                document.getElementById(`editStatusName-${i}`).value.trim(); const c =
+                    document.getElementById(`editStatusColor-${i}`).value; if (v) {
+                        appData.settings.statuses[i].name = v; appData.settings.statuses[i].color =
+                            c; saveData();
+                    } editingStatusIndex = -1; renderSettingsLists();
+        }
+        function deleteStatus(i) {
+            if (appData.settings.statuses.length > 1 &&
+                confirm("削除?")) {
+                appData.settings.statuses.splice(i, 1); saveData();
+                renderSettingsLists();
+            }
+        }
+
+    </script>
+</body>
+
+</html>
