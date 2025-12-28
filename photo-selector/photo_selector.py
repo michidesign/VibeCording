@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Photo Selector - 写真自動選定ツール
-大量の写真を品質評価し、良い/普通/良くないの3段階に分類します。
+大量の写真を品質評価し、「最高」から「非常に悪い」まで7段階に分類します。
 """
 
 import argparse
@@ -595,7 +595,7 @@ class PhotoSelector:
 
 def main():
     parser = argparse.ArgumentParser(
-        description='写真を自動評価し、良い/普通/良くないの3段階に分類します。'
+        description='写真を自動評価し、「最高」から「非常に悪い」まで7段階に分類します。'
     )
     parser.add_argument(
         '--input', '-i',
