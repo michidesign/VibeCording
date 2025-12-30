@@ -111,19 +111,19 @@ GUIを使わず、ターミナルから直接実行することもできます�
 ```bash
 cd "photo-selectorフォルダのパス"
 source venv/bin/activate
-python photo_selector.py --input 写真があるフォルダ --output 結果を保存するフォルダ
+python src/photo_selector.py --input 写真があるフォルダ --output 結果を保存するフォルダ
 ```
 
 ### 具体例
 
 ```bash
-python photo_selector.py --input ~/Desktop/写真2024 --output ~/Desktop/写真2024_分類済み
+python src/photo_selector.py --input ~/Desktop/写真2024 --output ~/Desktop/写真2024_分類済み
 ```
 
 ### バッチサイズの指定
 
 ```bash
-python photo_selector.py --input ~/Desktop/写真 --output ~/Desktop/結果 --batch-size 300
+python src/photo_selector.py --input ~/Desktop/写真 --output ~/Desktop/結果 --batch-size 300
 ```
 
 ---
@@ -278,13 +278,19 @@ pip install "numpy<2"
 
 ## ファイル構成
 
-| ファイル名 | 説明 |
-|-----------|------|
-| Photo Selector.command | ダブルクリックで起動するファイル |
-| photo_selector_gui.py | GUI版のプログラム |
-| photo_selector.py | 写真評価の処理プログラム |
-| requirements.txt | 必要なライブラリ一覧 |
-| venv/ | Python仮想環境（自動生成） |
+```
+photo-selector/
+├── Photo Selector.command   # ダブルクリックで起動するファイル
+├── README.md                # このドキュメント
+├── requirements.txt         # 必要なライブラリ一覧
+├── src/                     # ソースコード
+│   ├── photo_selector.py        # 写真評価の処理プログラム
+│   └── photo_selector_gui.py    # GUI版のプログラム
+├── docs/                    # ドキュメント類
+│   ├── Photo_Selector_マニュアル.pdf  # ユーザーマニュアル
+│   └── images/              # ドキュメント用画像
+└── venv/                    # Python仮想環境（自動生成）
+```
 
 ---
 

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kids Sunglasses - 子供の写真にサングラスを追加</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- face-api.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <!-- JSZip -->
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script defer src="script.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Kids Sunglasses</h1>
+            <p>子供の写真にサングラスを自動で追加します</p>
+            <div id="statusBar" class="status-bar">
+                <span id="modelStatus" class="status loading">AIモデル読み込み中...</span>
+            </div>
+        </header>
+
+        <main>
+            <div class="panels">
+                <!-- 左パネル: 設定 -->
+                <div class="left-panel">
+                    <!-- サングラス選択セクション -->
+                    <section class="card sunglasses-section">
+                        <h2>サングラス画像</h2>
+                        <div class="sunglasses-preview">
+                            <img id="sunglassesPreview" src="default-sunglasses.png" alt="現在のサングラス">
+                        </div>
+                        <div class="sunglasses-controls">
+                            <label for="sunglassesUpload" class="upload-btn secondary">
+                                カスタム画像をアップロード
+                            </label>
+                            <input type="file" id="sunglassesUpload" accept="image/png,image/webp" hidden>
+                            <button id="resetSunglassesBtn" class="reset-btn hidden">
+                                デフォルトに戻す
+                            </button>
+                        </div>
+                        <p class="hint">PNG形式（透過背景）推奨</p>
+                    </section>
+
+                    <!-- 写真アップロードセクション -->
+                    <section class="card upload-section" id="uploadSection">
+                        <h2>写真をアップロード</h2>
+                        <div class="drop-zone" id="dropZone">
+                            <div class="drop-zone-content">
+                                <span class="drop-icon">📷</span>
+                                <p>ドラッグ&ドロップ<br>または</p>
+                                <label for="photoUpload" class="upload-btn primary">
+                                    ファイルを選択
+                                </label>
+                                <input type="file" id="photoUpload" accept="image/*" multiple hidden>
+                            </div>
+                        </div>
+                        <p class="hint">複数選択可能</p>
+                    </section>
+
+                    <!-- 操作ボタン -->
+                    <section class="card controls-section">
+                        <button id="downloadBtn" class="download-btn" disabled>
+                            画像をダウンロード
+                        </button>
+                    </section>
+                </div>
+
+                <!-- 右パネル: プレビュー -->
+                <div class="right-panel">
+                    <section class="card preview-section">
+                        <h2>プレビュー</h2>
+
+                        <!-- ローディング -->
+                        <div id="loading" class="loading hidden">
+                            <div class="spinner"></div>
+                            <p id="loadingText">AI解析中...</p>
+                        </div>
+
+                        <!-- プレビューエリア -->
+                        <div id="previewContainer" class="preview-container">
+                            <div id="placeholder" class="placeholder">
+                                <p>ここに処理結果が表示されます</p>
+                            </div>
+                        </div>
+
+                        <!-- カルーセルコントロール -->
+                        <div id="carouselControls" class="carousel-controls hidden">
+                            <button id="prevBtn" class="nav-btn">&lt;</button>
+                            <span id="slideCounter">1 / 1</span>
+                            <button id="nextBtn" class="nav-btn">&gt;</button>
+                        </div>
+
+                        <!-- サムネイル -->
+                        <div id="thumbnailContainer" class="thumbnail-container hidden"></div>
+                    </section>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>子供のプライバシーを守るために、サングラスで目元を隠しましょう</p>
+        </footer>
+    </div>
+</body>
+
+</html>
