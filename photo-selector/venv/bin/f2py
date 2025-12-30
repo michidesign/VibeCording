@@ -1,4 +1,4 @@
-#!/Users/uchiyamatakahiro/Desktop/photo-selector/venv/bin/python3
+#!/Users/uchiyamatakahiro/Library/CloudStorage/GoogleDrive-danielerlandsson0809@gmail.com/マイドライブ/VibeCording/photo-selector/venv/bin/python3.12
 import sys
 from numpy.f2py.f2py2e import main
 if __name__ == '__main__':

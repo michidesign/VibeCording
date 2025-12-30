@@ -16,17 +16,51 @@
 - **完全無料**: すべてオープンソースのライブラリを使用
 - **時系列管理**: 撮影日時をファイル名に付加して時系列順に管理
 - **中断・再開対応**: 処理を途中でやめても、次回続きから処理可能
+- **GUI対応**: ダブルクリックで起動できる画面操作版
 
 ---
 
-## はじめに（セットアップ）
+## 起動方法（GUI版）
+
+### ダブルクリックで起動
+
+1. **photo-selector** フォルダを開く
+2. **「Photo Selector.command」** をダブルクリック
+3. GUIウィンドウが表示されます
+
+### 初回のみ：セキュリティの許可
+
+初めてダブルクリックすると「開発元を確認できない」と警告が出る場合があります。
+
+その場合：
+1. **システム設定** → **プライバシーとセキュリティ**
+2. 下の方に「"Photo Selector.command"はブロックされました」と表示
+3. **「このまま開く」** をクリック
+
+---
+
+## GUI版の使い方
+
+1. **入力フォルダ**：「選択」ボタンをクリックして、写真があるフォルダを選ぶ
+2. **出力フォルダ**：「選択」ボタンをクリックして、結果を保存するフォルダを選ぶ
+3. **バッチサイズ**：スライダーで一度に処理する枚数を調整（通常は変更不要）
+4. **「実行」ボタン**をクリック
+
+処理中はプログレスバーと処理ログが表示されます。
+
+---
+
+## はじめに（初回セットアップ）
+
+初めて使う場合は、以下のセットアップが必要です。
 
 ### 必要なもの
 
 - Mac（macOS）
-- Python 3.8以上（Macには標準でインストール済み）
+- Python 3.8以上
+- Homebrew（推奨）
 
-### 手順
+### セットアップ手順
 
 #### ステップ1: ターミナルを開く
 
@@ -38,15 +72,15 @@
 ターミナルに以下を入力してEnterキーを押します：
 
 ```bash
-cd ~/Desktop/photo-selector
+cd "このフォルダのパス"
 ```
+
+※フォルダをターミナルにドラッグ＆ドロップするとパスが入力されます
 
 #### ステップ3: 仮想環境を作成（初回のみ）
 
-以下のコマンドを1行ずつ入力してEnterキーを押します：
-
 ```bash
-python3 -m venv venv
+/opt/homebrew/bin/python3.12 -m venv venv
 ```
 
 #### ステップ4: 仮想環境を有効化
@@ -61,44 +95,35 @@ source venv/bin/activate
 
 ```bash
 pip install -r requirements.txt
+pip install "numpy<2"
 ```
 
-これで準備完了です。
+これで準備完了です。次回からは「Photo Selector.command」をダブルクリックするだけで起動できます。
 
 ---
 
-## 使い方
+## コマンドライン版の使い方（上級者向け）
+
+GUIを使わず、ターミナルから直接実行することもできます。
 
 ### 基本的な使い方
 
-写真を分類するには、以下のコマンドを実行します：
-
 ```bash
+cd "photo-selectorフォルダのパス"
+source venv/bin/activate
 python photo_selector.py --input 写真があるフォルダ --output 結果を保存するフォルダ
 ```
 
 ### 具体例
 
-#### 例1: デスクトップの写真フォルダを処理
-
 ```bash
 python photo_selector.py --input ~/Desktop/写真2024 --output ~/Desktop/写真2024_分類済み
 ```
 
-#### 例2: ピクチャフォルダの写真を処理
+### バッチサイズの指定
 
 ```bash
-python photo_selector.py --input ~/Pictures/子供の写真 --output ~/Desktop/アルバム候補
-```
-
-### 2回目以降の実行
-
-毎回、仮想環境を有効化してから実行してください：
-
-```bash
-cd ~/Desktop/photo-selector
-source venv/bin/activate
-python photo_selector.py --input 写真があるフォルダ --output 結果を保存するフォルダ
+python photo_selector.py --input ~/Desktop/写真 --output ~/Desktop/結果 --batch-size 300
 ```
 
 ---
@@ -186,34 +211,16 @@ Excelやスプレッドシートで開くと、各写真の詳細スコアを確
 
 ---
 
-## オプション機能
-
-### バッチサイズの指定
-
-写真が多い場合（1000枚以上など）、一度に処理する枚数を指定できます：
-
-```bash
-python photo_selector.py --input ~/Desktop/写真 --output ~/Desktop/結果 --batch-size 300
-```
-
-これにより、300枚ずつ処理されます。途中で中断しても、次回は続きから処理されます。
-
----
-
 ## 途中で中断した場合
 
-処理を途中でやめた場合（ターミナルを閉じた、Ctrl+Cで停止した、など）、
-次回同じコマンドを実行すると、処理済みのファイルは自動的にスキップされ、続きから処理されます。
+処理を途中でやめた場合（ウィンドウを閉じた、など）、
+次回同じ出力フォルダを指定して実行すると、処理済みのファイルは自動的にスキップされ、続きから処理されます。
 
 ### 最初からやり直したい場合
 
-出力フォルダ内の `.processed.txt` ファイルを削除してください：
+出力フォルダ内の `.processed.txt` ファイルを削除してください。
 
-```bash
-rm ~/Desktop/結果フォルダ/.processed.txt
-```
-
-または、Finderで出力フォルダを開き、隠しファイルを表示（Command + Shift + .）して `.processed.txt` を削除してください。
+Finderで出力フォルダを開き、隠しファイルを表示（Command + Shift + .）して `.processed.txt` を削除してください。
 
 ---
 
@@ -243,12 +250,18 @@ A: 元のフォルダに写真は残っているので、出力フォルダか�
 
 ## トラブルシューティング
 
-### 「command not found: python3」と表示される
+### 「開発元を確認できない」と表示される
 
-Pythonがインストールされていない可能性があります。以下のコマンドでインストールしてください：
+初回起動時のセキュリティ警告です。「起動方法（GUI版）」セクションの手順に従って許可してください。
+
+### NumPyのエラーが表示される
+
+ターミナルで以下を実行してください：
 
 ```bash
-xcode-select --install
+cd "photo-selectorフォルダのパス"
+source venv/bin/activate
+pip install "numpy<2"
 ```
 
 ### 「No such file or directory」と表示される
@@ -258,24 +271,27 @@ xcode-select --install
 
 ### 処理が遅い
 
-- バッチサイズを小さくしてみてください（`--batch-size 200` など）
+- バッチサイズを小さくしてみてください（GUIのスライダーで調整）
 - 他のアプリを閉じてメモリを確保してください
 
-### 仮想環境が有効化できない
+---
 
-ターミナルの行頭に `(venv)` が表示されていることを確認してください。
-表示されていない場合は、再度以下を実行してください：
+## ファイル構成
 
-```bash
-cd ~/Desktop/photo-selector
-source venv/bin/activate
-```
+| ファイル名 | 説明 |
+|-----------|------|
+| Photo Selector.command | ダブルクリックで起動するファイル |
+| photo_selector_gui.py | GUI版のプログラム |
+| photo_selector.py | 写真評価の処理プログラム |
+| requirements.txt | 必要なライブラリ一覧 |
+| venv/ | Python仮想環境（自動生成） |
 
 ---
 
 ## 技術仕様
 
 - 使用言語: Python 3.8+
+- GUI: CustomTkinter
 - 顔検出: OpenCV Haar Cascade
 - 画像処理: OpenCV, Pillow
 - EXIF読み取り: Pillow
@@ -285,5 +301,6 @@ source venv/bin/activate
 - opencv-python>=4.8.0
 - opencv-contrib-python>=4.8.0
 - Pillow>=10.0.0
-- numpy>=1.24.0
+- numpy>=1.24.0（2.0未満を推奨）
 - tqdm>=4.65.0
+- customtkinter>=5.2.0
