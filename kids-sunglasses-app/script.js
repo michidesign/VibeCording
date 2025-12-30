@@ -23,6 +23,7 @@ let currentSlideIndex = 0;
 let previousSlideIndex = -1;
 let mainPreviewImg = null;
 let thumbnailImages = [];
+let cachedImageObjects = []; // 事前読み込み済み画像オブジェクト
 const defaultSunglassesPath = 'default-sunglasses.png';
 
 // Initialize sunglasses image
@@ -548,6 +549,7 @@ function renderPreviews() {
     // Reset cached arrays
     mainPreviewImg = null;
     thumbnailImages = [];
+    cachedImageObjects = [];
     previousSlideIndex = -1;
 
     placeholder.classList.add('hidden');
@@ -557,6 +559,13 @@ function renderPreviews() {
         carouselControls.classList.remove('hidden');
         thumbnailContainer.classList.remove('hidden');
     }
+
+    // 全画像を事前にImageオブジェクトとしてキャッシュ（即座切り替え用）
+    processedImages.forEach((imgData) => {
+        const cachedImg = new Image();
+        cachedImg.src = imgData.blobURL;
+        cachedImageObjects.push(cachedImg);
+    });
 
     // Create single main preview image (src will be switched)
     mainPreviewImg = document.createElement('img');
@@ -584,22 +593,23 @@ function renderPreviews() {
     slideCounter.textContent = `1 / ${processedImages.length}`;
 }
 
-// Fast slide navigation
+// Fast slide navigation (optimized)
 function goToSlide(index) {
     if (index === currentSlideIndex) return;
     currentSlideIndex = index;
     updateCarousel();
 }
 
-// Update carousel display (optimized - only switch src)
+// Update carousel display (超高速版 - キャッシュ済み画像を使用)
 function updateCarousel() {
-    // Update main preview image src (use blobURL for instant switching)
-    if (mainPreviewImg && processedImages[currentSlideIndex]) {
-        mainPreviewImg.src = processedImages[currentSlideIndex].blobURL;
+    // キャッシュ済み画像のsrcを使用（既に読み込み済みなので即座に表示）
+    if (mainPreviewImg && cachedImageObjects[currentSlideIndex]) {
+        // 既にキャッシュされた画像からsrcをコピー（再読み込みなし）
+        mainPreviewImg.src = cachedImageObjects[currentSlideIndex].src;
         mainPreviewImg.alt = processedImages[currentSlideIndex].filename;
     }
 
-    // Update thumbnail active state
+    // Update thumbnail active state（クラス操作のみ - 高速）
     if (previousSlideIndex >= 0 && previousSlideIndex < thumbnailImages.length) {
         thumbnailImages[previousSlideIndex].classList.remove('active');
     }
