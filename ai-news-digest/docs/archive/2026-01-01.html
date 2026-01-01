@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="今日の注目AIニュース5選 - 2026年01月01日更新">
+    <title>AI News Digest - 2026年01月01日</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a24;
+            --bg-card-hover: #222230;
+            --text-primary: #f0f0f5;
+            --text-secondary: #a0a0b0;
+            --text-muted: #606070;
+            --accent-primary: #6366f1;
+            --accent-secondary: #8b5cf6;
+            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --font-sans: 'Inter', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        /* ヘッダー */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+        }
+
+        .header-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-gradient);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .update-time {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        /* メインコンテンツ */
+        .main {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 1.5rem 1rem 3rem;
+        }
+
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* ニュースカード */
+        .news-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.5s ease forwards;
+            animation-delay: calc(var(--card-index) * 0.1s);
+            opacity: 0;
+        }
+
+        .news-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-number {
+            width: 32px;
+            height: 32px;
+            background: var(--accent-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+            color: white;
+        }
+
+        .card-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .source-badge,
+        .lang-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.625rem;
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 100px;
+            color: var(--text-secondary);
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            line-height: 1.5;
+            margin-bottom: 0.875rem;
+        }
+
+        .card-title a {
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .card-title a:hover {
+            color: var(--accent-primary);
+        }
+
+        .card-summary {
+            color: var(--text-secondary);
+            font-size: 0.9375rem;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .card-date {
+            color: var(--text-muted);
+            font-size: 0.8125rem;
+        }
+
+        .read-more {
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .read-more:hover {
+            color: var(--accent-secondary);
+            gap: 0.5rem;
+        }
+
+        /* フッター */
+        .footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+            color: var(--text-muted);
+            font-size: 0.8125rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-primary);
+        }
+
+        /* レスポンシブ */
+        @media (max-width: 480px) {
+            .logo-text {
+                font-size: 1.25rem;
+            }
+            
+            .news-card {
+                padding: 1.25rem;
+            }
+            
+            .card-title {
+                font-size: 1rem;
+            }
+            
+            .card-summary {
+                font-size: 0.875rem;
+            }
+        }
+
+        /* アクセシビリティ */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* ダークモード最適化 (既にダークがデフォルト) */
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg-primary: #f5f5f7;
+                --bg-secondary: #ffffff;
+                --bg-card: #ffffff;
+                --bg-card-hover: #f0f0f5;
+                --text-primary: #1a1a2e;
+                --text-secondary: #4a4a5e;
+                --text-muted: #8a8a9e;
+                --border-color: rgba(0, 0, 0, 0.08);
+                --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+                --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
+                --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">🤖</div>
+                <span class="logo-text">AI News Digest</span>
+            </div>
+            <div class="header-meta">
+                <span class="update-time">
+                    📅 2026年01月01日 
+                </span>
+                <a href="archive.html" style="color: var(--text-secondary); text-decoration: none; font-size: 0.875rem;">📂 アーカイブ</a>
+                <a href="live.html" style="color: var(--accent-primary); text-decoration: none; font-size: 0.875rem;">🔄 今すぐ取得</a>
+                <a href="settings.html" style="color: var(--text-secondary); text-decoration: none; font-size: 0.875rem;">⚙️ 設定</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <h1 class="section-title">
+            📂 2026年01月01日のAIニュース
+        </h1>
+        
+        
+        <article class="news-card" style="--card-index: 0">
+            <div class="card-header">
+                <span class="card-number">1</span>
+                <div class="card-meta">
+                    <span class="source-badge">🇯🇵 ITmedia AI+</span>
+                    <span class="lang-badge">🇯🇵 日本語</span>
+                </div>
+            </div>
+            <h2 class="card-title">
+                <a href="https://atmarkit.itmedia.co.jp/ait/articles/2601/01/news012.html" target="_blank" rel="noopener noreferrer">
+                    OpenAI公式チートシートが注目　プロンプト作成は「構造化エンジニアリング」に
+                </a>
+            </h2>
+            <p class="card-summary">2025年に公開された記事の中から、AIの話題で特に注目を集めた10本をランキング形式で紹介します。何が読者の関心を引いたのでしょうか。</p>
+            <div class="card-footer">
+                <time class="card-date">2025年12月31日 23:00</time>
+                <a href="https://atmarkit.itmedia.co.jp/ait/articles/2601/01/news012.html" target="_blank" rel="noopener noreferrer" class="read-more">
+                    元記事を読む →
+                </a>
+            </div>
+        </article>
+        
+
+        <article class="news-card" style="--card-index: 1">
+            <div class="card-header">
+                <span class="card-number">2</span>
+                <div class="card-meta">
+                    <span class="source-badge">📄 Impress Watch AI</span>
+                    <span class="lang-badge">🇯🇵 日本語</span>
+                </div>
+            </div>
+            <h2 class="card-title">
+                <a href="https://www.watch.impress.co.jp/docs/news/2075143.html" target="_blank" rel="noopener noreferrer">
+                    ソフトバンクグループ、OpenAIへの3.5兆円追加出資を完了
+                </a>
+            </h2>
+            <p class="card-summary">ソフトバンクグループは、OpenAIへの225億ドル(約3.52兆円)の追加出資が12月26日に完了したと発表した。これにより、25年3月にコミットしたOpenAIへの追加出資が外部投資家へのシンジケーションを含めて完了し、ソフトバンクグループのOpenAIに対する持ち株比率は約11%となった。</p>
+            <div class="card-footer">
+                <time class="card-date">2025年12月31日 02:44</time>
+                <a href="https://www.watch.impress.co.jp/docs/news/2075143.html" target="_blank" rel="noopener noreferrer" class="read-more">
+                    元記事を読む →
+                </a>
+            </div>
+        </article>
+        
+
+        <article class="news-card" style="--card-index: 2">
+            <div class="card-header">
+                <span class="card-number">3</span>
+                <div class="card-meta">
+                    <span class="source-badge">📰 GIGAZINE</span>
+                    <span class="lang-badge">🇯🇵 日本語</span>
+                </div>
+            </div>
+            <h2 class="card-title">
+                <a href="https://gigazine.net/news/20260101-h100-desktop-home/" target="_blank" rel="noopener noreferrer">
+                    NVIDIAの業務用GPUとAIチップを搭載した激安AIサーバーを入手して家庭用AIマシンを作ってしまった記録が話題に
+                </a>
+            </h2>
+            <p class="card-summary">NVIDIAのハイエンドGPU「H100」やAI処理チップ「GH200」は基本的にデータセンター向けに販売されている製品で、個人での入手は困難です。そんなH100やGH200を搭載したサーバーを非常に安い価格で購入して自宅用AIデスクトップPCに仕立て上げた記録をAI研究者のDavid Noel Ng氏が公開しています。 続きを読む...</p>
+            <div class="card-footer">
+                <time class="card-date">2026年01月01日 01:00</time>
+                <a href="https://gigazine.net/news/20260101-h100-desktop-home/" target="_blank" rel="noopener noreferrer" class="read-more">
+                    元記事を読む →
+                </a>
+            </div>
+        </article>
+        
+
+        <article class="news-card" style="--card-index: 3">
+            <div class="card-header">
+                <span class="card-number">4</span>
+                <div class="card-meta">
+                    <span class="source-badge">🇯🇵 ITmedia AI+</span>
+                    <span class="lang-badge">🇯🇵 日本語</span>
+                </div>
+            </div>
+            <h2 class="card-title">
+                <a href="https://www.itmedia.co.jp/enterprise/articles/2601/01/news014.html" target="_blank" rel="noopener noreferrer">
+                    AIブームを「銀の弾丸」に変えらえるか　2026年、企業ITが直面する課題
+                </a>
+            </h2>
+            <p class="card-summary">AI活用の推進やセキュリティの課題など、2025年のIT業界は話題に事欠かない1年だった。アイ・ティ・アールが発表した「国内IT投資動向調査報告書2026」を基に今後を読み解く。</p>
+            <div class="card-footer">
+                <time class="card-date">2025年12月31日 15:00</time>
+                <a href="https://www.itmedia.co.jp/enterprise/articles/2601/01/news014.html" target="_blank" rel="noopener noreferrer" class="read-more">
+                    元記事を読む →
+                </a>
+            </div>
+        </article>
+        
+
+        <article class="news-card" style="--card-index: 4">
+            <div class="card-header">
+                <span class="card-number">5</span>
+                <div class="card-meta">
+                    <span class="source-badge">📄 ASCII.jp AI</span>
+                    <span class="lang-badge">🇯🇵 日本語</span>
+                </div>
+            </div>
+            <h2 class="card-title">
+                <a href="https://ascii.jp/elem/000/004/363/4363786/?rss" target="_blank" rel="noopener noreferrer">
+                    “売れる接客”をAIで。アパレルEC特化型「Clerky for Apparel」β版Waitlistを公開。先行導入企業の募集を開始
+                </a>
+            </h2>
+            <p class="card-summary">“売れる接客”をAIで。アパレルEC特化型「Clerky for Apparel」β版Waitlistを公開。先行導入企業の募集を開始</p>
+            <div class="card-footer">
+                <time class="card-date">2025年12月31日 08:03</time>
+                <a href="https://ascii.jp/elem/000/004/363/4363786/?rss" target="_blank" rel="noopener noreferrer" class="read-more">
+                    元記事を読む →
+                </a>
+            </div>
+        </article>
+        
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>AI News Digest</p>
+            <p style="margin-top: 0.5rem;">主要なAI関連ニュースソースから厳選してお届けします</p>
+            <div class="footer-links">
+                <a href="#" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">
+                    ↑ トップへ戻る
+                </a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI News Digest - 今すぐ取得</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a24;
+            --bg-card-hover: #222230;
+            --text-primary: #f0f0f5;
+            --text-secondary: #a0a0b0;
+            --text-muted: #606070;
+            --accent-primary: #6366f1;
+            --accent-secondary: #8b5cf6;
+            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --font-sans: 'Inter', 'Noto Sans JP', -apple-system, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+        }
+
+        .header-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-gradient);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-primary);
+        }
+
+        .main {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1rem 3rem;
+        }
+
+        .fetch-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .fetch-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .fetch-desc {
+            color: var(--text-secondary);
+            font-size: 0.9375rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .fetch-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 2rem;
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .fetch-btn:hover:not(:disabled) {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .fetch-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .fetch-btn .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .status-bar {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .status-bar.error {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+        }
+
+        .status-bar.success {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: var(--bg-secondary);
+            border-radius: 2px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-gradient);
+            transition: width 0.3s ease;
+        }
+
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        #newsContainer {
+            display: none;
+        }
+
+        .news-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.5s ease forwards;
+            animation-delay: calc(var(--card-index, 0) * 0.1s);
+            opacity: 0;
+        }
+
+        .news-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-number {
+            width: 32px;
+            height: 32px;
+            background: var(--accent-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+            color: white;
+        }
+
+        .card-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .source-badge,
+        .lang-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.625rem;
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 100px;
+            color: var(--text-secondary);
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            line-height: 1.5;
+            margin-bottom: 0.875rem;
+        }
+
+        .card-title a {
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .card-title a:hover {
+            color: var(--accent-primary);
+        }
+
+        .card-summary {
+            color: var(--text-secondary);
+            font-size: 0.9375rem;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .card-date {
+            color: var(--text-muted);
+            font-size: 0.8125rem;
+        }
+
+        .read-more {
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .read-more:hover {
+            color: var(--accent-secondary);
+        }
+
+        .footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+            color: var(--text-muted);
+            font-size: 0.8125rem;
+        }
+
+        @media (max-width: 480px) {
+            .logo-text {
+                font-size: 1.25rem;
+            }
+
+            .news-card {
+                padding: 1.25rem;
+            }
+
+            .card-title {
+                font-size: 1rem;
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg-primary: #f5f5f7;
+                --bg-secondary: #ffffff;
+                --bg-card: #ffffff;
+                --bg-card-hover: #f0f0f5;
+                --text-primary: #1a1a2e;
+                --text-secondary: #4a4a5e;
+                --text-muted: #8a8a9e;
+                --border-color: rgba(0, 0, 0, 0.08);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">🔄</div>
+                <span class="logo-text">AI News - Live</span>
+            </div>
+            <nav class="nav-links">
+                <a href="index.html" class="nav-link">📰 定期配信版</a>
+                <a href="settings.html" class="nav-link">⚙️ 設定</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <section class="fetch-section">
+            <h1 class="fetch-title">🚀 今すぐAIニュースを取得</h1>
+            <p class="fetch-desc">
+                ボタンをクリックすると、最新のAI関連ニュースをリアルタイムで収集します
+            </p>
+            <button class="fetch-btn" id="fetchBtn" onclick="fetchNews()">
+                <span id="btnIcon">🔍</span>
+                <span id="btnText">ニュースを取得</span>
+            </button>
+            <div class="status-bar" id="statusBar" style="display: none;">
+                <span id="statusText">準備中...</span>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="newsContainer">
+            <h2 class="section-title">
+                <span>🔥</span>
+                <span id="resultTitle">取得結果</span>
+            </h2>
+            <div id="newsList"></div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>AI News Digest - Live Edition</p>
+            <p style="margin-top: 0.5rem;">クライアントサイドでRSSフィードを取得・表示</p>
+        </div>
+    </footer>
+
+    <script>
+        // RSS取得用プロキシ（CORS回避）
+        const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+
+        // ニュースソース
+        const NEWS_SOURCES = [
+            { name: "ITmedia AI+", url: "https://rss.itmedia.co.jp/rss/2.0/aiplus.xml", language: "ja" },
+            { name: "GIGAZINE", url: "https://gigazine.net/news/rss_2.0/", language: "ja" },
+            { name: "Impress Watch", url: "https://www.watch.impress.co.jp/data/rss/1.0/ipw/feed.rdf", language: "ja" },
+            { name: "TechCrunch AI", url: "https://techcrunch.com/category/artificial-intelligence/feed/", language: "en" },
+            { name: "The Verge AI", url: "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml", language: "en" },
+        ];
+
+        // AIキーワード（スコアリング用）
+        const AI_KEYWORDS = [
+            'openai', 'gpt', 'chatgpt', 'google', 'gemini', 'anthropic', 'claude',
+            'meta', 'llama', 'microsoft', 'copilot', 'ai', 'artificial intelligence',
+            '人工知能', '生成ai', '言語モデル', 'エージェント', 'ニューラル',
+            'deepmind', 'nvidia', 'transformer', 'llm', 'machine learning'
+        ];
+
+        let isLoading = false;
+
+        async function fetchNews() {
+            if (isLoading) return;
+            isLoading = true;
+
+            const fetchBtn = document.getElementById('fetchBtn');
+            const btnIcon = document.getElementById('btnIcon');
+            const btnText = document.getElementById('btnText');
+            const statusBar = document.getElementById('statusBar');
+            const statusText = document.getElementById('statusText');
+            const progressFill = document.getElementById('progressFill');
+            const newsContainer = document.getElementById('newsContainer');
+            const newsList = document.getElementById('newsList');
+
+            // UI更新
+            fetchBtn.disabled = true;
+            btnIcon.innerHTML = '<div class="spinner"></div>';
+            btnText.textContent = '取得中...';
+            statusBar.style.display = 'block';
+            statusBar.className = 'status-bar';
+            newsContainer.style.display = 'none';
+
+            const allArticles = [];
+            const totalSources = NEWS_SOURCES.length;
+
+            try {
+                for (let i = 0; i < NEWS_SOURCES.length; i++) {
+                    const source = NEWS_SOURCES[i];
+                    statusText.textContent = `${source.name} から取得中...`;
+                    progressFill.style.width = `${((i + 1) / totalSources) * 100}%`;
+
+                    try {
+                        const articles = await fetchRSS(source);
+                        allArticles.push(...articles);
+                    } catch (e) {
+                        console.error(`Error fetching ${source.name}:`, e);
+                    }
+
+                    // レート制限回避
+                    await sleep(300);
+                }
+
+                // 重複除去とスコアリング
+                statusText.textContent = '記事を選定中...';
+                const uniqueArticles = removeDuplicates(allArticles);
+                const scoredArticles = scoreArticles(uniqueArticles);
+                const topArticles = scoredArticles.slice(0, 5);
+
+                // 表示
+                displayArticles(topArticles);
+
+                statusBar.className = 'status-bar success';
+                statusText.textContent = `✅ ${allArticles.length}件の記事から上位5件を選定しました`;
+                progressFill.style.width = '100%';
+
+            } catch (error) {
+                statusBar.className = 'status-bar error';
+                statusText.textContent = `❌ エラー: ${error.message}`;
+            }
+
+            // ボタンを復元
+            fetchBtn.disabled = false;
+            btnIcon.innerHTML = '🔍';
+            btnText.textContent = '再取得';
+            isLoading = false;
+        }
+
+        async function fetchRSS(source) {
+            const url = CORS_PROXY + encodeURIComponent(source.url);
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const text = await response.text();
+            const parser = new DOMParser();
+            const xml = parser.parseFromString(text, 'text/xml');
+
+            const articles = [];
+            const items = xml.querySelectorAll('item');
+
+            items.forEach((item, index) => {
+                if (index >= 10) return; // 各ソース10件まで
+
+                const title = item.querySelector('title')?.textContent || '';
+                const link = item.querySelector('link')?.textContent || '';
+                const description = item.querySelector('description')?.textContent || '';
+
+                // 公開日の取得（複数フォーマット対応）
+                let pubDateStr = item.querySelector('pubDate')?.textContent || '';
+                if (!pubDateStr) {
+                    // dc:date形式（RDF/Atom）
+                    pubDateStr = item.getElementsByTagNameNS('http://purl.org/dc/elements/1.1/', 'date')[0]?.textContent || '';
+                }
+                if (!pubDateStr) {
+                    // date形式
+                    pubDateStr = item.querySelector('date')?.textContent || '';
+                }
+
+                // 日付のパース
+                let pubDate = null;
+                let pubDateDisplay = '日時不明';
+                if (pubDateStr) {
+                    const parsed = new Date(pubDateStr);
+                    if (!isNaN(parsed.getTime())) {
+                        pubDate = parsed;
+                        pubDateDisplay = formatDate(parsed);
+                    }
+                }
+
+                // AI関連かチェック
+                const textContent = (title + ' ' + description).toLowerCase();
+                const isAI = AI_KEYWORDS.some(kw => textContent.includes(kw));
+
+                if (source.name.includes('AI') || source.name.includes('ITmedia') || isAI) {
+                    articles.push({
+                        title: title,
+                        url: link,
+                        source: source.name,
+                        language: source.language,
+                        description: stripHtml(description).substring(0, 300),
+                        pubDate: pubDate,
+                        pubDateDisplay: pubDateDisplay,
+                        score: 0
+                    });
+                }
+            });
+
+            return articles;
+        }
+
+        function formatDate(date) {
+            return date.toLocaleDateString('ja-JP', {
+                year: 'numeric',
+                month: 'numeric',
+                day: 'numeric'
+            });
+        }
+
+        function stripHtml(html) {
+            const tmp = document.createElement('div');
+            tmp.innerHTML = html;
+            return tmp.textContent || tmp.innerText || '';
+        }
+
+        function removeDuplicates(articles) {
+            const seen = new Set();
+            return articles.filter(article => {
+                const key = article.title.toLowerCase().substring(0, 50);
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+            });
+        }
+
+        function scoreArticles(articles) {
+            const now = new Date();
+
+            articles.forEach(article => {
+                let score = 0;
+                const text = (article.title + ' ' + article.description).toLowerCase();
+
+                // キーワードスコア
+                AI_KEYWORDS.forEach(kw => {
+                    if (text.includes(kw)) score += 5;
+                });
+
+                // 主要企業ボーナス
+                ['openai', 'google', 'anthropic', 'meta', 'microsoft'].forEach(company => {
+                    if (text.includes(company)) score += 10;
+                });
+
+                // 新しさボーナス（pubDateがある場合のみ）
+                if (article.pubDate) {
+                    const age = (now - article.pubDate) / (1000 * 60 * 60);
+                    if (age < 24) score += 10;
+                    else if (age < 48) score += 5;
+                }
+
+                // 日本語ボーナス
+                if (article.language === 'ja') score += 5;
+
+                article.score = score;
+            });
+
+            return articles.sort((a, b) => b.score - a.score);
+        }
+
+        function displayArticles(articles) {
+            const newsContainer = document.getElementById('newsContainer');
+            const newsList = document.getElementById('newsList');
+            const resultTitle = document.getElementById('resultTitle');
+
+            const now = new Date();
+            resultTitle.textContent = `取得結果（${now.toLocaleString('ja-JP')}）`;
+
+            newsList.innerHTML = articles.map((article, index) => {
+                const dateStr = article.pubDateDisplay || '日時不明';
+                const langBadge = article.language === 'ja' ? '🇯🇵 日本語' : '🌐 English';
+
+                return `
+                    <article class="news-card" style="--card-index: ${index}">
+                        <div class="card-header">
+                            <span class="card-number">${index + 1}</span>
+                            <div class="card-meta">
+                                <span class="source-badge">📰 ${article.source}</span>
+                                <span class="lang-badge">${langBadge}</span>
+                            </div>
+                        </div>
+                        <h2 class="card-title">
+                            <a href="${article.url}" target="_blank" rel="noopener noreferrer">
+                                ${article.title}
+                            </a>
+                        </h2>
+                        <p class="card-summary">${article.description || '要約はありません'}</p>
+                        <div class="card-footer">
+                            <time class="card-date">${dateStr}</time>
+                            <a href="${article.url}" target="_blank" rel="noopener noreferrer" class="read-more">
+                                元記事を読む →
+                            </a>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+
+            newsContainer.style.display = 'block';
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+    </script>
+</body>
+
+</html>

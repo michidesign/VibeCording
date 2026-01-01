@@ -1,0 +1,169 @@
+{
+  "schedule": {
+    "hour": 6,
+    "minute": 0,
+    "timezone": "Asia/Tokyo"
+  },
+  "output": {
+    "max_articles": 5,
+    "language": "ja"
+  },
+  "sources": [
+    {
+      "name": "ITmedia AI+",
+      "url": "https://rss.itmedia.co.jp/rss/2.0/aiplus.xml",
+      "language": "ja",
+      "priority": 1
+    },
+    {
+      "name": "ITmedia NEWS",
+      "url": "https://rss.itmedia.co.jp/rss/2.0/news_bursts.xml",
+      "language": "ja",
+      "priority": 2
+    },
+    {
+      "name": "GIGAZINE",
+      "url": "https://gigazine.net/news/rss_2.0/",
+      "language": "ja",
+      "priority": 2
+    },
+    {
+      "name": "Impress Watch AI",
+      "url": "https://www.watch.impress.co.jp/data/rss/1.0/ipw/feed.rdf",
+      "language": "ja",
+      "priority": 1
+    },
+    {
+      "name": "ASCII.jp AI",
+      "url": "https://ascii.jp/rss.xml",
+      "language": "ja",
+      "priority": 2
+    },
+    {
+      "name": "CNET Japan",
+      "url": "https://japan.cnet.com/rss/index.rdf",
+      "language": "ja",
+      "priority": 2
+    },
+    {
+      "name": "TechCrunch AI",
+      "url": "https://techcrunch.com/category/artificial-intelligence/feed/",
+      "language": "en",
+      "priority": 1
+    },
+    {
+      "name": "VentureBeat AI",
+      "url": "https://venturebeat.com/category/ai/feed/",
+      "language": "en",
+      "priority": 1
+    },
+    {
+      "name": "The Verge AI",
+      "url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
+      "language": "en",
+      "priority": 1
+    },
+    {
+      "name": "MIT Technology Review",
+      "url": "https://www.technologyreview.com/feed/",
+      "language": "en",
+      "priority": 2
+    },
+    {
+      "name": "Wired AI",
+      "url": "https://www.wired.com/feed/tag/ai/latest/rss",
+      "language": "en",
+      "priority": 1
+    },
+    {
+      "name": "Ars Technica",
+      "url": "https://feeds.arstechnica.com/arstechnica/technology-lab",
+      "language": "en",
+      "priority": 2
+    },
+    {
+      "name": "Google AI Blog",
+      "url": "https://blog.google/technology/ai/rss/",
+      "language": "en",
+      "priority": 1
+    }
+  ],
+  "scoring": {
+    "keywords": {
+      "high_priority": [
+        "OpenAI",
+        "GPT-5",
+        "GPT-4",
+        "ChatGPT",
+        "DALL-E",
+        "Sora",
+        "Google",
+        "Gemini",
+        "DeepMind",
+        "Bard",
+        "Anthropic",
+        "Claude",
+        "Meta",
+        "Llama",
+        "Microsoft",
+        "Copilot",
+        "breakthrough",
+        "ブレークスルー",
+        "革新",
+        "launch",
+        "release",
+        "発表",
+        "リリース",
+        "公開",
+        "AGI",
+        "人工汎用知能"
+      ],
+      "medium_priority": [
+        "LLM",
+        "大規模言語モデル",
+        "transformer",
+        "トランスフォーマー",
+        "diffusion",
+        "拡散モデル",
+        "fine-tuning",
+        "ファインチューニング",
+        "RAG",
+        "retrieval",
+        "agent",
+        "エージェント",
+        "multimodal",
+        "マルチモーダル",
+        "vision",
+        "画像認識",
+        "speech",
+        "音声",
+        "robotics",
+        "ロボット"
+      ],
+      "company_names": [
+        "OpenAI",
+        "Google",
+        "Anthropic",
+        "Meta",
+        "Microsoft",
+        "NVIDIA",
+        "Amazon",
+        "Apple",
+        "Hugging Face",
+        "Stability AI",
+        "Mistral",
+        "Cohere",
+        "AI21",
+        "Inflection"
+      ]
+    },
+    "weights": {
+      "high_priority_keyword": 10,
+      "medium_priority_keyword": 5,
+      "company_name": 8,
+      "recency_24h": 10,
+      "recency_48h": 5,
+      "japanese_source": 5
+    }
+  }
+}

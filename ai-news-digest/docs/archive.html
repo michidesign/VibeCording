@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI News Digest - アーカイブ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a24;
+            --bg-card-hover: #222230;
+            --text-primary: #f0f0f5;
+            --text-secondary: #a0a0b0;
+            --text-muted: #606070;
+            --accent-primary: #6366f1;
+            --accent-secondary: #8b5cf6;
+            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --font-sans: 'Inter', 'Noto Sans JP', -apple-system, sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem 1rem;
+        }
+        .header-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-gradient);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .back-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+        }
+        .back-link:hover {
+            color: var(--accent-primary);
+        }
+        .main {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+        .archive-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .archive-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+        .archive-item:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent-primary);
+            transform: translateX(4px);
+        }
+        .archive-date {
+            font-weight: 500;
+        }
+        .archive-arrow {
+            color: var(--accent-primary);
+        }
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg-primary: #f5f5f7;
+                --bg-secondary: #ffffff;
+                --bg-card: #ffffff;
+                --bg-card-hover: #f0f0f5;
+                --text-primary: #1a1a2e;
+                --text-secondary: #4a4a5e;
+                --text-muted: #8a8a9e;
+                --border-color: rgba(0, 0, 0, 0.08);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">📂</div>
+                <span class="logo-text">アーカイブ</span>
+            </div>
+            <a href="index.html" class="back-link">← 最新ニュースへ戻る</a>
+        </div>
+    </header>
+    <main class="main">
+        <h1 class="section-title">📚 過去のAIニュース</h1>
+        <div class="archive-list">
+            <a href="archive/2026-01-01.html" class="archive-item">
+                    <span class="archive-date">📰 2026年01月01日</span>
+                    <span class="archive-arrow">→</span>
+                </a>
+        </div>
+    </main>
+</body>
+</html>
