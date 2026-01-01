@@ -24,13 +24,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       
+      - name: Prepare deployment folder
+        run: |
+          mkdir -p _site/ai-news-digest
+          cp -r ai-news-digest/docs/* _site/ai-news-digest/
+          echo '<html><head><meta http-equiv="refresh" content="0;url=ai-news-digest/"></head></html>' > _site/index.html
+      
       - name: Setup Pages
         uses: actions/configure-pages@v5
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'ai-news-digest/docs'
+          path: '_site'
       
       - name: Deploy to GitHub Pages
         id: deployment
