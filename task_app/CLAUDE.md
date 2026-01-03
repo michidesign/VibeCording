@@ -20,9 +20,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### 単一ファイル構成
 - **1-7行目**: HTMLドキュメントヘッド
-- **8-1930行目**: CSS（Apple Design System準拠）
-- **1931-2150行目**: HTML構造とテンプレート
-- **2150行目以降**: JavaScriptアプリケーションロジック
+- **8-2040行目**: CSS（Apple Design System準拠、トースト通知、タッチドラッグ含む）
+- **2041-2350行目**: HTML構造とテンプレート（ARIA属性付き）
+- **2350行目以降**: JavaScriptアプリケーションロジック
 
 ### 状態管理
 グローバル `appData` オブジェクトをlocalStorageに保存（キー: `task_app_data_v25_ux`）:
@@ -50,6 +50,10 @@ appData = {
 | `toggleComplete()` | タスクのアーカイブ/復元 |
 | `importData()` / `exportData()` | JSONファイル入出力 |
 | `handleDragStart/Over/Drop/End` | ドラッグ&ドロップ並び替え |
+| `handleTouchStart/Move/End` | タッチドラッグ&ドロップ |
+| `showToast()` | トースト通知表示 |
+| `handleGlobalKeydown()` | グローバルキーボード操作 |
+| `closeAllModals()` | 全モーダルを閉じる |
 
 ### 表示モード
 `currentView` 変数で制御される3つのビュー:
@@ -105,6 +109,17 @@ CSSは `.claude/skills/apple-design` に定義されたApple Design Systemに準
 - `prefers-reduced-motion`: アニメーション無効化
 - `prefers-contrast: high`: 高コントラストモード
 - `focus-visible`: キーボードフォーカス表示
+- ARIA属性: `role`, `aria-modal`, `aria-label`, `aria-selected`
+- キーボード操作: `Escape`キーでモーダルを閉じる
+
+### UX機能
+| 機能 | 説明 |
+|------|------|
+| 検索 | タスク名/メモ/サブタスクでリアルタイム検索 |
+| トースト通知 | タスク追加時に自動で消える通知 |
+| キーボード操作 | Escapeでモーダル閉じる、Enterで送信 |
+| タッチドラッグ | モバイルでの長押しドラッグ&ドロップ |
+| フォーカス管理 | タスク追加後に入力欄にフォーカス |
 
 ### デザイン変更時の注意
 - CSS変数を使用して色・サイズを変更

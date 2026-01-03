@@ -1927,6 +1927,182 @@
                 border: 2px solid currentColor;
             }
         }
+
+        /* ===== TOAST NOTIFICATIONS ===== */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(0);
+            padding: 14px 28px;
+            border-radius: var(--radius-pill);
+            background: var(--color-label);
+            color: var(--color-background);
+            font-family: var(--font-text);
+            font-size: 15px;
+            font-weight: 500;
+            z-index: 10001;
+            box-shadow: var(--shadow-lg);
+            animation: toast-in 0.3s var(--ease-out);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toast-success::before {
+            content: '✓';
+            font-size: 18px;
+        }
+
+        .toast-error {
+            background: var(--color-red);
+        }
+
+        .toast-error::before {
+            content: '✕';
+            font-size: 18px;
+        }
+
+        .toast-info {
+            background: var(--color-blue);
+        }
+
+        .toast-info::before {
+            content: 'ℹ';
+            font-size: 18px;
+        }
+
+        .toast-fade-out {
+            animation: toast-out 0.3s var(--ease-out) forwards;
+        }
+
+        @keyframes toast-in {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        @keyframes toast-out {
+            from {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+        }
+
+        body.dark-mode .toast {
+            background: var(--color-background-tertiary);
+            color: var(--color-label);
+        }
+
+        body.dark-mode .toast-error {
+            background: var(--color-red);
+            color: #ffffff;
+        }
+
+        body.dark-mode .toast-info {
+            background: var(--color-blue);
+            color: #ffffff;
+        }
+
+        /* ===== TOUCH DRAG STYLES ===== */
+        .task-card.dragging {
+            opacity: 0.5;
+        }
+
+        .task-card.touch-over {
+            border-top: 3px solid var(--color-blue) !important;
+            margin-top: -3px;
+        }
+
+        .touch-drag-clone {
+            border-radius: var(--radius-md);
+            background: var(--color-background);
+        }
+
+        /* Improve drag handle touch target on mobile */
+        @media (max-width: 734px) {
+            .drag-handle {
+                min-width: 44px;
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+
+        /* Search Input Styles */
+        .search-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            color: var(--color-label-tertiary);
+            pointer-events: none;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 40px 12px 42px;
+            font-family: var(--font-text);
+            font-size: 15px;
+            color: var(--color-label);
+            background: var(--color-background-secondary);
+            border: 1px solid var(--color-separator);
+            border-radius: var(--radius-sm);
+            outline: none;
+            transition: border-color var(--duration-normal) var(--ease-out),
+                        box-shadow var(--duration-normal) var(--ease-out);
+        }
+
+        .search-input::placeholder {
+            color: var(--color-label-tertiary);
+        }
+
+        .search-input:focus {
+            border-color: var(--color-blue);
+            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
+        }
+
+        .search-clear {
+            position: absolute;
+            right: 10px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-fill-tertiary);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            color: var(--color-label-secondary);
+            opacity: 0.7;
+            transition: opacity var(--duration-fast) var(--ease-out),
+                        background var(--duration-fast) var(--ease-out);
+        }
+
+        .search-clear:hover {
+            opacity: 1;
+            background: var(--color-fill-secondary);
+        }
+
+        /* Dark mode adjustments for search */
+        body.dark-mode .search-input:focus {
+            box-shadow: 0 0 0 3px rgba(41, 151, 255, 0.2);
+        }
     </style>
 </head>
 
@@ -2002,19 +2178,37 @@
                 <div style="flex:1;"></div>
 
                 <div style="display:flex; flex-direction:column; gap:8px;"> <!-- Reduced Gap -->
+                    <!-- Search Section -->
+                    <div style="margin-top: 40px;">
+                        <span class="section-label">SEARCH</span>
+                        <div class="search-wrapper">
+                            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <path d="m21 21-4.35-4.35"></path>
+                            </svg>
+                            <input type="text" id="searchInput" class="search-input" placeholder="タスクを検索..." aria-label="タスク検索">
+                            <button class="search-clear" id="searchClear" aria-label="検索をクリア" style="display:none;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M18 6 6 18"></path>
+                                    <path d="m6 6 12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
                     <!-- Round 28: VIEWS Label -->
-                    <div style="margin-top: 40px;"> <!-- Round 30: Added Spacing -->
+                    <div style="margin-top: 16px;">
                         <span class="section-label">VIEWS</span>
                         <!-- Round 51: View Scroll Wrapper -->
                         <div class="nav-scroll-wrapper">
                             <button class="scroll-btn left"
                                 onclick="scrollNav('view-buttons-container', 'left')">‹</button>
-                            <div class="nav-group" id="view-buttons-container">
-                                <button class="nav-btn active" id="btn-view-active"
+                            <div class="nav-group" id="view-buttons-container" role="tablist" aria-label="表示モード切り替え">
+                                <button class="nav-btn active" id="btn-view-active" role="tab" aria-selected="true"
                                     onclick="setViewMode('active')">すべて</button>
-                                <button class="nav-btn" id="btn-view-archived"
+                                <button class="nav-btn" id="btn-view-archived" role="tab" aria-selected="false"
                                     onclick="setViewMode('archived')">完了</button>
-                                <button class="nav-btn btn-trash-mode" id="btn-view-trash"
+                                <button class="nav-btn btn-trash-mode" id="btn-view-trash" role="tab" aria-selected="false"
                                     onclick="setViewMode('trash')">ゴミ箱</button>
                             </div>
                             <button class="scroll-btn right"
@@ -2029,7 +2223,7 @@
                         <div class="nav-scroll-wrapper">
                             <button class="scroll-btn left"
                                 onclick="scrollNav('filter-buttons-container', 'left')">‹</button>
-                            <div class="nav-group" id="filter-buttons-container"></div>
+                            <div class="nav-group" id="filter-buttons-container" role="group" aria-label="カテゴリフィルター"></div>
                             <button class="scroll-btn right"
                                 onclick="scrollNav('filter-buttons-container', 'right')">›</button>
                         </div>
@@ -2071,7 +2265,7 @@
         <main class="content">
             <!-- Center: Task List Area -->
             <div class="main-tasks-area">
-                <ul id="taskList" class="task-list"></ul>
+                <ul id="taskList" class="task-list" role="list" aria-label="タスク一覧"></ul>
             </div>
 
             <!-- Right: Global Memo Area -->
@@ -2088,10 +2282,10 @@
     </div>
 
     <!-- SETTINGS MODAL -->
-    <div class="modal-overlay" id="settingsModal">
+    <div class="modal-overlay" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle">
         <div class="modal-container">
             <div class="modal-header">
-                <div class="modal-title">設定 (Settings)</div>
+                <div class="modal-title" id="settingsModalTitle">設定 (Settings)</div>
             </div>
 
             <!-- Compact Grid Layout -->
@@ -2160,10 +2354,10 @@
     </div>
 
     <!-- HELP MODAL -->
-    <div class="modal-overlay" id="helpModal">
+    <div class="modal-overlay" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpModalTitle">
         <div class="modal-container" style="max-width: 800px;">
             <div class="modal-header">
-                <div class="modal-title">使い方 (How to Use)</div>
+                <div class="modal-title" id="helpModalTitle">使い方 (How to Use)</div>
             </div>
             <div class="modal-content" style="max-height: 60vh; overflow-y: auto;">
                 <h3 style="margin-top: 0;">基本操作</h3>
@@ -2215,10 +2409,10 @@
     </div>
 
     <!-- CONFIRM IMPORT MODAL -->
-    <div class="modal-overlay" id="confirmModal">
+    <div class="modal-overlay" id="confirmModal" role="alertdialog" aria-modal="true" aria-labelledby="confirmModalTitle">
         <div class="modal-container" style="max-width: 400px;">
             <div class="modal-header">
-                <div class="modal-title">データの読み込み確認</div>
+                <div class="modal-title" id="confirmModalTitle">データの読み込み確認</div>
             </div>
             <div class="modal-content" style="text-align: center; padding: 20px 0;">
                 <p style="color: #666; margin-bottom: 16px;">現在のデータを上書きして、ファイルのデータを読み込みますか？</p>
@@ -2232,10 +2426,10 @@
     </div>
 
     <!-- SUBTASK MODAL -->
-    <div class="modal-overlay" id="subtaskModal">
+    <div class="modal-overlay" id="subtaskModal" role="dialog" aria-modal="true" aria-labelledby="subtaskModalTitle">
         <div class="modal-container" style="max-width: 400px;">
             <div class="modal-header">
-                <div class="modal-title">サブタスクを追加</div>
+                <div class="modal-title" id="subtaskModalTitle">サブタスクを追加</div>
             </div>
             <div class="modal-content" style="padding: 20px 0;">
                 <input type="text" id="newSubtaskInput" class="form-control" placeholder="サブタスク名を入力"
@@ -2248,10 +2442,10 @@
         </div>
     </div>
 
-    <!-- SUCCESS MODAL -->
-    <div class="modal-overlay" id="successModal">
+    <!-- SUCCESS MODAL (Legacy - replaced with toast) -->
+    <div class="modal-overlay" id="successModal" role="dialog" aria-modal="true" aria-label="成功">
         <div class="modal-container" style="max-width: 300px; text-align: center;">
-            <div style="font-size: 48px; margin-bottom: 16px;">✓</div>
+            <div style="font-size: 48px; margin-bottom: 16px;" aria-hidden="true">✓</div>
             <div class="modal-title" style="margin-bottom: 16px;">タスクを登録しました</div>
             <button class="btn-primary-modal" onclick="closeSuccessModal()" style="width: 100%;">OK</button>
         </div>
@@ -2281,6 +2475,7 @@
         // Round 58: Missing Globals Restored
         let viewMode = 'active';
         let filterCategory = 'all';
+        let searchQuery = '';
         let expandedSubtasksMap = {};
 
         // Round 59: Additional Missing Globals
@@ -2340,9 +2535,26 @@
 
             // Setup Search Listener
             const searchEl = document.getElementById('searchInput');
+            const searchClearBtn = document.getElementById('searchClear');
             if (searchEl) {
                 searchEl.addEventListener('input', (e) => {
-                    // Determine logic for search (not fully implemented yet but preventing error)
+                    searchQuery = e.target.value.toLowerCase().trim();
+                    // Show/hide clear button
+                    if (searchClearBtn) {
+                        searchClearBtn.style.display = e.target.value ? 'flex' : 'none';
+                    }
+                    renderTasks();
+                });
+            }
+            if (searchClearBtn) {
+                searchClearBtn.addEventListener('click', () => {
+                    if (searchEl) {
+                        searchEl.value = '';
+                        searchQuery = '';
+                        searchClearBtn.style.display = 'none';
+                        renderTasks();
+                        searchEl.focus();
+                    }
                 });
             }
         }
@@ -2361,7 +2573,24 @@
 
             // Setup Global Memo View
             updateGlobalMemoView();
+
+            // Global Keyboard Handler
+            document.addEventListener('keydown', handleGlobalKeydown);
         });
+
+        // Global Keyboard Handler
+        function handleGlobalKeydown(e) {
+            // Escape key: Close all open modals
+            if (e.key === 'Escape') {
+                closeAllModals();
+            }
+        }
+
+        // Close All Modals
+        function closeAllModals() {
+            const modals = document.querySelectorAll('.modal-overlay.open');
+            modals.forEach(m => m.classList.remove('open'));
+        }
         function exportData() {
             // Round 57: Sync Global Memo before export
             const memoEl = document.getElementById('globalMemo');
@@ -2447,7 +2676,21 @@
             const showTrash = viewMode === 'trash';
 
             const filtered = appData.tasks.filter(t => {
+                // Category filter
                 if (filterCategory !== 'all' && t.category !== filterCategory) return false;
+
+                // Search filter
+                if (searchQuery) {
+                    const nameMatch = t.name.toLowerCase().includes(searchQuery);
+                    const memoMatch = t.memo && t.memo.toLowerCase().includes(searchQuery);
+                    const subtaskMatch = t.subtasks && t.subtasks.some(s =>
+                        s.name.toLowerCase().includes(searchQuery) ||
+                        (s.memo && s.memo.toLowerCase().includes(searchQuery))
+                    );
+                    if (!nameMatch && !memoMatch && !subtaskMatch) return false;
+                }
+
+                // View mode filter
                 if (viewMode === 'active') return !t.isDeleted && !t.isArchived;
                 if (viewMode === 'archived') return !t.isDeleted && t.isArchived;
                 if (viewMode === 'trash') return t.isDeleted;
@@ -2482,6 +2725,10 @@
                     li.addEventListener('dragstart', handleDragStart); li.addEventListener('dragover',
                         handleDragOver); li.addEventListener('drop', handleDrop); li.addEventListener('dragend',
                             handleDragEnd);
+                    // Touch drag support
+                    li.addEventListener('touchstart', handleTouchStart, { passive: true });
+                    li.addEventListener('touchmove', handleTouchMove, { passive: false });
+                    li.addEventListener('touchend', handleTouchEnd);
                 }
                 const ro = showTrash || showArchived;
 
@@ -2808,10 +3055,13 @@
                 t.style.display = 'none';
             }
 
-            // Update active button state
+            // Update active button state and aria-selected
             ['active', 'archived', 'trash'].forEach(mode => {
                 const btn = document.getElementById('btn-view-' + mode);
-                if (btn) btn.classList.toggle('active', mode === m);
+                if (btn) {
+                    btn.classList.toggle('active', mode === m);
+                    btn.setAttribute('aria-selected', mode === m ? 'true' : 'false');
+                }
             });
 
             renderTasks();
@@ -2837,8 +3087,9 @@
             saveData(); renderTasks(); n.value = ''; document.getElementById('inputDeadline').value
                 = ''; document.getElementById('inputMemo').value = '';
 
-            // Round 55: Success Modal
+            // Show success toast and return focus
             openSuccessModal();
+            n.focus();
         }
         function updateTask(id, f, v) {
             const t = appData.tasks.find(x => x.id === id); if (t) {
@@ -3173,6 +3424,137 @@
             saveData();
         }
 
+        // Touch Drag & Drop Support
+        let touchDragItem = null;
+        let touchDragClone = null;
+        let touchStartY = 0;
+        let touchTimeout = null;
+        let isTouchDragging = false;
+
+        function handleTouchStart(e) {
+            const dragHandle = e.target.closest('.drag-handle');
+            if (!dragHandle) return;
+
+            const taskCard = e.target.closest('.task-card');
+            if (!taskCard) return;
+
+            touchStartY = e.touches[0].clientY;
+
+            // Long press to start drag (300ms)
+            touchTimeout = setTimeout(() => {
+                startTouchDrag(taskCard, e.touches[0]);
+            }, 300);
+        }
+
+        function startTouchDrag(element, touch) {
+            isTouchDragging = true;
+            touchDragItem = element;
+            element.classList.add('dragging');
+
+            // Create clone for visual feedback
+            touchDragClone = element.cloneNode(true);
+            touchDragClone.classList.add('touch-drag-clone');
+            touchDragClone.style.cssText = `
+                position: fixed;
+                left: ${element.getBoundingClientRect().left}px;
+                top: ${touch.clientY - 30}px;
+                width: ${element.offsetWidth}px;
+                opacity: 0.9;
+                z-index: 9999;
+                pointer-events: none;
+                transform: scale(1.02);
+                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            `;
+            document.body.appendChild(touchDragClone);
+
+            // Vibration feedback if available
+            if (navigator.vibrate) navigator.vibrate(50);
+        }
+
+        function handleTouchMove(e) {
+            if (!isTouchDragging || !touchDragClone) {
+                // Cancel long press if moved too much
+                if (touchTimeout && Math.abs(e.touches[0].clientY - touchStartY) > 10) {
+                    clearTimeout(touchTimeout);
+                    touchTimeout = null;
+                }
+                return;
+            }
+
+            e.preventDefault();
+            const touch = e.touches[0];
+            touchDragClone.style.top = `${touch.clientY - 30}px`;
+
+            // Find target element
+            const elementsBelow = document.elementsFromPoint(touch.clientX, touch.clientY);
+            const targetCard = elementsBelow.find(el =>
+                el.classList.contains('task-card') && el !== touchDragItem
+            );
+
+            // Update visual feedback
+            document.querySelectorAll('.task-card.touch-over').forEach(el =>
+                el.classList.remove('touch-over')
+            );
+
+            if (targetCard) {
+                targetCard.classList.add('touch-over');
+            }
+        }
+
+        function handleTouchEnd(e) {
+            clearTimeout(touchTimeout);
+            touchTimeout = null;
+
+            if (!isTouchDragging) return;
+
+            const list = document.getElementById('taskList');
+
+            // Find drop target
+            const touchOverElement = document.querySelector('.task-card.touch-over');
+            if (touchOverElement && touchDragItem) {
+                const items = Array.from(list.querySelectorAll('.task-card'));
+                const fromIndex = items.indexOf(touchDragItem);
+                const toIndex = items.indexOf(touchOverElement);
+
+                if (fromIndex !== -1 && toIndex !== -1 && fromIndex !== toIndex) {
+                    // Determine position (before or after)
+                    if (fromIndex < toIndex) {
+                        list.insertBefore(touchDragItem, touchOverElement.nextSibling);
+                    } else {
+                        list.insertBefore(touchDragItem, touchOverElement);
+                    }
+
+                    // Update data model
+                    const visibleTaskIds = Array.from(list.querySelectorAll('.task-card')).map(el => el.dataset.id);
+                    const reorderedTasks = [];
+                    const otherTasks = [];
+
+                    appData.tasks.forEach(task => {
+                        const index = visibleTaskIds.indexOf(task.id);
+                        if (index !== -1) {
+                            reorderedTasks[index] = task;
+                        } else {
+                            otherTasks.push(task);
+                        }
+                    });
+
+                    appData.tasks = [...reorderedTasks.filter(t => t), ...otherTasks];
+                    saveData();
+                }
+            }
+
+            // Cleanup
+            if (touchDragItem) touchDragItem.classList.remove('dragging');
+            if (touchDragClone) touchDragClone.remove();
+            document.querySelectorAll('.task-card.touch-over').forEach(el =>
+                el.classList.remove('touch-over')
+            );
+
+            touchDragItem = null;
+            touchDragClone = null;
+            isTouchDragging = false;
+        }
+
         // Round 59: Missing toggleGlobalMemoEdit function
         function toggleGlobalMemoEdit(isEdit) {
             const view = document.getElementById('globalMemoView');
@@ -3233,14 +3615,33 @@
             }
         }
 
-        // Modal Management - Success
+        // Modal Management - Success (legacy)
         function openSuccessModal() {
-            const m = document.getElementById('successModal');
-            if (m) m.classList.add('open');
+            // Replaced with toast notification
+            showToast('タスクを登録しました', 'success');
         }
         function closeSuccessModal() {
             const m = document.getElementById('successModal');
             if (m) m.classList.remove('open');
+        }
+
+        // Toast Notification System
+        function showToast(message, type = 'success') {
+            // Remove existing toasts
+            document.querySelectorAll('.toast').forEach(t => t.remove());
+
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'polite');
+            document.body.appendChild(toast);
+
+            // Auto dismiss after 2.5 seconds
+            setTimeout(() => {
+                toast.classList.add('toast-fade-out');
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
         }
 
         // Modal Global Functions
