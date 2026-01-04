@@ -73,28 +73,105 @@ export default function FlashCard({ flag, onLearned, onNotYet, showButtons = tru
         >
           {/* Front of card */}
           <div
-            className="absolute inset-0 glass-card-strong flex flex-col items-center justify-center p-8 md:p-10"
+            className="absolute inset-0 glass-card-glow flex flex-col items-center justify-center p-8 md:p-10 relative overflow-hidden"
             style={{ backfaceVisibility: 'hidden' }}
           >
-            <span className="text-emoji-hero drop-shadow-lg">{flag.emoji}</span>
-            <div className="mt-10 text-muted text-body-lg">
-              タップして めくる
-            </div>
+            {/* 装飾的なキラキラ */}
+            <motion.div
+              className="absolute top-4 left-4 text-2xl"
+              animate={{
+                scale: [1, 1.3, 1],
+                rotate: [0, 180, 360],
+              }}
+              transition={{ duration: 3, repeat: Infinity }}
+            >
+              ✨
+            </motion.div>
+            <motion.div
+              className="absolute top-4 right-4 text-2xl"
+              animate={{
+                scale: [1.3, 1, 1.3],
+                rotate: [360, 180, 0],
+              }}
+              transition={{ duration: 3, repeat: Infinity }}
+            >
+              ⭐
+            </motion.div>
+            <motion.div
+              className="absolute bottom-4 left-4 text-2xl"
+              animate={{
+                scale: [1, 1.2, 1],
+              }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              🌟
+            </motion.div>
+            <motion.div
+              className="absolute bottom-4 right-4 text-2xl"
+              animate={{
+                scale: [1.2, 1, 1.2],
+              }}
+              transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+            >
+              💫
+            </motion.div>
+
+            <motion.span
+              className="text-emoji-hero drop-shadow-lg"
+              animate={{
+                y: [0, -10, 0],
+                rotate: [-2, 2, -2],
+              }}
+              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              {flag.emoji}
+            </motion.span>
+            <motion.div
+              className="mt-10 text-muted text-body-lg"
+              animate={{ opacity: [0.6, 1, 0.6] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              👆 タップして めくる
+            </motion.div>
           </div>
 
           {/* Back of card */}
           <div
-            className="absolute inset-0 glass-card-strong flex flex-col items-center p-8 md:p-10"
+            className="absolute inset-0 glass-card-glow flex flex-col items-center p-8 md:p-10 relative overflow-hidden"
             style={{
               backfaceVisibility: 'hidden',
               transform: 'rotateY(180deg)',
             }}
           >
-            <span className="text-emoji-lg mb-6 drop-shadow-lg">{flag.emoji}</span>
-            <h2 className="text-heading-lg mb-8 drop-shadow-lg">
-              {displayName}
-            </h2>
-            <div className="w-full h-52 md:h-64 rounded-2xl overflow-hidden border border-white/20">
+            {/* 成功のキラキラ */}
+            <motion.div
+              className="absolute top-3 right-3 text-xl"
+              animate={{
+                rotate: [0, 360],
+                scale: [1, 1.2, 1],
+              }}
+              transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+            >
+              🎉
+            </motion.div>
+
+            <motion.span
+              className="text-emoji-lg mb-6 drop-shadow-lg"
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: 'spring', stiffness: 200, delay: 0.3 }}
+            >
+              {flag.emoji}
+            </motion.span>
+            <motion.h2
+              className="text-heading-lg mb-8 drop-shadow-lg text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <span className="text-rainbow">{displayName}</span>
+            </motion.h2>
+            <div className="w-full h-52 md:h-64 rounded-2xl overflow-hidden border-2 border-white/30 shadow-lg">
               {isFlipped && (
                 <MapContainer
                   center={[flag.lat, flag.lng]}
@@ -121,25 +198,40 @@ export default function FlashCard({ flag, onLearned, onNotYet, showButtons = tru
       <AnimatePresence>
         {isFlipped && showButtons && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 20, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.9 }}
             className="flex gap-6 md:gap-8"
           >
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.1, rotate: -3 }}
+              whileTap={{ scale: 0.9 }}
+              animate={{
+                boxShadow: [
+                  '0 0 20px rgba(74, 222, 128, 0.4)',
+                  '0 0 40px rgba(74, 222, 128, 0.8)',
+                  '0 0 20px rgba(74, 222, 128, 0.4)',
+                ],
+              }}
+              transition={{
+                boxShadow: { duration: 1.5, repeat: Infinity },
+              }}
               onClick={(e) => {
                 e.stopPropagation();
                 handleLearned();
               }}
-              className="btn-lg btn-success rounded-2xl shadow-lg"
+              className="btn-lg btn-success rounded-2xl shadow-lg relative overflow-hidden"
             >
-              ⭕ おぼえた！
+              <motion.span
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                animate={{ x: ['-100%', '200%'] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              />
+              <span className="relative z-10">⭕ おぼえた！</span>
             </motion.button>
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.1, rotate: 3 }}
+              whileTap={{ scale: 0.9 }}
               onClick={(e) => {
                 e.stopPropagation();
                 handleNotYet();

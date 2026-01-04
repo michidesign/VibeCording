@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ProgressProvider } from './context/ProgressContext';
+import FloatingDecorations from './components/FloatingDecorations';
 import GradeSelect from './pages/GradeSelect';
 import Home from './pages/Home';
 import Learning from './pages/Learning';
@@ -79,6 +80,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <ProgressProvider>
+        <FloatingDecorations count={18} />
         <AppRoutes />
       </ProgressProvider>
     </BrowserRouter>

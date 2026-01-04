@@ -71,26 +71,38 @@ export default function Learning() {
 
   if (sessionFlags.length === 0) {
     return (
-      <div className="bg-gradient-main min-h-screen flex items-center justify-center py-12 md:py-16">
-        <div className="content-container">
+      <div className="bg-gradient-main min-h-screen flex items-center justify-center py-12 md:py-16 relative bg-pattern-dots">
+        <div className="content-container relative z-10">
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="glass-card card-padding text-center max-w-lg mx-auto"
+            initial={{ opacity: 0, scale: 0.9, rotate: -5 }}
+            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+            transition={{ type: 'spring', stiffness: 150 }}
+            className="glass-card-glow card-padding text-center max-w-lg mx-auto"
           >
-            <div className="text-emoji-lg mb-8">🎉</div>
+            <motion.div
+              className="text-emoji-lg mb-8"
+              animate={{
+                scale: [1, 1.2, 1],
+                rotate: [-10, 10, -10],
+              }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              🎉
+            </motion.div>
             <h2 className="text-heading-lg mb-6">
-              すごい！
+              <span className="text-rainbow">すごい！</span>
             </h2>
             <p className="text-body-lg text-secondary mb-10">
-              ぜんぶ おぼえたね！
+              ✨ ぜんぶ おぼえたね！ ✨
             </p>
-            <button
+            <motion.button
               onClick={() => navigate('/home')}
               className="btn-lg glass-button text-white"
+              whileHover={{ scale: 1.05, rotate: -2 }}
+              whileTap={{ scale: 0.95 }}
             >
-              ホームにもどる
-            </button>
+              🏠 ホームにもどる
+            </motion.button>
           </motion.div>
         </div>
       </div>
@@ -105,33 +117,55 @@ export default function Learning() {
   const progressPercent = (currentIndex / sessionFlags.length) * 100;
 
   return (
-    <div className="bg-gradient-main min-h-screen py-12 md:py-16">
-      <div className="content-container">
+    <div className="bg-gradient-main min-h-screen py-12 md:py-16 relative bg-pattern-dots">
+      <div className="content-container relative z-10">
         {/* Header */}
-        <div className="flex items-center justify-between section-gap py-6">
-          <button
+        <motion.div
+          className="flex items-center justify-between section-gap py-6"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <motion.button
             onClick={() => navigate('/home')}
             className="glass-button btn-icon text-white text-heading-md"
+            whileHover={{ scale: 1.1, rotate: -5 }}
+            whileTap={{ scale: 0.9 }}
           >
             ←
-          </button>
-          <div className="glass-card card-padding-sm">
+          </motion.button>
+          <motion.div
+            className="glass-card-glow card-padding-sm"
+            animate={{
+              boxShadow: [
+                '0 8px 32px rgba(0, 0, 0, 0.1)',
+                '0 8px 32px rgba(0, 0, 0, 0.2)',
+                '0 8px 32px rgba(0, 0, 0, 0.1)',
+              ],
+            }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
             <span className="text-white text-body-lg font-bold">
-              {currentIndex + 1} / {sessionFlags.length}
+              📚 {currentIndex + 1} / {sessionFlags.length}
             </span>
-          </div>
+          </motion.div>
           <div className="btn-icon" />
-        </div>
+        </motion.div>
 
         {/* Progress bar */}
         <div className="section-gap">
-          <div className="progress-bar-bg h-3 md:h-4">
+          <div className="progress-bar-bg h-3 md:h-4 relative overflow-hidden">
             <motion.div
-              className="progress-bar-fill h-full"
+              className="progress-bar-fill h-full relative"
               initial={{ width: 0 }}
               animate={{ width: `${progressPercent}%` }}
               transition={{ duration: 0.3 }}
-            />
+            >
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+                animate={{ x: ['-100%', '200%'] }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
+              />
+            </motion.div>
           </div>
         </div>
 
@@ -149,18 +183,36 @@ export default function Learning() {
 
         {/* Session stats */}
         <div className="flex justify-center gap-8 md:gap-10">
-          <div className="glass-card card-padding-sm text-center">
-            <div className="text-body-sm text-secondary mb-2">おぼえた</div>
-            <div className="text-stat-md text-success">
+          <motion.div
+            className="glass-card-glow card-padding-sm text-center"
+            whileHover={{ scale: 1.05 }}
+          >
+            <div className="text-body-sm text-secondary mb-2">⭕ おぼえた</div>
+            <motion.div
+              className="text-stat-md text-success"
+              key={learnedInSession.length}
+              initial={{ scale: 1.5 }}
+              animate={{ scale: 1 }}
+              transition={{ type: 'spring' }}
+            >
               {learnedInSession.length}
-            </div>
-          </div>
-          <div className="glass-card card-padding-sm text-center">
-            <div className="text-body-sm text-secondary mb-2">まだ</div>
-            <div className="text-stat-md text-muted">
+            </motion.div>
+          </motion.div>
+          <motion.div
+            className="glass-card-glow card-padding-sm text-center"
+            whileHover={{ scale: 1.05 }}
+          >
+            <div className="text-body-sm text-secondary mb-2">❌ まだ</div>
+            <motion.div
+              className="text-stat-md text-muted"
+              key={notYetInSession.length}
+              initial={{ scale: 1.3 }}
+              animate={{ scale: 1 }}
+              transition={{ type: 'spring' }}
+            >
               {notYetInSession.length}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
       </div>
     </div>
