@@ -9,8 +9,20 @@
 - **日本語要約**: Gemini APIで英語記事も日本語に翻訳・要約
 - **手動取得**: ボタンクリックでリアルタイムにニュースを取得
 - **アーカイブ**: 過去のニュースをいつでも確認可能
-- **スマホ対応**: モダンでレスポンシブなデザイン
+- **スマホ対応**: レスポンシブデザイン対応
 - **完全無料**: GitHub Actions + GitHub Pagesで無料運用
+
+## 🎨 デザインシステム
+
+[デジタル庁デザインシステム（DADS）](https://design.digital.go.jp/)に準拠したアクセシブルなUIを採用しています。
+
+| 項目 | 仕様 |
+|------|------|
+| プライマリカラー | #0071c1（青） |
+| フォント | Noto Sans JP |
+| スペーシング | 8pxグリッド |
+| アクセシビリティ | WCAG 2.2準拠 |
+| テーマ | ライト/ダーク切り替え対応 |
 
 ## 📰 対応ニュースソース
 
@@ -81,6 +93,7 @@
 
 - 📅 配信時刻の変更
 - 📰 出力記事数の変更
+- ⏱️ 収集期間の変更（デフォルト: 24時間）
 - ✅ ニュースソースの有効/無効切り替え
 - ➕ カスタムRSSフィードの追加
 
@@ -97,7 +110,7 @@ ai-news-digest/
 │   ├── news_collector.py    # ニュース収集
 │   ├── article_scorer.py    # スコアリング
 │   ├── summarizer.py        # 要約生成（日英対応）
-│   └── html_generator.py    # HTML生成
+│   └── html_generator.py    # HTML生成（DADS準拠）
 ├── config/
 │   └── settings.json        # 設定ファイル
 ├── docs/
@@ -108,7 +121,7 @@ ai-news-digest/
 │   └── settings.html        # 設定画面
 ├── .github/
 │   └── workflows/
-│       └── daily_news.yml   # 自動実行設定
+│       └── daily_news.yml   # 自動実行設定（毎朝6時JST）
 └── requirements.txt
 ```
 
@@ -128,9 +141,17 @@ python main.py
 # テストモード（記事収集のみ）
 python main.py --test
 
-# APIなしで実行（要約品質は低下）
+# APIなしで実行（翻訳・要約なし）
 python main.py --no-api
 ```
+
+## ♿ アクセシビリティ
+
+- **スキップリンク**: メインコンテンツへの直接移動
+- **フォーカス表示**: キーボード操作時の3px青アウトライン
+- **タッチターゲット**: 最小48pxを確保
+- **コントラスト**: WCAG 2.2 レベルAAに準拠
+- **モーション軽減**: `prefers-reduced-motion`対応
 
 ## 📄 ライセンス
 
@@ -141,3 +162,4 @@ MIT License
 - ニュースソース各社のRSSフィード
 - Google Gemini API
 - GitHub Actions & Pages
+- [デジタル庁デザインシステム](https://design.digital.go.jp/)

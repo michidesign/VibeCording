@@ -7,29 +7,38 @@
     <title>AI News Digest - 今すぐ取得</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-primary: #0a0a0f;
-            --bg-secondary: #12121a;
-            --bg-card: #1a1a24;
-            --bg-card-hover: #222230;
-            --text-primary: #f0f0f5;
-            --text-secondary: #a0a0b0;
-            --text-muted: #606070;
-            --accent-primary: #6366f1;
-            --accent-secondary: #8b5cf6;
-            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
-            --border-color: rgba(255, 255, 255, 0.08);
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            --font-sans: 'Inter', 'Noto Sans JP', -apple-system, sans-serif;
+            /* DADS カラーパレット */
+            --dads-primary-500: #0071c1;
+            --dads-primary-600: #005bb4;
+            --dads-primary-700: #004c96;
+            --dads-primary-50: #e8f3fc;
+
+            --dads-text-primary: #212529;
+            --dads-text-secondary: #495057;
+            --dads-text-muted: #6c757d;
+            --dads-text-link: #0071c1;
+
+            --dads-bg-primary: #ffffff;
+            --dads-bg-secondary: #f8f9fa;
+            --dads-border-light: #dee2e6;
+            --dads-border-default: #ced4da;
+
+            /* セマンティックカラー */
+            --dads-success: #28a745;
+            --dads-success-light: #d4edda;
+            --dads-error: #dc3545;
+            --dads-error-light: #f8d7da;
+
+            /* スペーシング（8px基準） */
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 24px;
+            --space-6: 32px;
+            --space-8: 48px;
         }
 
         * {
@@ -40,24 +49,42 @@
 
         html {
             scroll-behavior: smooth;
+            font-size: 100%;
         }
 
         body {
-            font-family: var(--font-sans);
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.7;
+            font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif;
+            background: var(--dads-bg-secondary);
+            color: var(--dads-text-primary);
+            line-height: 1.75;
             min-height: 100vh;
+            font-size: 16px;
+        }
+
+        /* スキップリンク */
+        .skip-link {
+            position: absolute;
+            top: -100px;
+            left: 0;
+            background: var(--dads-primary-500);
+            color: #ffffff;
+            padding: var(--space-3) var(--space-4);
+            z-index: 1000;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .skip-link:focus {
+            top: 0;
         }
 
         .header {
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border-color);
-            padding: 1.5rem 1rem;
+            background: var(--dads-bg-primary);
+            border-bottom: 1px solid var(--dads-border-light);
+            padding: var(--space-4);
             position: sticky;
             top: 0;
             z-index: 100;
-            backdrop-filter: blur(12px);
         }
 
         .header-content {
@@ -67,20 +94,20 @@
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: var(--space-4);
         }
 
         .logo {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: var(--space-3);
         }
 
         .logo-icon {
             width: 40px;
             height: 40px;
-            background: var(--accent-gradient);
-            border-radius: var(--radius-sm);
+            background: var(--dads-primary-500);
+            border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -90,78 +117,88 @@
         .logo-text {
             font-size: 1.5rem;
             font-weight: 700;
-            background: var(--accent-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--dads-primary-500);
         }
 
         .nav-links {
             display: flex;
-            gap: 1rem;
+            gap: var(--space-4);
+            align-items: center;
         }
 
         .nav-link {
-            color: var(--text-secondary);
-            text-decoration: none;
+            color: var(--dads-text-link);
+            text-decoration: underline;
             font-size: 0.875rem;
-            transition: color 0.2s;
+            font-weight: 500;
         }
 
         .nav-link:hover {
-            color: var(--accent-primary);
+            color: var(--dads-primary-700);
+        }
+
+        .nav-link:focus-visible {
+            outline: 3px solid var(--dads-primary-500);
+            outline-offset: 2px;
         }
 
         .main {
             max-width: 800px;
             margin: 0 auto;
-            padding: 2rem 1rem 3rem;
+            padding: var(--space-6) var(--space-4) var(--space-8);
         }
 
         .fetch-section {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 2rem;
+            background: var(--dads-bg-primary);
+            border: 1px solid var(--dads-border-light);
+            border-radius: 8px;
+            padding: var(--space-6);
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: var(--space-6);
         }
 
         .fetch-title {
             font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
+            font-weight: 700;
+            margin-bottom: var(--space-2);
         }
 
         .fetch-desc {
-            color: var(--text-secondary);
-            font-size: 0.9375rem;
-            margin-bottom: 1.5rem;
+            color: var(--dads-text-secondary);
+            font-size: 1rem;
+            margin-bottom: var(--space-5);
         }
 
         .fetch-btn {
             display: inline-flex;
             align-items: center;
-            gap: 0.75rem;
-            padding: 1rem 2rem;
-            background: var(--accent-gradient);
-            color: white;
-            border: none;
-            border-radius: var(--radius-md);
+            justify-content: center;
+            gap: var(--space-3);
+            padding: var(--space-4) var(--space-6);
+            background: var(--dads-primary-500);
+            color: #ffffff;
+            border: 2px solid var(--dads-primary-500);
+            border-radius: 4px;
             font-family: inherit;
             font-size: 1rem;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
+            min-height: 48px;
             transition: all 0.2s;
         }
 
         .fetch-btn:hover:not(:disabled) {
-            opacity: 0.9;
-            transform: translateY(-2px);
+            background: var(--dads-primary-700);
+            border-color: var(--dads-primary-700);
+        }
+
+        .fetch-btn:focus-visible {
+            outline: 3px solid var(--dads-primary-500);
+            outline-offset: 2px;
         }
 
         .fetch-btn:disabled {
-            opacity: 0.6;
+            opacity: 0.5;
             cursor: not-allowed;
         }
 
@@ -181,46 +218,46 @@
         }
 
         .status-bar {
-            margin-top: 1rem;
-            padding: 0.75rem;
-            background: var(--bg-secondary);
-            border-radius: var(--radius-sm);
+            margin-top: var(--space-4);
+            padding: var(--space-3);
+            background: var(--dads-bg-secondary);
+            border-radius: 4px;
             font-size: 0.875rem;
-            color: var(--text-secondary);
+            color: var(--dads-text-secondary);
         }
 
         .status-bar.error {
-            background: rgba(239, 68, 68, 0.15);
-            color: var(--danger);
+            background: var(--dads-error-light);
+            color: var(--dads-error);
         }
 
         .status-bar.success {
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--success);
+            background: var(--dads-success-light);
+            color: var(--dads-success);
         }
 
         .progress-bar {
             height: 4px;
-            background: var(--bg-secondary);
+            background: var(--dads-border-light);
             border-radius: 2px;
-            margin-top: 0.5rem;
+            margin-top: var(--space-2);
             overflow: hidden;
         }
 
         .progress-fill {
             height: 100%;
-            background: var(--accent-gradient);
+            background: var(--dads-primary-500);
             transition: width 0.3s ease;
         }
 
         .section-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 1.5rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--dads-text-primary);
+            margin-bottom: var(--space-5);
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: var(--space-2);
         }
 
         #newsContainer {
@@ -228,46 +265,29 @@
         }
 
         .news-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            transition: all 0.3s ease;
-            animation: fadeInUp 0.5s ease forwards;
-            animation-delay: calc(var(--card-index, 0) * 0.1s);
-            opacity: 0;
+            background: var(--dads-bg-primary);
+            border: 1px solid var(--dads-border-light);
+            border-radius: 8px;
+            padding: var(--space-5);
+            margin-bottom: var(--space-4);
+            transition: box-shadow 0.2s ease;
         }
 
         .news-card:hover {
-            background: var(--bg-card-hover);
-            border-color: var(--accent-primary);
-            transform: translateY(-2px);
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .card-header {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
+            gap: var(--space-3);
+            margin-bottom: var(--space-4);
         }
 
         .card-number {
             width: 32px;
             height: 32px;
-            background: var(--accent-gradient);
+            background: var(--dads-primary-500);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -275,47 +295,51 @@
             font-weight: 700;
             font-size: 0.875rem;
             flex-shrink: 0;
-            color: white;
+            color: #ffffff;
         }
 
         .card-meta {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.5rem;
+            gap: var(--space-2);
         }
 
         .source-badge,
         .lang-badge {
             font-size: 0.75rem;
-            padding: 0.25rem 0.625rem;
-            background: rgba(99, 102, 241, 0.15);
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            border-radius: 100px;
-            color: var(--text-secondary);
+            padding: 4px 12px;
+            background: var(--dads-primary-50);
+            border: 1px solid var(--dads-border-default);
+            border-radius: 4px;
+            color: var(--dads-text-secondary);
         }
 
         .card-title {
             font-size: 1.125rem;
-            font-weight: 600;
+            font-weight: 700;
             line-height: 1.5;
-            margin-bottom: 0.875rem;
+            margin-bottom: var(--space-3);
         }
 
         .card-title a {
-            color: var(--text-primary);
-            text-decoration: none;
-            transition: color 0.2s ease;
+            color: var(--dads-text-primary);
+            text-decoration: underline;
         }
 
         .card-title a:hover {
-            color: var(--accent-primary);
+            color: var(--dads-primary-500);
+        }
+
+        .card-title a:focus-visible {
+            outline: 3px solid var(--dads-primary-500);
+            outline-offset: 2px;
         }
 
         .card-summary {
-            color: var(--text-secondary);
-            font-size: 0.9375rem;
-            line-height: 1.8;
-            margin-bottom: 1rem;
+            color: var(--dads-text-secondary);
+            font-size: 1rem;
+            line-height: 1.75;
+            margin-bottom: var(--space-4);
         }
 
         .card-footer {
@@ -323,49 +347,94 @@
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 0.75rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--border-color);
+            gap: var(--space-3);
+            padding-top: var(--space-4);
+            border-top: 1px solid var(--dads-border-light);
         }
 
         .card-date {
-            color: var(--text-muted);
-            font-size: 0.8125rem;
+            color: var(--dads-text-muted);
+            font-size: 0.875rem;
         }
 
         .read-more {
-            color: var(--accent-primary);
-            text-decoration: none;
+            color: var(--dads-text-link);
+            text-decoration: underline;
             font-size: 0.875rem;
-            font-weight: 500;
-            transition: all 0.2s ease;
+            font-weight: 700;
+            min-height: 48px;
+            display: inline-flex;
+            align-items: center;
         }
 
         .read-more:hover {
-            color: var(--accent-secondary);
+            color: var(--dads-primary-700);
+        }
+
+        .read-more:focus-visible {
+            outline: 3px solid var(--dads-primary-500);
+            outline-offset: 2px;
         }
 
         .footer {
-            background: var(--bg-secondary);
-            border-top: 1px solid var(--border-color);
-            padding: 2rem 1rem;
+            background: var(--dads-bg-primary);
+            border-top: 1px solid var(--dads-border-light);
+            padding: var(--space-6) var(--space-4);
             text-align: center;
         }
 
         .footer-content {
             max-width: 800px;
             margin: 0 auto;
-            color: var(--text-muted);
-            font-size: 0.8125rem;
+            color: var(--dads-text-muted);
+            font-size: 0.875rem;
         }
 
-        @media (max-width: 480px) {
+        /* ダークモード */
+        [data-theme="dark"] {
+            --dads-text-primary: #f1f3f5;
+            --dads-text-secondary: #ced4da;
+            --dads-text-muted: #adb5bd;
+            --dads-text-link: #6aade7;
+            --dads-bg-primary: #212529;
+            --dads-bg-secondary: #343a40;
+            --dads-border-light: #495057;
+            --dads-border-default: #6c757d;
+            --dads-primary-50: rgba(0, 113, 193, 0.15);
+            --dads-success-light: rgba(40, 167, 69, 0.15);
+            --dads-error-light: rgba(220, 53, 69, 0.15);
+        }
+
+        .theme-toggle {
+            background: var(--dads-bg-secondary);
+            border: 1px solid var(--dads-border-default);
+            border-radius: 4px;
+            padding: var(--space-2) var(--space-3);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            color: var(--dads-text-secondary);
+            min-height: 48px;
+        }
+
+        .theme-toggle:hover {
+            background: var(--dads-primary-50);
+            border-color: var(--dads-primary-500);
+        }
+
+        .theme-toggle:focus-visible {
+            outline: 3px solid var(--dads-primary-500);
+            outline-offset: 2px;
+        }
+
+        @media (max-width: 576px) {
             .logo-text {
                 font-size: 1.25rem;
             }
 
             .news-card {
-                padding: 1.25rem;
+                padding: var(--space-4);
             }
 
             .card-title {
@@ -373,23 +442,19 @@
             }
         }
 
-        @media (prefers-color-scheme: light) {
-            :root {
-                --bg-primary: #f5f5f7;
-                --bg-secondary: #ffffff;
-                --bg-card: #ffffff;
-                --bg-card-hover: #f0f0f5;
-                --text-primary: #1a1a2e;
-                --text-secondary: #4a4a5e;
-                --text-muted: #8a8a9e;
-                --border-color: rgba(0, 0, 0, 0.08);
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
             }
         }
     </style>
 </head>
 
 <body>
-    <header class="header">
+    <a href="#main-content" class="skip-link">本文へスキップ</a>
+
+    <header class="header" role="banner">
         <div class="header-content">
             <div class="logo">
                 <div class="logo-icon">🔄</div>
@@ -398,11 +463,14 @@
             <nav class="nav-links">
                 <a href="index.html" class="nav-link">📰 定期配信版</a>
                 <a href="settings.html" class="nav-link">⚙️ 設定</a>
+                <button class="theme-toggle" onclick="toggleTheme()" title="テーマ切り替え" aria-label="テーマ切り替え">
+                    <span id="theme-icon">☀️</span>
+                </button>
             </nav>
         </div>
     </header>
 
-    <main class="main">
+    <main id="main-content" class="main" role="main">
         <section class="fetch-section">
             <h1 class="fetch-title">🚀 今すぐAIニュースを取得</h1>
             <p class="fetch-desc">
@@ -429,7 +497,7 @@
         </section>
     </main>
 
-    <footer class="footer">
+    <footer class="footer" role="contentinfo">
         <div class="footer-content">
             <p>AI News Digest - Live Edition</p>
             <p style="margin-top: 0.5rem;">クライアントサイドでRSSフィードを取得・表示</p>
@@ -437,6 +505,32 @@
     </footer>
 
     <script>
+        // テーマ切り替え機能
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            updateThemeButton(theme);
+        }
+
+        function updateThemeButton(theme) {
+            const icon = document.getElementById('theme-icon');
+            icon.textContent = theme === 'dark' ? '🌙' : '☀️';
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            setTheme(currentTheme === 'light' ? 'dark' : 'light');
+        }
+
+        (function () {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                setTheme(savedTheme);
+            } else {
+                setTheme('light');
+            }
+        })();
+
         // RSS取得用プロキシ（CORS回避）
         const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
 
@@ -470,7 +564,6 @@
             const statusText = document.getElementById('statusText');
             const progressFill = document.getElementById('progressFill');
             const newsContainer = document.getElementById('newsContainer');
-            const newsList = document.getElementById('newsList');
 
             // UI更新
             fetchBtn.disabled = true;
@@ -496,17 +589,14 @@
                         console.error(`Error fetching ${source.name}:`, e);
                     }
 
-                    // レート制限回避
                     await sleep(300);
                 }
 
-                // 重複除去とスコアリング
                 statusText.textContent = '記事を選定中...';
                 const uniqueArticles = removeDuplicates(allArticles);
                 const scoredArticles = scoreArticles(uniqueArticles);
                 const topArticles = scoredArticles.slice(0, 5);
 
-                // 表示
                 displayArticles(topArticles);
 
                 statusBar.className = 'status-bar success';
@@ -518,7 +608,6 @@
                 statusText.textContent = `❌ エラー: ${error.message}`;
             }
 
-            // ボタンを復元
             fetchBtn.disabled = false;
             btnIcon.innerHTML = '🔍';
             btnText.textContent = '再取得';
@@ -541,24 +630,20 @@
             const items = xml.querySelectorAll('item');
 
             items.forEach((item, index) => {
-                if (index >= 10) return; // 各ソース10件まで
+                if (index >= 10) return;
 
                 const title = item.querySelector('title')?.textContent || '';
                 const link = item.querySelector('link')?.textContent || '';
                 const description = item.querySelector('description')?.textContent || '';
 
-                // 公開日の取得（複数フォーマット対応）
                 let pubDateStr = item.querySelector('pubDate')?.textContent || '';
                 if (!pubDateStr) {
-                    // dc:date形式（RDF/Atom）
                     pubDateStr = item.getElementsByTagNameNS('http://purl.org/dc/elements/1.1/', 'date')[0]?.textContent || '';
                 }
                 if (!pubDateStr) {
-                    // date形式
                     pubDateStr = item.querySelector('date')?.textContent || '';
                 }
 
-                // 日付のパース
                 let pubDate = null;
                 let pubDateDisplay = '日時不明';
                 if (pubDateStr) {
@@ -569,7 +654,6 @@
                     }
                 }
 
-                // AI関連かチェック
                 const textContent = (title + ' ' + description).toLowerCase();
                 const isAI = AI_KEYWORDS.some(kw => textContent.includes(kw));
 
@@ -621,24 +705,20 @@
                 let score = 0;
                 const text = (article.title + ' ' + article.description).toLowerCase();
 
-                // キーワードスコア
                 AI_KEYWORDS.forEach(kw => {
                     if (text.includes(kw)) score += 5;
                 });
 
-                // 主要企業ボーナス
                 ['openai', 'google', 'anthropic', 'meta', 'microsoft'].forEach(company => {
                     if (text.includes(company)) score += 10;
                 });
 
-                // 新しさボーナス（pubDateがある場合のみ）
                 if (article.pubDate) {
                     const age = (now - article.pubDate) / (1000 * 60 * 60);
                     if (age < 24) score += 10;
                     else if (age < 48) score += 5;
                 }
 
-                // 日本語ボーナス
                 if (article.language === 'ja') score += 5;
 
                 article.score = score;
@@ -660,7 +740,7 @@
                 const langBadge = article.language === 'ja' ? '🇯🇵 日本語' : '🌐 English';
 
                 return `
-                    <article class="news-card" style="--card-index: ${index}">
+                    <article class="news-card">
                         <div class="card-header">
                             <span class="card-number">${index + 1}</span>
                             <div class="card-meta">

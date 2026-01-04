@@ -149,24 +149,40 @@ class HTMLGenerator:
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {{
-            --bg-primary: #0a0a0f;
-            --bg-secondary: #12121a;
-            --bg-card: #1a1a24;
-            --bg-card-hover: #222230;
-            --text-primary: #f0f0f5;
-            --text-secondary: #a0a0b0;
-            --text-muted: #606070;
-            --accent-primary: #6366f1;
-            --accent-secondary: #8b5cf6;
-            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
-            --border-color: rgba(255, 255, 255, 0.08);
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
-            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            --font-sans: 'Inter', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+            /* DADS カラーパレット */
+            --dads-primary-500: #0071c1;
+            --dads-primary-600: #005bb4;
+            --dads-primary-700: #004c96;
+            --dads-primary-50: #e8f3fc;
+            
+            --dads-text-primary: #212529;
+            --dads-text-secondary: #495057;
+            --dads-text-muted: #6c757d;
+            --dads-text-link: #0071c1;
+            
+            --dads-bg-primary: #ffffff;
+            --dads-bg-secondary: #f8f9fa;
+            --dads-border-light: #dee2e6;
+            --dads-border-default: #ced4da;
+            
+            /* スペーシング（8px基準） */
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 24px;
+            --space-6: 32px;
+            --space-8: 48px;
+            
+            /* 互換性のための変数 */
+            --bg-primary: var(--dads-bg-primary);
+            --bg-secondary: var(--dads-bg-secondary);
+            --bg-card: var(--dads-bg-primary);
+            --bg-card-hover: var(--dads-bg-secondary);
+            --text-primary: var(--dads-text-primary);
+            --text-secondary: var(--dads-text-secondary);
+            --text-muted: var(--dads-text-muted);
+            --accent-primary: var(--dads-primary-500);
+            --border-color: var(--dads-border-light);
         }}
 
         * {{
@@ -177,25 +193,43 @@ class HTMLGenerator:
 
         html {{
             scroll-behavior: smooth;
+            font-size: 100%;
         }}
 
         body {{
-            font-family: var(--font-sans);
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.7;
+            font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif;
+            background: var(--dads-bg-secondary);
+            color: var(--dads-text-primary);
+            line-height: 1.75;
             min-height: 100vh;
+            font-size: 16px;
+        }}
+
+        /* スキップリンク（アクセシビリティ） */
+        .skip-link {{
+            position: absolute;
+            top: -100px;
+            left: 0;
+            background: var(--dads-primary-500);
+            color: #ffffff;
+            padding: var(--space-3) var(--space-4);
+            z-index: 1000;
+            text-decoration: none;
+            font-weight: 700;
+        }}
+
+        .skip-link:focus {{
+            top: 0;
         }}
 
         /* ヘッダー */
         .header {{
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border-color);
-            padding: 1.5rem 1rem;
+            background: var(--dads-bg-primary);
+            border-bottom: 1px solid var(--dads-border-light);
+            padding: var(--space-4) var(--space-4);
             position: sticky;
             top: 0;
             z-index: 100;
-            backdrop-filter: blur(12px);
         }}
 
         .header-content {{
@@ -206,15 +240,15 @@ class HTMLGenerator:
         .logo {{
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 0.5rem;
+            gap: var(--space-3);
+            margin-bottom: var(--space-2);
         }}
 
         .logo-icon {{
             width: 40px;
             height: 40px;
-            background: var(--accent-gradient);
-            border-radius: var(--radius-sm);
+            background: var(--dads-primary-500);
+            border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -224,85 +258,81 @@ class HTMLGenerator:
         .logo-text {{
             font-size: 1.5rem;
             font-weight: 700;
-            background: var(--accent-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--dads-primary-500);
         }}
 
         .header-meta {{
             display: flex;
             align-items: center;
-            gap: 1rem;
-            color: var(--text-secondary);
+            gap: var(--space-4);
+            color: var(--dads-text-secondary);
             font-size: 0.875rem;
+            flex-wrap: wrap;
+        }}
+
+        .header-meta a {{
+            color: var(--dads-text-link);
+            text-decoration: underline;
+            font-weight: 500;
+        }}
+
+        .header-meta a:hover {{
+            color: var(--dads-primary-700);
+        }}
+
+        .header-meta a:focus-visible {{
+            outline: 3px solid var(--dads-primary-500);
+            outline-offset: 2px;
         }}
 
         .update-time {{
             display: flex;
             align-items: center;
-            gap: 0.375rem;
+            gap: 6px;
         }}
 
         /* メインコンテンツ */
         .main {{
             max-width: 800px;
             margin: 0 auto;
-            padding: 1.5rem 1rem 3rem;
+            padding: var(--space-5) var(--space-4) var(--space-8);
         }}
 
         .section-title {{
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 1.5rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--dads-text-primary);
+            margin-bottom: var(--space-5);
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: var(--space-2);
         }}
 
         /* ニュースカード */
         .news-card {{
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            transition: all 0.3s ease;
-            animation: fadeInUp 0.5s ease forwards;
-            animation-delay: calc(var(--card-index) * 0.1s);
-            opacity: 0;
+            background: var(--dads-bg-primary);
+            border: 1px solid var(--dads-border-light);
+            border-radius: 8px;
+            padding: var(--space-5);
+            margin-bottom: var(--space-4);
+            transition: box-shadow 0.2s ease;
         }}
 
         .news-card:hover {{
-            background: var(--bg-card-hover);
-            border-color: var(--accent-primary);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }}
-
-        @keyframes fadeInUp {{
-            from {{
-                opacity: 0;
-                transform: translateY(20px);
-            }}
-            to {{
-                opacity: 1;
-                transform: translateY(0);
-            }}
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }}
 
         .card-header {{
             display: flex;
             align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
+            gap: var(--space-3);
+            margin-bottom: var(--space-4);
         }}
 
         .card-number {{
             width: 32px;
             height: 32px;
-            background: var(--accent-gradient);
+            background: var(--dads-primary-500);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -310,47 +340,52 @@ class HTMLGenerator:
             font-weight: 700;
             font-size: 0.875rem;
             flex-shrink: 0;
-            color: white;
+            color: #ffffff;
         }}
 
         .card-meta {{
             display: flex;
             flex-wrap: wrap;
-            gap: 0.5rem;
+            gap: var(--space-2);
         }}
 
         .source-badge,
         .lang-badge {{
             font-size: 0.75rem;
-            padding: 0.25rem 0.625rem;
-            background: rgba(99, 102, 241, 0.15);
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            border-radius: 100px;
-            color: var(--text-secondary);
+            padding: 4px 12px;
+            background: var(--dads-primary-50);
+            border: 1px solid var(--dads-border-default);
+            border-radius: 4px;
+            color: var(--dads-text-secondary);
         }}
 
         .card-title {{
             font-size: 1.125rem;
-            font-weight: 600;
+            font-weight: 700;
             line-height: 1.5;
-            margin-bottom: 0.875rem;
+            margin-bottom: var(--space-3);
         }}
 
         .card-title a {{
-            color: var(--text-primary);
-            text-decoration: none;
+            color: var(--dads-text-primary);
+            text-decoration: underline;
             transition: color 0.2s ease;
         }}
 
         .card-title a:hover {{
-            color: var(--accent-primary);
+            color: var(--dads-primary-500);
+        }}
+
+        .card-title a:focus-visible {{
+            outline: 3px solid var(--dads-primary-500);
+            outline-offset: 2px;
         }}
 
         .card-summary {{
-            color: var(--text-secondary);
-            font-size: 0.9375rem;
-            line-height: 1.8;
-            margin-bottom: 1rem;
+            color: var(--dads-text-secondary);
+            font-size: 1rem;
+            line-height: 1.75;
+            margin-bottom: var(--space-4);
         }}
 
         .card-footer {{
@@ -358,80 +393,89 @@ class HTMLGenerator:
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 0.75rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--border-color);
+            gap: var(--space-3);
+            padding-top: var(--space-4);
+            border-top: 1px solid var(--dads-border-light);
         }}
 
         .card-date {{
-            color: var(--text-muted);
-            font-size: 0.8125rem;
+            color: var(--dads-text-muted);
+            font-size: 0.875rem;
         }}
 
         .read-more {{
-            color: var(--accent-primary);
-            text-decoration: none;
+            color: var(--dads-text-link);
+            text-decoration: underline;
             font-size: 0.875rem;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            display: flex;
+            font-weight: 700;
+            display: inline-flex;
             align-items: center;
-            gap: 0.25rem;
+            gap: 4px;
+            padding: var(--space-2) 0;
+            min-height: 48px;
         }}
 
         .read-more:hover {{
-            color: var(--accent-secondary);
-            gap: 0.5rem;
+            color: var(--dads-primary-700);
+        }}
+
+        .read-more:focus-visible {{
+            outline: 3px solid var(--dads-primary-500);
+            outline-offset: 2px;
         }}
 
         /* フッター */
         .footer {{
-            background: var(--bg-secondary);
-            border-top: 1px solid var(--border-color);
-            padding: 2rem 1rem;
+            background: var(--dads-bg-primary);
+            border-top: 1px solid var(--dads-border-light);
+            padding: var(--space-6) var(--space-4);
             text-align: center;
         }}
 
         .footer-content {{
             max-width: 800px;
             margin: 0 auto;
-            color: var(--text-muted);
-            font-size: 0.8125rem;
+            color: var(--dads-text-muted);
+            font-size: 0.875rem;
         }}
 
         .footer-links {{
             display: flex;
             justify-content: center;
-            gap: 1.5rem;
-            margin-top: 1rem;
+            gap: var(--space-5);
+            margin-top: var(--space-4);
         }}
 
         .footer-links a {{
-            color: var(--text-secondary);
-            text-decoration: none;
-            transition: color 0.2s ease;
+            color: var(--dads-text-link);
+            text-decoration: underline;
         }}
 
         .footer-links a:hover {{
-            color: var(--accent-primary);
+            color: var(--dads-primary-700);
+        }}
+
+        .footer-links a:focus-visible {{
+            outline: 3px solid var(--dads-primary-500);
+            outline-offset: 2px;
         }}
 
         /* レスポンシブ */
-        @media (max-width: 480px) {{
+        @media (max-width: 576px) {{
             .logo-text {{
                 font-size: 1.25rem;
             }}
             
             .news-card {{
-                padding: 1.25rem;
+                padding: var(--space-4);
             }}
             
             .card-title {{
                 font-size: 1rem;
             }}
             
-            .card-summary {{
-                font-size: 0.875rem;
+            .header-meta {{
+                gap: var(--space-3);
             }}
         }}
 
@@ -443,49 +487,49 @@ class HTMLGenerator:
             }}
         }}
 
-        /* ライトモード */
-        [data-theme="light"] {{
-            --bg-primary: #f5f5f7;
-            --bg-secondary: #ffffff;
-            --bg-card: #ffffff;
-            --bg-card-hover: #f0f0f5;
-            --text-primary: #1a1a2e;
-            --text-secondary: #4a4a5e;
-            --text-muted: #8a8a9e;
-            --border-color: rgba(0, 0, 0, 0.08);
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
-            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+        /* ダークモード */
+        [data-theme="dark"] {{
+            --dads-text-primary: #f1f3f5;
+            --dads-text-secondary: #ced4da;
+            --dads-text-muted: #adb5bd;
+            --dads-text-link: #6aade7;
+            --dads-bg-primary: #212529;
+            --dads-bg-secondary: #343a40;
+            --dads-border-light: #495057;
+            --dads-border-default: #6c757d;
+            --dads-primary-50: rgba(0, 113, 193, 0.15);
         }}
 
         /* テーマ切り替えボタン */
         .theme-toggle {{
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 100px;
-            padding: 0.375rem 0.75rem;
+            background: var(--dads-bg-secondary);
+            border: 1px solid var(--dads-border-default);
+            border-radius: 4px;
+            padding: var(--space-2) var(--space-3);
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 0.375rem;
-            font-size: 0.875rem;
-            color: var(--text-secondary);
+            font-size: 1rem;
+            color: var(--dads-text-secondary);
             transition: all 0.2s ease;
+            min-height: 48px;
         }}
 
         .theme-toggle:hover {{
-            background: var(--bg-card-hover);
-            border-color: var(--accent-primary);
-            color: var(--text-primary);
+            background: var(--dads-primary-50);
+            border-color: var(--dads-primary-500);
         }}
 
-        .theme-toggle .icon {{
-            font-size: 1rem;
+        .theme-toggle:focus-visible {{
+            outline: 3px solid var(--dads-primary-500);
+            outline-offset: 2px;
         }}
     </style>
 </head>
 <body>
-    <header class="header">
+    <a href="#main-content" class="skip-link">本文へスキップ</a>
+
+    <header class="header" role="banner">
         <div class="header-content">
             <div class="logo">
                 <div class="logo-icon">🤖</div>
@@ -495,17 +539,17 @@ class HTMLGenerator:
                 <span class="update-time">
                     📅 {date_str} {time_str}
                 </span>
-                <a href="archive.html" style="color: var(--text-secondary); text-decoration: none; font-size: 0.875rem;">📂 アーカイブ</a>
-                <a href="live.html" style="color: var(--accent-primary); text-decoration: none; font-size: 0.875rem;">🔄 今すぐ取得</a>
-                <a href="settings.html" style="color: var(--text-secondary); text-decoration: none; font-size: 0.875rem;">⚙️ 設定</a>
-                <button class="theme-toggle" onclick="toggleTheme()" title="テーマ切り替え">
-                    <span class="icon" id="theme-icon">🌙</span>
+                <a href="archive.html">📂 アーカイブ</a>
+                <a href="live.html">🔄 今すぐ取得</a>
+                <a href="settings.html">⚙️ 設定</a>
+                <button class="theme-toggle" onclick="toggleTheme()" title="テーマ切り替え" aria-label="テーマ切り替え">
+                    <span id="theme-icon">☀️</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <main class="main">
+    <main id="main-content" class="main" role="main">
         <h1 class="section-title">
             {section_title}
         </h1>
@@ -543,8 +587,8 @@ class HTMLGenerator:
         }}
 
         function toggleTheme() {{
-            const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
             setTheme(newTheme);
         }}
 
@@ -554,9 +598,8 @@ class HTMLGenerator:
             if (savedTheme) {{
                 setTheme(savedTheme);
             }} else {{
-                // システム設定に従う
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                setTheme(prefersDark ? 'dark' : 'light');
+                // ライトモードをデフォルトに（DADS準拠）
+                setTheme('light');
             }}
         }})();
     </script>
@@ -592,7 +635,7 @@ class HTMLGenerator:
                 for date in archive_dates
             ])
         else:
-            archive_items = '<p style="color: var(--text-muted); text-align: center; padding: 2rem;">まだアーカイブはありません</p>'
+            archive_items = '<p style="color: var(--dads-text-muted); text-align: center; padding: var(--space-6);">まだアーカイブはありません</p>'
         
         html = f'''<!DOCTYPE html>
 <html lang="ja">
@@ -602,37 +645,56 @@ class HTMLGenerator:
     <title>AI News Digest - アーカイブ</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {{
-            --bg-primary: #0a0a0f;
-            --bg-secondary: #12121a;
-            --bg-card: #1a1a24;
-            --bg-card-hover: #222230;
-            --text-primary: #f0f0f5;
-            --text-secondary: #a0a0b0;
-            --text-muted: #606070;
-            --accent-primary: #6366f1;
-            --accent-secondary: #8b5cf6;
-            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
-            --border-color: rgba(255, 255, 255, 0.08);
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            --font-sans: 'Inter', 'Noto Sans JP', -apple-system, sans-serif;
+            /* DADS カラーパレット */
+            --dads-primary-500: #0071c1;
+            --dads-primary-700: #004c96;
+            --dads-primary-50: #e8f3fc;
+            
+            --dads-text-primary: #212529;
+            --dads-text-secondary: #495057;
+            --dads-text-muted: #6c757d;
+            --dads-text-link: #0071c1;
+            
+            --dads-bg-primary: #ffffff;
+            --dads-bg-secondary: #f8f9fa;
+            --dads-border-light: #dee2e6;
+            --dads-border-default: #ced4da;
+            
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 24px;
+            --space-6: 32px;
         }}
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        html {{ font-size: 100%; }}
         body {{
-            font-family: var(--font-sans);
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.7;
+            font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif;
+            background: var(--dads-bg-secondary);
+            color: var(--dads-text-primary);
+            line-height: 1.75;
             min-height: 100vh;
+            font-size: 16px;
         }}
+        .skip-link {{
+            position: absolute;
+            top: -100px;
+            left: 0;
+            background: var(--dads-primary-500);
+            color: #ffffff;
+            padding: var(--space-3) var(--space-4);
+            z-index: 1000;
+            text-decoration: none;
+            font-weight: 700;
+        }}
+        .skip-link:focus {{ top: 0; }}
         .header {{
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border-color);
-            padding: 1.5rem 1rem;
+            background: var(--dads-bg-primary);
+            border-bottom: 1px solid var(--dads-border-light);
+            padding: var(--space-4);
         }}
         .header-content {{
             max-width: 800px;
@@ -644,13 +706,13 @@ class HTMLGenerator:
         .logo {{
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: var(--space-3);
         }}
         .logo-icon {{
             width: 40px;
             height: 40px;
-            background: var(--accent-gradient);
-            border-radius: var(--radius-sm);
+            background: var(--dads-primary-500);
+            border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -659,87 +721,145 @@ class HTMLGenerator:
         .logo-text {{
             font-size: 1.5rem;
             font-weight: 700;
-            background: var(--accent-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--dads-primary-500);
         }}
         .back-link {{
-            color: var(--text-secondary);
-            text-decoration: none;
+            color: var(--dads-text-link);
+            text-decoration: underline;
             font-size: 0.875rem;
+            font-weight: 500;
         }}
         .back-link:hover {{
-            color: var(--accent-primary);
+            color: var(--dads-primary-700);
+        }}
+        .back-link:focus-visible {{
+            outline: 3px solid var(--dads-primary-500);
+            outline-offset: 2px;
         }}
         .main {{
             max-width: 800px;
             margin: 0 auto;
-            padding: 2rem 1rem;
+            padding: var(--space-6) var(--space-4);
         }}
         .section-title {{
             font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
+            font-weight: 700;
+            margin-bottom: var(--space-5);
         }}
         .archive-list {{
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: var(--space-2);
         }}
         .archive-item {{
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1rem 1.25rem;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
+            padding: var(--space-4) var(--space-5);
+            background: var(--dads-bg-primary);
+            border: 1px solid var(--dads-border-light);
+            border-radius: 8px;
             text-decoration: none;
-            color: var(--text-primary);
-            transition: all 0.2s;
+            color: var(--dads-text-primary);
+            transition: box-shadow 0.2s;
+            min-height: 48px;
         }}
         .archive-item:hover {{
-            background: var(--bg-card-hover);
-            border-color: var(--accent-primary);
-            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }}
+        .archive-item:focus-visible {{
+            outline: 3px solid var(--dads-primary-500);
+            outline-offset: 2px;
         }}
         .archive-date {{
             font-weight: 500;
         }}
         .archive-arrow {{
-            color: var(--accent-primary);
+            color: var(--dads-primary-500);
         }}
-        @media (prefers-color-scheme: light) {{
-            :root {{
-                --bg-primary: #f5f5f7;
-                --bg-secondary: #ffffff;
-                --bg-card: #ffffff;
-                --bg-card-hover: #f0f0f5;
-                --text-primary: #1a1a2e;
-                --text-secondary: #4a4a5e;
-                --text-muted: #8a8a9e;
-                --border-color: rgba(0, 0, 0, 0.08);
-            }}
+        /* ダークモード */
+        [data-theme="dark"] {{
+            --dads-text-primary: #f1f3f5;
+            --dads-text-secondary: #ced4da;
+            --dads-text-muted: #adb5bd;
+            --dads-text-link: #6aade7;
+            --dads-bg-primary: #212529;
+            --dads-bg-secondary: #343a40;
+            --dads-border-light: #495057;
+            --dads-border-default: #6c757d;
+            --dads-primary-50: rgba(0, 113, 193, 0.15);
+        }}
+        .theme-toggle {{
+            background: var(--dads-bg-secondary);
+            border: 1px solid var(--dads-border-default);
+            border-radius: 4px;
+            padding: var(--space-2) var(--space-3);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            color: var(--dads-text-secondary);
+            min-height: 48px;
+        }}
+        .theme-toggle:hover {{
+            background: var(--dads-primary-50);
+            border-color: var(--dads-primary-500);
+        }}
+        .theme-toggle:focus-visible {{
+            outline: 3px solid var(--dads-primary-500);
+            outline-offset: 2px;
+        }}
+        @media (max-width: 576px) {{
+            .logo-text {{ font-size: 1.25rem; }}
+            .header-content {{ flex-direction: column; gap: var(--space-3); }}
         }}
     </style>
 </head>
 <body>
-    <header class="header">
+    <a href="#main-content" class="skip-link">本文へスキップ</a>
+    <header class="header" role="banner">
         <div class="header-content">
             <div class="logo">
                 <div class="logo-icon">📂</div>
                 <span class="logo-text">アーカイブ</span>
             </div>
-            <a href="index.html" class="back-link">← 最新ニュースへ戻る</a>
+            <div style="display: flex; align-items: center; gap: var(--space-4);">
+                <a href="index.html" class="back-link">← 最新ニュースへ戻る</a>
+                <button class="theme-toggle" onclick="toggleTheme()" title="テーマ切り替え" aria-label="テーマ切り替え">
+                    <span id="theme-icon">☀️</span>
+                </button>
+            </div>
         </div>
     </header>
-    <main class="main">
+    <main id="main-content" class="main" role="main">
         <h1 class="section-title">📚 過去のAIニュース</h1>
         <div class="archive-list">
             {archive_items}
         </div>
     </main>
+    <script>
+        function setTheme(theme) {{
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            updateThemeButton(theme);
+        }}
+        function updateThemeButton(theme) {{
+            const icon = document.getElementById('theme-icon');
+            icon.textContent = theme === 'dark' ? '🌙' : '☀️';
+        }}
+        function toggleTheme() {{
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            setTheme(currentTheme === 'light' ? 'dark' : 'light');
+        }}
+        (function() {{
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {{
+                setTheme(savedTheme);
+            }} else {{
+                setTheme('light');
+            }}
+        }})();
+    </script>
 </body>
 </html>'''
         
