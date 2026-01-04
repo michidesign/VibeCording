@@ -443,21 +443,44 @@ class HTMLGenerator:
             }}
         }}
 
-        /* ダークモード最適化 (既にダークがデフォルト) */
-        @media (prefers-color-scheme: light) {{
-            :root {{
-                --bg-primary: #f5f5f7;
-                --bg-secondary: #ffffff;
-                --bg-card: #ffffff;
-                --bg-card-hover: #f0f0f5;
-                --text-primary: #1a1a2e;
-                --text-secondary: #4a4a5e;
-                --text-muted: #8a8a9e;
-                --border-color: rgba(0, 0, 0, 0.08);
-                --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
-                --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
-                --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
-            }}
+        /* ライトモード */
+        [data-theme="light"] {{
+            --bg-primary: #f5f5f7;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f0f0f5;
+            --text-primary: #1a1a2e;
+            --text-secondary: #4a4a5e;
+            --text-muted: #8a8a9e;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+        }}
+
+        /* テーマ切り替えボタン */
+        .theme-toggle {{
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 100px;
+            padding: 0.375rem 0.75rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }}
+
+        .theme-toggle:hover {{
+            background: var(--bg-card-hover);
+            border-color: var(--accent-primary);
+            color: var(--text-primary);
+        }}
+
+        .theme-toggle .icon {{
+            font-size: 1rem;
         }}
     </style>
 </head>
@@ -475,6 +498,9 @@ class HTMLGenerator:
                 <a href="archive.html" style="color: var(--text-secondary); text-decoration: none; font-size: 0.875rem;">📂 アーカイブ</a>
                 <a href="live.html" style="color: var(--accent-primary); text-decoration: none; font-size: 0.875rem;">🔄 今すぐ取得</a>
                 <a href="settings.html" style="color: var(--text-secondary); text-decoration: none; font-size: 0.875rem;">⚙️ 設定</a>
+                <button class="theme-toggle" onclick="toggleTheme()" title="テーマ切り替え">
+                    <span class="icon" id="theme-icon">🌙</span>
+                </button>
             </div>
         </div>
     </header>
@@ -498,6 +524,42 @@ class HTMLGenerator:
             </div>
         </div>
     </footer>
+
+    <script>
+        // テーマ切り替え機能
+        function setTheme(theme) {{
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            updateThemeButton(theme);
+        }}
+
+        function updateThemeButton(theme) {{
+            const icon = document.getElementById('theme-icon');
+            if (theme === 'light') {{
+                icon.textContent = '☀️';
+            }} else {{
+                icon.textContent = '🌙';
+            }}
+        }}
+
+        function toggleTheme() {{
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            setTheme(newTheme);
+        }}
+
+        // ページ読み込み時にテーマを適用
+        (function() {{
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {{
+                setTheme(savedTheme);
+            }} else {{
+                // システム設定に従う
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                setTheme(prefersDark ? 'dark' : 'light');
+            }}
+        }})();
+    </script>
 </body>
 </html>'''
         
