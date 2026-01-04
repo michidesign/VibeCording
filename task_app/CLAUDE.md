@@ -80,6 +80,7 @@ CSSは `.claude/skills/apple-design` に定義されたApple Design Systemに準
   /* タイポグラフィ */
   --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', ...;
   --font-text: -apple-system, BlinkMacSystemFont, 'SF Pro Text', ...;
+  letter-spacing: 0.05em; /* 日本語可読性向上 */
 
   /* アニメーション */
   --ease-out: cubic-bezier(0, 0, 0.58, 1);
@@ -120,6 +121,8 @@ CSSは `.claude/skills/apple-design` に定義されたApple Design Systemに準
 | キーボード操作 | Escapeでモーダル閉じる、Enterで送信 |
 | タッチドラッグ | モバイルでの長押しドラッグ&ドロップ |
 | フォーカス管理 | タスク追加後に入力欄にフォーカス |
+| コンパクトUI | タスクカードの縦幅を最適化し一覧性向上 |
+| カスタム矢印 | セレクトボックスにカスタムSVG矢印を採用 |
 
 ### デザイン変更時の注意
 - CSS変数を使用して色・サイズを変更
