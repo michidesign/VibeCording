@@ -11,7 +11,7 @@ on:
       hours_limit:
         description: '何時間以内の記事を取得するか'
         required: false
-        default: '48'
+        default: '24'
       article_count:
         description: '出力する記事数'
         required: false

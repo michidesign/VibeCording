@@ -6,7 +6,10 @@ AIニュース配信ツール - HTML生成モジュール
 
 import os
 import json
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
+
+# 日本標準時 (JST = UTC+9)
+JST = timezone(timedelta(hours=9))
 from typing import List, Any
 from string import Template
 
@@ -114,7 +117,7 @@ class HTMLGenerator:
         Returns:
             HTML文字列
         """
-        now = datetime.now()
+        now = datetime.now(JST)
         
         if is_archive and archive_date:
             # アーカイブページの場合
