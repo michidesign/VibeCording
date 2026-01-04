@@ -22,7 +22,7 @@ export default function Collection() {
 
   return (
     <div className="bg-gradient-main min-h-screen py-12 md:py-16 relative bg-pattern-dots">
-      <div className="content-container relative z-10">
+      <div className="content-container relative z-10 flex flex-col items-center">
         {/* Header */}
         <motion.div
           className="flex items-center justify-between section-gap py-6"

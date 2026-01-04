@@ -78,7 +78,7 @@ export default function Review() {
   if (sessionFlags.length === 0) {
     return (
       <div className="bg-gradient-main min-h-screen flex items-center justify-center py-12 md:py-16">
-        <div className="content-container">
+        <div className="content-container flex flex-col items-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -111,8 +111,8 @@ export default function Review() {
   const progressPercent = (currentIndex / sessionFlags.length) * 100;
 
   return (
-    <div className="bg-gradient-main min-h-screen py-12 md:py-16">
-      <div className="content-container">
+    <div className="bg-gradient-main min-h-screen py-12 md:py-16 pb-24">
+      <div className="content-container flex flex-col items-center">
         {/* Header */}
         <div className="flex items-center justify-between section-gap py-6">
           <button
@@ -123,7 +123,7 @@ export default function Review() {
           </button>
           <div className="glass-card card-padding-sm flex items-center gap-3">
             <span className="text-info text-body-md">ふくしゅう</span>
-            <span className="text-white text-body-lg font-bold">
+            <span className="text-body-lg font-bold">
               {currentIndex + 1} / {sessionFlags.length}
             </span>
           </div>

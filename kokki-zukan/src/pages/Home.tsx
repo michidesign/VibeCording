@@ -51,7 +51,7 @@ export default function Home() {
 
   return (
     <div className="bg-gradient-main min-h-screen py-12 md:py-16 relative bg-pattern-waves">
-      <div className="content-container relative z-10">
+      <div className="content-container relative z-10 flex flex-col items-center">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -114,7 +114,7 @@ export default function Home() {
                   className="text-stat-lg"
                   key={learnedCount}
                   initial={{ scale: 1.5, color: '#4ade80' }}
-                  animate={{ scale: 1, color: '#ffffff' }}
+                  animate={{ scale: 1, color: '#2d3748' }}
                   transition={{ duration: 0.5 }}
                 >
                   {learnedCount}

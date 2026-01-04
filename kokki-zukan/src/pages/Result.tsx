@@ -110,7 +110,7 @@ export default function Result() {
       {/* 強化されたコンフェッティ */}
       {learnedInSession.length > 0 && <Confetti />}
 
-      <div className="content-container relative z-10">
+      <div className="content-container relative z-10 flex flex-col items-center">
         {/* Result header */}
         <motion.div
           initial={{ opacity: 0, scale: 0.5, rotate: -10 }}

@@ -117,8 +117,8 @@ export default function Learning() {
   const progressPercent = (currentIndex / sessionFlags.length) * 100;
 
   return (
-    <div className="bg-gradient-main min-h-screen py-12 md:py-16 relative bg-pattern-dots">
-      <div className="content-container relative z-10">
+    <div className="bg-gradient-main min-h-screen py-12 md:py-16 pb-24 relative bg-pattern-dots">
+      <div className="content-container relative z-10 flex flex-col items-center">
         {/* Header */}
         <motion.div
           className="flex items-center justify-between section-gap py-6"
@@ -144,7 +144,7 @@ export default function Learning() {
             }}
             transition={{ duration: 2, repeat: Infinity }}
           >
-            <span className="text-white text-body-lg font-bold">
+            <span className="text-body-lg font-bold">
               📚 {currentIndex + 1} / {sessionFlags.length}
             </span>
           </motion.div>

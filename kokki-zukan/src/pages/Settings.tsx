@@ -22,7 +22,7 @@ export default function Settings() {
 
   return (
     <div className="bg-gradient-main min-h-screen py-12 md:py-16">
-      <div className="content-container">
+      <div className="content-container flex flex-col items-center">
         {/* Header */}
         <div className="flex items-center justify-between section-gap py-6">
           <button
@@ -52,13 +52,12 @@ export default function Settings() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => handleGradeChange(config.grade)}
-                  className={`card-padding-sm rounded-2xl text-left transition-all ${
-                    progress.grade === config.grade
-                      ? 'bg-white/30 border-2 border-white/50'
-                      : 'bg-white/10 border-2 border-transparent'
-                  }`}
+                  className={`card-padding-sm rounded-2xl text-left transition-all ${progress.grade === config.grade
+                    ? 'bg-white/30 border-2 border-white/50'
+                    : 'bg-white/10 border-2 border-transparent'
+                    }`}
                 >
-                  <div className="text-body-lg font-bold text-white">{config.label}</div>
+                  <div className="text-body-lg font-bold">{config.label}</div>
                   <div className="text-body-md text-secondary mt-2">{config.flagCount}カ国</div>
                 </motion.button>
               ))}
@@ -78,20 +77,20 @@ export default function Settings() {
             <div className="space-y-6 md:space-y-7">
               <div className="flex justify-between items-center">
                 <span className="text-body-lg text-secondary">おぼえた こっき</span>
-                <span className="text-body-lg font-bold text-white">
+                <span className="text-body-lg font-bold">
                   {progress.stats.totalLearned} こ
                 </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-body-lg text-secondary">れんぞく がくしゅう</span>
-                <span className="text-body-lg font-bold text-white">
+                <span className="text-body-lg font-bold">
                   {progress.stats.currentStreak} にち
                 </span>
               </div>
               {progress.stats.lastPlayDate && (
                 <div className="flex justify-between items-center">
                   <span className="text-body-lg text-secondary">さいごに あそんだ ひ</span>
-                  <span className="text-body-lg font-bold text-white">
+                  <span className="text-body-lg font-bold">
                     {new Date(progress.stats.lastPlayDate).toLocaleDateString('ja-JP')}
                   </span>
                 </div>
