@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>テキスト差分比較 | Diff Tool</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ==========================================
+       CSS Variables - Apple Design System
+    ========================================== */
+    :root {
+      /* Colors */
+      --color-label: #1d1d1f;
+      --color-label-secondary: #86868b;
+      --color-label-tertiary: #aeaeb2;
+      --color-background: #ffffff;
+      --color-background-secondary: #f5f5f7;
+      --color-background-tertiary: #e8e8ed;
+      --color-blue: #0071e3;
+      --color-blue-hover: #0077ed;
+      --color-fill: rgba(120, 120, 128, 0.12);
+      --color-fill-secondary: rgba(120, 120, 128, 0.08);
+      --color-separator: rgba(60, 60, 67, 0.12);
+      --color-separator-opaque: #c6c6c8;
+
+      /* Semantic Colors */
+      --color-green: #34c759;
+      --color-green-light: rgba(52, 199, 89, 0.12);
+      --color-red: #ff3b30;
+      --color-red-light: rgba(255, 59, 48, 0.12);
+      --color-yellow: #ffcc00;
+      --color-yellow-light: rgba(255, 204, 0, 0.12);
+
+      /* Diff Colors */
+      --diff-added-bg: rgba(52, 199, 89, 0.1);
+      --diff-added-char: rgba(52, 199, 89, 0.3);
+      --diff-added-text: #248a3d;
+      --diff-removed-bg: rgba(255, 59, 48, 0.1);
+      --diff-removed-char: rgba(255, 59, 48, 0.3);
+      --diff-removed-text: #d70015;
+      --diff-line-number: #86868b;
+
+      /* Typography */
+      --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', 'Helvetica Neue', sans-serif;
+      --font-text: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'Helvetica Neue', sans-serif;
+      --font-mono: 'SF Mono', 'JetBrains Mono', 'Menlo', monospace;
+
+      /* Animation */
+      --ease-out: cubic-bezier(0, 0, 0.58, 1);
+      --ease-in-out: cubic-bezier(0.4, 0, 0.6, 1);
+      --duration-fast: 200ms;
+      --duration-normal: 300ms;
+
+      /* Layout */
+      --container-max: 1200px;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-xl: 22px;
+
+      /* Spacing */
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      --space-2xl: 48px;
+      --space-3xl: 64px;
+    }
+
+    /* Dark Mode */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-label: #f5f5f7;
+        --color-label-secondary: #a1a1a6;
+        --color-label-tertiary: #6e6e73;
+        --color-background: #000000;
+        --color-background-secondary: #1c1c1e;
+        --color-background-tertiary: #2c2c2e;
+        --color-fill: rgba(120, 120, 128, 0.32);
+        --color-fill-secondary: rgba(120, 120, 128, 0.24);
+        --color-separator: rgba(84, 84, 88, 0.65);
+        --color-separator-opaque: #38383a;
+
+        --diff-added-bg: rgba(52, 199, 89, 0.15);
+        --diff-added-text: #30d158;
+        --diff-removed-bg: rgba(255, 69, 58, 0.15);
+        --diff-removed-text: #ff453a;
+      }
+    }
+
+    /* ==========================================
+       Base Styles
+    ========================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-text);
+      font-size: 17px;
+      line-height: 1.47059;
+      font-weight: 400;
+      letter-spacing: -0.022em;
+      color: var(--color-label);
+      background: var(--color-background);
+      min-height: 100vh;
+    }
+
+    /* ==========================================
+       Skip Link (Accessibility)
+    ========================================== */
+    .skip-link {
+      position: absolute;
+      top: -100%;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: var(--space-sm) var(--space-md);
+      background: var(--color-blue);
+      color: #fff;
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      z-index: 1000;
+      transition: top var(--duration-fast) var(--ease-out);
+    }
+
+    .skip-link:focus {
+      top: var(--space-md);
+    }
+
+    /* ==========================================
+       Header
+    ========================================== */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid var(--color-separator);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .header {
+        background: rgba(0, 0, 0, 0.72);
+      }
+    }
+
+    .header-inner {
+      max-width: var(--container-max);
+      margin: 0 auto;
+      padding: var(--space-md) var(--space-lg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-md);
+    }
+
+    .header-title {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 21px;
+      font-weight: 600;
+      letter-spacing: 0.011em;
+      color: var(--color-label);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: var(--space-sm);
+    }
+
+    /* ==========================================
+       Buttons
+    ========================================== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-md);
+      font-family: var(--font-text);
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.28577;
+      letter-spacing: -0.016em;
+      text-decoration: none;
+      border: none;
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-out);
+      min-height: 36px;
+    }
+
+    .btn:focus-visible {
+      outline: 4px solid rgba(0, 113, 227, 0.4);
+      outline-offset: 1px;
+    }
+
+    .btn-primary {
+      background: var(--color-blue);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--color-blue-hover);
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    .btn-secondary {
+      background: var(--color-fill);
+      color: var(--color-label);
+    }
+
+    .btn-secondary:hover {
+      background: var(--color-fill-secondary);
+    }
+
+    .btn-secondary.active {
+      background: var(--color-blue);
+      color: #fff;
+    }
+
+    /* ==========================================
+       Main Container
+    ========================================== */
+    .main {
+      max-width: var(--container-max);
+      margin: 0 auto;
+      padding: var(--space-xl) var(--space-lg) var(--space-3xl);
+    }
+
+    /* ==========================================
+       Section Title
+    ========================================== */
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -0.016em;
+      color: var(--color-label-secondary);
+      text-transform: uppercase;
+      margin: 0 0 var(--space-md);
+    }
+
+    /* ==========================================
+       Editor Section
+    ========================================== */
+    .editor-section {
+      margin-bottom: var(--space-xl);
+    }
+
+    .editor-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-md);
+    }
+
+    @media (max-width: 768px) {
+      .editor-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .editor-pane {
+      background: var(--color-background-secondary);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      transition: box-shadow var(--duration-normal) var(--ease-out);
+    }
+
+    .editor-pane:focus-within {
+      box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.3);
+    }
+
+    .editor-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: 1px solid var(--color-separator);
+    }
+
+    .editor-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-label-secondary);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .editor-label-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .editor-label-dot.left {
+      background: var(--color-red);
+    }
+
+    .editor-label-dot.right {
+      background: var(--color-green);
+    }
+
+    .editor-char-count {
+      font-size: 12px;
+      color: var(--color-label-tertiary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .editor-textarea {
+      width: 100%;
+      min-height: 280px;
+      padding: var(--space-lg);
+      font-family: var(--font-mono);
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--color-label);
+      background: transparent;
+      border: none;
+      resize: vertical;
+      outline: none;
+    }
+
+    .editor-textarea::placeholder {
+      color: var(--color-label-tertiary);
+    }
+
+    /* ==========================================
+       Results Section
+    ========================================== */
+    .results-section {
+      background: var(--color-background-secondary);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+    }
+
+    .results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: 1px solid var(--color-separator);
+      flex-wrap: wrap;
+      gap: var(--space-md);
+    }
+
+    .results-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-label-secondary);
+    }
+
+    .results-stats {
+      display: flex;
+      gap: var(--space-lg);
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      font-size: 13px;
+      color: var(--color-label-secondary);
+    }
+
+    .stat-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 22px;
+      height: 22px;
+      padding: 0 var(--space-sm);
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 11px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-badge.added {
+      background: var(--diff-added-bg);
+      color: var(--diff-added-text);
+    }
+
+    .stat-badge.removed {
+      background: var(--diff-removed-bg);
+      color: var(--diff-removed-text);
+    }
+
+    .stat-badge.unchanged {
+      background: var(--color-fill);
+      color: var(--color-label-secondary);
+    }
+
+    .view-toggle {
+      display: flex;
+      gap: 2px;
+      background: var(--color-fill);
+      padding: 2px;
+      border-radius: var(--radius-md);
+    }
+
+    .view-toggle .btn {
+      padding: var(--space-xs) var(--space-md);
+      min-height: 28px;
+      font-size: 13px;
+      background: transparent;
+      color: var(--color-label-secondary);
+      border-radius: calc(var(--radius-md) - 2px);
+    }
+
+    .view-toggle .btn.active {
+      background: var(--color-background);
+      color: var(--color-label);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    .view-toggle .btn:hover:not(.active) {
+      color: var(--color-label);
+    }
+
+    /* ==========================================
+       Diff Display
+    ========================================== */
+    .diff-container {
+      overflow-x: auto;
+    }
+
+    .diff-empty {
+      padding: var(--space-3xl);
+      text-align: center;
+      color: var(--color-label-tertiary);
+    }
+
+    .diff-empty-icon {
+      font-size: 56px;
+      margin-bottom: var(--space-lg);
+      opacity: 0.3;
+    }
+
+    .diff-empty-text {
+      font-size: 17px;
+      font-weight: 400;
+    }
+
+    /* Side by Side View */
+    .diff-side-by-side {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @media (max-width: 768px) {
+      .diff-side-by-side {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .diff-side {
+      border-right: 1px solid var(--color-separator);
+    }
+
+    .diff-side:last-child {
+      border-right: none;
+    }
+
+    /* Inline View */
+    .diff-inline {
+      width: 100%;
+    }
+
+    /* Diff Lines */
+    .diff-line {
+      display: flex;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.6;
+      min-height: 22px;
+    }
+
+    .diff-line-number {
+      flex-shrink: 0;
+      width: 44px;
+      padding: 0 var(--space-sm);
+      text-align: right;
+      color: var(--diff-line-number);
+      background: var(--color-background-tertiary);
+      border-right: 1px solid var(--color-separator);
+      user-select: none;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .diff-line-marker {
+      flex-shrink: 0;
+      width: 22px;
+      text-align: center;
+      font-weight: 500;
+      user-select: none;
+    }
+
+    .diff-line-content {
+      flex: 1;
+      padding: 0 var(--space-md);
+      white-space: pre-wrap;
+      word-break: break-all;
+      min-width: 0;
+    }
+
+    /* Line States */
+    .diff-line.added {
+      background: var(--diff-added-bg);
+    }
+
+    .diff-line.added .diff-line-marker {
+      color: var(--diff-added-text);
+    }
+
+    .diff-line.removed {
+      background: var(--diff-removed-bg);
+    }
+
+    .diff-line.removed .diff-line-marker {
+      color: var(--diff-removed-text);
+    }
+
+    .diff-line.unchanged {
+      background: transparent;
+    }
+
+    .diff-line.unchanged .diff-line-marker {
+      color: var(--color-label-tertiary);
+    }
+
+    .diff-line.empty {
+      background: var(--color-background-tertiary);
+    }
+
+    .diff-line.empty .diff-line-content {
+      color: var(--color-label-tertiary);
+    }
+
+    /* Character-level highlights */
+    .diff-char-added {
+      background: var(--diff-added-char);
+      border-radius: 3px;
+    }
+
+    .diff-char-removed {
+      background: var(--diff-removed-char);
+      border-radius: 3px;
+    }
+
+    /* ==========================================
+       Footer
+    ========================================== */
+    .footer {
+      max-width: var(--container-max);
+      margin: 0 auto;
+      padding: var(--space-lg);
+      text-align: center;
+      color: var(--color-label-tertiary);
+      font-size: 12px;
+    }
+
+    /* ==========================================
+       Utilities
+    ========================================== */
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* ==========================================
+       Animations
+    ========================================== */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .diff-line {
+      animation: fadeIn var(--duration-normal) var(--ease-out) forwards;
+    }
+
+    /* Reduced Motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Skip Link -->
+  <a href="#main-content" class="skip-link">本文へスキップ</a>
+
+  <!-- Header -->
+  <header class="header" role="banner">
+    <div class="header-inner">
+      <h1 class="header-title">テキスト差分比較ツール</h1>
+      <div class="header-actions">
+        <button type="button" class="btn btn-secondary" id="clearBtn" aria-label="入力をクリア">
+          クリア
+        </button>
+        <button type="button" class="btn btn-secondary" id="swapBtn" aria-label="左右を入れ替え">
+          入れ替え
+        </button>
+        <button type="button" class="btn btn-primary" id="compareBtn">
+          比較する
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main id="main-content" class="main" role="main">
+    <!-- Editor Section -->
+    <section class="editor-section" aria-labelledby="editor-heading">
+      <h2 id="editor-heading" class="visually-hidden">テキスト入力</h2>
+      <div class="editor-grid">
+        <!-- Left Editor -->
+        <div class="editor-pane">
+          <div class="editor-header">
+            <label for="leftText" class="editor-label">
+              <span class="editor-label-dot left" aria-hidden="true"></span>
+              元のテキスト
+            </label>
+            <span class="editor-char-count" id="leftCount">0 文字</span>
+          </div>
+          <textarea
+            id="leftText"
+            class="editor-textarea"
+            placeholder="比較元のテキストを入力..."
+            spellcheck="false"
+            aria-describedby="leftCount"
+          ></textarea>
+        </div>
+        <!-- Right Editor -->
+        <div class="editor-pane">
+          <div class="editor-header">
+            <label for="rightText" class="editor-label">
+              <span class="editor-label-dot right" aria-hidden="true"></span>
+              変更後のテキスト
+            </label>
+            <span class="editor-char-count" id="rightCount">0 文字</span>
+          </div>
+          <textarea
+            id="rightText"
+            class="editor-textarea"
+            placeholder="比較先のテキストを入力..."
+            spellcheck="false"
+            aria-describedby="rightCount"
+          ></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results Section -->
+    <section class="results-section" aria-labelledby="results-heading">
+      <div class="results-header">
+        <h2 id="results-heading" class="results-title">比較結果</h2>
+        <div class="results-stats" id="resultStats" aria-live="polite">
+          <span class="stat-item">
+            <span class="stat-badge added" id="addedCount">0</span>
+            追加
+          </span>
+          <span class="stat-item">
+            <span class="stat-badge removed" id="removedCount">0</span>
+            削除
+          </span>
+          <span class="stat-item">
+            <span class="stat-badge unchanged" id="unchangedCount">0</span>
+            変更なし
+          </span>
+        </div>
+        <div class="view-toggle" role="tablist" aria-label="表示形式の切り替え">
+          <button
+            type="button"
+            class="btn active"
+            role="tab"
+            aria-selected="true"
+            aria-controls="diffOutput"
+            id="sideBySideTab"
+            data-view="side-by-side"
+          >
+            左右表示
+          </button>
+          <button
+            type="button"
+            class="btn"
+            role="tab"
+            aria-selected="false"
+            aria-controls="diffOutput"
+            id="inlineTab"
+            data-view="inline"
+          >
+            統合表示
+          </button>
+        </div>
+      </div>
+      <div class="diff-container" id="diffOutput" role="tabpanel" aria-labelledby="sideBySideTab">
+        <div class="diff-empty">
+          <div class="diff-empty-icon" aria-hidden="true">↔</div>
+          <p class="diff-empty-text">テキストを入力して「比較する」をクリック</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer" role="contentinfo">
+    <p>Ctrl/Cmd + Enter で比較実行</p>
+  </footer>
+
+  <script>
+    // ==========================================
+    // DOM Elements
+    // ==========================================
+    const leftText = document.getElementById('leftText');
+    const rightText = document.getElementById('rightText');
+    const leftCount = document.getElementById('leftCount');
+    const rightCount = document.getElementById('rightCount');
+    const compareBtn = document.getElementById('compareBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const swapBtn = document.getElementById('swapBtn');
+    const diffOutput = document.getElementById('diffOutput');
+    const addedCountEl = document.getElementById('addedCount');
+    const removedCountEl = document.getElementById('removedCount');
+    const unchangedCountEl = document.getElementById('unchangedCount');
+    const sideBySideTab = document.getElementById('sideBySideTab');
+    const inlineTab = document.getElementById('inlineTab');
+
+    let currentView = 'side-by-side';
+    let currentDiff = null;
+
+    // ==========================================
+    // Diff Algorithm (Myers-like LCS based)
+    // ==========================================
+    function computeLCS(arr1, arr2) {
+      const m = arr1.length;
+      const n = arr2.length;
+      const dp = Array(m + 1).fill(null).map(() => Array(n + 1).fill(0));
+
+      for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+          if (arr1[i - 1] === arr2[j - 1]) {
+            dp[i][j] = dp[i - 1][j - 1] + 1;
+          } else {
+            dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+          }
+        }
+      }
+
+      const lcs = [];
+      let i = m, j = n;
+      while (i > 0 && j > 0) {
+        if (arr1[i - 1] === arr2[j - 1]) {
+          lcs.unshift({ value: arr1[i - 1], leftIndex: i - 1, rightIndex: j - 1 });
+          i--; j--;
+        } else if (dp[i - 1][j] > dp[i][j - 1]) {
+          i--;
+        } else {
+          j--;
+        }
+      }
+
+      return lcs;
+    }
+
+    function computeDiff(leftLines, rightLines) {
+      const lcs = computeLCS(leftLines, rightLines);
+      const diff = [];
+
+      let leftIdx = 0;
+      let rightIdx = 0;
+      let lcsIdx = 0;
+
+      while (leftIdx < leftLines.length || rightIdx < rightLines.length) {
+        if (lcsIdx < lcs.length) {
+          const lcsItem = lcs[lcsIdx];
+
+          while (leftIdx < lcsItem.leftIndex) {
+            diff.push({
+              type: 'removed',
+              leftLine: leftIdx + 1,
+              rightLine: null,
+              content: leftLines[leftIdx]
+            });
+            leftIdx++;
+          }
+
+          while (rightIdx < lcsItem.rightIndex) {
+            diff.push({
+              type: 'added',
+              leftLine: null,
+              rightLine: rightIdx + 1,
+              content: rightLines[rightIdx]
+            });
+            rightIdx++;
+          }
+
+          diff.push({
+            type: 'unchanged',
+            leftLine: leftIdx + 1,
+            rightLine: rightIdx + 1,
+            content: leftLines[leftIdx]
+          });
+          leftIdx++;
+          rightIdx++;
+          lcsIdx++;
+        } else {
+          while (leftIdx < leftLines.length) {
+            diff.push({
+              type: 'removed',
+              leftLine: leftIdx + 1,
+              rightLine: null,
+              content: leftLines[leftIdx]
+            });
+            leftIdx++;
+          }
+          while (rightIdx < rightLines.length) {
+            diff.push({
+              type: 'added',
+              leftLine: null,
+              rightLine: rightIdx + 1,
+              content: rightLines[rightIdx]
+            });
+            rightIdx++;
+          }
+        }
+      }
+
+      return diff;
+    }
+
+    function computeCharDiff(str1, str2) {
+      const chars1 = str1.split('');
+      const chars2 = str2.split('');
+      const lcs = computeLCS(chars1, chars2);
+
+      let result1 = '';
+      let result2 = '';
+      let idx1 = 0, idx2 = 0, lcsIdx = 0;
+
+      while (idx1 < chars1.length || idx2 < chars2.length) {
+        if (lcsIdx < lcs.length) {
+          const lcsItem = lcs[lcsIdx];
+
+          while (idx1 < lcsItem.leftIndex) {
+            result1 += `<span class="diff-char-removed">${escapeHtml(chars1[idx1])}</span>`;
+            idx1++;
+          }
+
+          while (idx2 < lcsItem.rightIndex) {
+            result2 += `<span class="diff-char-added">${escapeHtml(chars2[idx2])}</span>`;
+            idx2++;
+          }
+
+          result1 += escapeHtml(chars1[idx1]);
+          result2 += escapeHtml(chars2[idx2]);
+          idx1++; idx2++; lcsIdx++;
+        } else {
+          while (idx1 < chars1.length) {
+            result1 += `<span class="diff-char-removed">${escapeHtml(chars1[idx1])}</span>`;
+            idx1++;
+          }
+          while (idx2 < chars2.length) {
+            result2 += `<span class="diff-char-added">${escapeHtml(chars2[idx2])}</span>`;
+            idx2++;
+          }
+        }
+      }
+
+      return { left: result1, right: result2 };
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function renderSideBySide(diff) {
+      const leftLines = [];
+      const rightLines = [];
+
+      let i = 0;
+      while (i < diff.length) {
+        const item = diff[i];
+
+        if (item.type === 'unchanged') {
+          leftLines.push({ ...item, type: 'unchanged' });
+          rightLines.push({ ...item, type: 'unchanged' });
+          i++;
+        } else if (item.type === 'removed') {
+          const removedGroup = [];
+          const addedGroup = [];
+
+          while (i < diff.length && diff[i].type === 'removed') {
+            removedGroup.push(diff[i]);
+            i++;
+          }
+          while (i < diff.length && diff[i].type === 'added') {
+            addedGroup.push(diff[i]);
+            i++;
+          }
+
+          const maxLen = Math.max(removedGroup.length, addedGroup.length);
+          for (let j = 0; j < maxLen; j++) {
+            const removed = removedGroup[j];
+            const added = addedGroup[j];
+
+            if (removed && added) {
+              const charDiff = computeCharDiff(removed.content, added.content);
+              leftLines.push({ ...removed, highlightedContent: charDiff.left });
+              rightLines.push({ ...added, highlightedContent: charDiff.right });
+            } else if (removed) {
+              leftLines.push(removed);
+              rightLines.push({ type: 'empty', content: '' });
+            } else if (added) {
+              leftLines.push({ type: 'empty', content: '' });
+              rightLines.push(added);
+            }
+          }
+        } else if (item.type === 'added') {
+          leftLines.push({ type: 'empty', content: '' });
+          rightLines.push(item);
+          i++;
+        }
+      }
+
+      let html = '<div class="diff-side-by-side">';
+
+      html += '<div class="diff-side">';
+      leftLines.forEach((line, idx) => {
+        const lineNum = line.leftLine || '';
+        const marker = line.type === 'removed' ? '−' : line.type === 'empty' ? '' : ' ';
+        const content = line.highlightedContent || escapeHtml(line.content);
+        html += `
+          <div class="diff-line ${line.type}" style="animation-delay: ${idx * 8}ms">
+            <span class="diff-line-number">${lineNum}</span>
+            <span class="diff-line-marker">${marker}</span>
+            <span class="diff-line-content">${content || '&nbsp;'}</span>
+          </div>
+        `;
+      });
+      html += '</div>';
+
+      html += '<div class="diff-side">';
+      rightLines.forEach((line, idx) => {
+        const lineNum = line.rightLine || '';
+        const marker = line.type === 'added' ? '+' : line.type === 'empty' ? '' : ' ';
+        const content = line.highlightedContent || escapeHtml(line.content);
+        html += `
+          <div class="diff-line ${line.type}" style="animation-delay: ${idx * 8}ms">
+            <span class="diff-line-number">${lineNum}</span>
+            <span class="diff-line-marker">${marker}</span>
+            <span class="diff-line-content">${content || '&nbsp;'}</span>
+          </div>
+        `;
+      });
+      html += '</div>';
+
+      html += '</div>';
+      return html;
+    }
+
+    function renderInline(diff) {
+      let html = '<div class="diff-inline">';
+
+      diff.forEach((line, idx) => {
+        const leftNum = line.leftLine || '';
+        const rightNum = line.rightLine || '';
+        let marker = ' ';
+        if (line.type === 'added') marker = '+';
+        if (line.type === 'removed') marker = '−';
+
+        const content = escapeHtml(line.content);
+
+        html += `
+          <div class="diff-line ${line.type}" style="animation-delay: ${idx * 8}ms">
+            <span class="diff-line-number">${leftNum}</span>
+            <span class="diff-line-number">${rightNum}</span>
+            <span class="diff-line-marker">${marker}</span>
+            <span class="diff-line-content">${content || '&nbsp;'}</span>
+          </div>
+        `;
+      });
+
+      html += '</div>';
+      return html;
+    }
+
+    function renderDiff() {
+      if (!currentDiff || currentDiff.length === 0) {
+        diffOutput.innerHTML = `
+          <div class="diff-empty">
+            <div class="diff-empty-icon" aria-hidden="true">✓</div>
+            <p class="diff-empty-text">テキストは同一です</p>
+          </div>
+        `;
+        return;
+      }
+
+      if (currentView === 'side-by-side') {
+        diffOutput.innerHTML = renderSideBySide(currentDiff);
+      } else {
+        diffOutput.innerHTML = renderInline(currentDiff);
+      }
+    }
+
+    function updateCharCount(textarea, countEl) {
+      const count = textarea.value.length;
+      countEl.textContent = `${count.toLocaleString()} 文字`;
+    }
+
+    function performComparison() {
+      const left = leftText.value;
+      const right = rightText.value;
+
+      if (!left && !right) {
+        diffOutput.innerHTML = `
+          <div class="diff-empty">
+            <div class="diff-empty-icon" aria-hidden="true">↔</div>
+            <p class="diff-empty-text">テキストを入力して「比較する」をクリック</p>
+          </div>
+        `;
+        addedCountEl.textContent = '0';
+        removedCountEl.textContent = '0';
+        unchangedCountEl.textContent = '0';
+        return;
+      }
+
+      const leftLines = left.split('\n');
+      const rightLines = right.split('\n');
+
+      currentDiff = computeDiff(leftLines, rightLines);
+
+      const stats = currentDiff.reduce((acc, item) => {
+        acc[item.type] = (acc[item.type] || 0) + 1;
+        return acc;
+      }, {});
+
+      addedCountEl.textContent = stats.added || 0;
+      removedCountEl.textContent = stats.removed || 0;
+      unchangedCountEl.textContent = stats.unchanged || 0;
+
+      renderDiff();
+    }
+
+    function handleViewChange(view) {
+      currentView = view;
+
+      sideBySideTab.classList.toggle('active', view === 'side-by-side');
+      sideBySideTab.setAttribute('aria-selected', view === 'side-by-side');
+      inlineTab.classList.toggle('active', view === 'inline');
+      inlineTab.setAttribute('aria-selected', view === 'inline');
+
+      diffOutput.setAttribute('aria-labelledby', view === 'side-by-side' ? 'sideBySideTab' : 'inlineTab');
+
+      if (currentDiff) {
+        renderDiff();
+      }
+    }
+
+    function clearAll() {
+      leftText.value = '';
+      rightText.value = '';
+      updateCharCount(leftText, leftCount);
+      updateCharCount(rightText, rightCount);
+      currentDiff = null;
+      diffOutput.innerHTML = `
+        <div class="diff-empty">
+          <div class="diff-empty-icon" aria-hidden="true">↔</div>
+          <p class="diff-empty-text">テキストを入力して「比較する」をクリック</p>
+        </div>
+      `;
+      addedCountEl.textContent = '0';
+      removedCountEl.textContent = '0';
+      unchangedCountEl.textContent = '0';
+      leftText.focus();
+    }
+
+    function swapTexts() {
+      const temp = leftText.value;
+      leftText.value = rightText.value;
+      rightText.value = temp;
+      updateCharCount(leftText, leftCount);
+      updateCharCount(rightText, rightCount);
+      if (currentDiff) {
+        performComparison();
+      }
+    }
+
+    // Event Listeners
+    leftText.addEventListener('input', () => updateCharCount(leftText, leftCount));
+    rightText.addEventListener('input', () => updateCharCount(rightText, rightCount));
+
+    compareBtn.addEventListener('click', performComparison);
+    clearBtn.addEventListener('click', clearAll);
+    swapBtn.addEventListener('click', swapTexts);
+
+    sideBySideTab.addEventListener('click', () => handleViewChange('side-by-side'));
+    inlineTab.addEventListener('click', () => handleViewChange('inline'));
+
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        performComparison();
+      }
+    });
+
+    // Initialize
+    updateCharCount(leftText, leftCount);
+    updateCharCount(rightText, rightCount);
+  </script>
+</body>
+</html>

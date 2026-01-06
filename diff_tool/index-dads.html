@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>テキスト差分比較ツール | Diff Tool</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ==========================================
+       CSS Variables - DADS Design System
+    ========================================== */
+    :root {
+      /* Primary Colors */
+      --dads-primary-900: #003d78;
+      --dads-primary-800: #004c96;
+      --dads-primary-700: #005bb4;
+      --dads-primary-600: #006bd2;
+      --dads-primary-500: #0071c1;
+      --dads-primary-400: #3d8fd4;
+      --dads-primary-300: #6aade7;
+      --dads-primary-200: #a3cef2;
+      --dads-primary-100: #d1e7f9;
+      --dads-primary-50: #e8f3fc;
+
+      /* Neutral Colors */
+      --dads-neutral-white: #ffffff;
+      --dads-neutral-50: #f8f9fa;
+      --dads-neutral-100: #f1f3f5;
+      --dads-neutral-200: #e9ecef;
+      --dads-neutral-300: #dee2e6;
+      --dads-neutral-400: #ced4da;
+      --dads-neutral-500: #adb5bd;
+      --dads-neutral-600: #868e96;
+      --dads-neutral-700: #495057;
+      --dads-neutral-800: #343a40;
+      --dads-neutral-900: #212529;
+
+      /* Semantic Colors */
+      --dads-success-light: #d4edda;
+      --dads-success: #28a745;
+      --dads-success-dark: #1e7e34;
+      --dads-error-light: #f8d7da;
+      --dads-error: #dc3545;
+      --dads-error-dark: #bd2130;
+      --dads-warning-light: #fff3cd;
+      --dads-warning: #ffc107;
+      --dads-warning-dark: #d39e00;
+      --dads-info-light: #cce5ff;
+      --dads-info: #17a2b8;
+      --dads-info-dark: #117a8b;
+
+      /* Text Colors */
+      --dads-text-primary: #212529;
+      --dads-text-secondary: #495057;
+      --dads-text-muted: #6c757d;
+      --dads-text-link: #0071c1;
+
+      /* Background Colors */
+      --dads-bg-primary: #ffffff;
+      --dads-bg-secondary: #f8f9fa;
+      --dads-bg-tertiary: #e9ecef;
+
+      /* Border Colors */
+      --dads-border-light: #dee2e6;
+      --dads-border-default: #ced4da;
+      --dads-border-dark: #adb5bd;
+
+      /* Diff-specific Colors */
+      --diff-added-bg: #e6ffed;
+      --diff-added-border: #34d058;
+      --diff-added-text: #22863a;
+      --diff-removed-bg: #ffeef0;
+      --diff-removed-border: #ea4a5a;
+      --diff-removed-text: #cb2431;
+      --diff-changed-bg: #fff5b1;
+      --diff-changed-border: #f9c513;
+      --diff-line-number: #6a737d;
+
+      /* Spacing */
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 24px;
+      --space-6: 32px;
+      --space-8: 48px;
+
+      /* Animation */
+      --transition-fast: 0.15s ease;
+      --transition-normal: 0.2s ease;
+    }
+
+    /* ==========================================
+       Base Styles
+    ========================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 16px;
+      line-height: 1.75;
+      color: var(--dads-text-primary);
+      background: var(--dads-bg-secondary);
+      min-height: 100vh;
+    }
+
+    /* ==========================================
+       Skip Link (Accessibility)
+    ========================================== */
+    .skip-link {
+      position: absolute;
+      top: -100%;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: var(--space-2) var(--space-4);
+      background: var(--dads-primary-500);
+      color: var(--dads-neutral-white);
+      text-decoration: none;
+      border-radius: 0 0 4px 4px;
+      z-index: 1000;
+      transition: top var(--transition-fast);
+    }
+
+    .skip-link:focus {
+      top: 0;
+    }
+
+    /* ==========================================
+       Header
+    ========================================== */
+    .header {
+      background: var(--dads-bg-primary);
+      border-bottom: 1px solid var(--dads-border-light);
+      padding: var(--space-4) var(--space-5);
+    }
+
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+    }
+
+    .header-title {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--dads-text-primary);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .header-title-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      background: var(--dads-primary-500);
+      border-radius: 8px;
+      color: var(--dads-neutral-white);
+      font-size: 18px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: var(--space-2);
+    }
+
+    /* ==========================================
+       Buttons
+    ========================================== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-4);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1;
+      text-decoration: none;
+      border: 2px solid transparent;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      min-height: 40px;
+    }
+
+    .btn:focus-visible {
+      outline: 3px solid var(--dads-primary-500);
+      outline-offset: 2px;
+    }
+
+    .btn-primary {
+      background: var(--dads-primary-500);
+      color: var(--dads-neutral-white);
+      border-color: var(--dads-primary-500);
+    }
+
+    .btn-primary:hover {
+      background: var(--dads-primary-700);
+      border-color: var(--dads-primary-700);
+    }
+
+    .btn-secondary {
+      background: var(--dads-neutral-white);
+      color: var(--dads-text-primary);
+      border-color: var(--dads-border-default);
+    }
+
+    .btn-secondary:hover {
+      background: var(--dads-bg-secondary);
+      border-color: var(--dads-border-dark);
+    }
+
+    .btn-secondary.active {
+      background: var(--dads-primary-50);
+      border-color: var(--dads-primary-500);
+      color: var(--dads-primary-700);
+    }
+
+    .btn-icon {
+      padding: var(--space-2);
+      min-height: 36px;
+      min-width: 36px;
+    }
+
+    /* ==========================================
+       Main Container
+    ========================================== */
+    .main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: var(--space-5);
+    }
+
+    /* ==========================================
+       Editor Section
+    ========================================== */
+    .editor-section {
+      background: var(--dads-bg-primary);
+      border-radius: 8px;
+      border: 1px solid var(--dads-border-light);
+      overflow: hidden;
+      margin-bottom: var(--space-5);
+    }
+
+    .editor-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--dads-border-light);
+    }
+
+    @media (max-width: 768px) {
+      .editor-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .editor-pane {
+      background: var(--dads-bg-primary);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .editor-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-3) var(--space-4);
+      background: var(--dads-bg-secondary);
+      border-bottom: 1px solid var(--dads-border-light);
+    }
+
+    .editor-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--dads-text-secondary);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .editor-label-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+
+    .editor-label-icon.left {
+      color: var(--diff-removed-text);
+    }
+
+    .editor-label-icon.right {
+      color: var(--diff-added-text);
+    }
+
+    .editor-char-count {
+      font-size: 12px;
+      color: var(--dads-text-muted);
+      font-weight: 400;
+    }
+
+    .editor-textarea {
+      width: 100%;
+      min-height: 300px;
+      padding: var(--space-4);
+      font-family: 'JetBrains Mono', 'Consolas', 'Monaco', monospace;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--dads-text-primary);
+      background: var(--dads-bg-primary);
+      border: none;
+      resize: vertical;
+      outline: none;
+    }
+
+    .editor-textarea:focus {
+      background: var(--dads-neutral-50);
+    }
+
+    .editor-textarea::placeholder {
+      color: var(--dads-text-muted);
+    }
+
+    /* ==========================================
+       Results Section
+    ========================================== */
+    .results-section {
+      background: var(--dads-bg-primary);
+      border-radius: 8px;
+      border: 1px solid var(--dads-border-light);
+      overflow: hidden;
+    }
+
+    .results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-3) var(--space-4);
+      background: var(--dads-bg-secondary);
+      border-bottom: 1px solid var(--dads-border-light);
+      flex-wrap: wrap;
+      gap: var(--space-3);
+    }
+
+    .results-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--dads-text-secondary);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .results-stats {
+      display: flex;
+      gap: var(--space-4);
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+      font-size: 13px;
+      color: var(--dads-text-secondary);
+    }
+
+    .stat-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 24px;
+      padding: 2px 8px;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 12px;
+    }
+
+    .stat-badge.added {
+      background: var(--diff-added-bg);
+      color: var(--diff-added-text);
+    }
+
+    .stat-badge.removed {
+      background: var(--diff-removed-bg);
+      color: var(--diff-removed-text);
+    }
+
+    .stat-badge.unchanged {
+      background: var(--dads-bg-tertiary);
+      color: var(--dads-text-muted);
+    }
+
+    .view-toggle {
+      display: flex;
+      gap: var(--space-1);
+      background: var(--dads-bg-tertiary);
+      padding: 2px;
+      border-radius: 4px;
+    }
+
+    .view-toggle .btn {
+      padding: var(--space-2) var(--space-3);
+      min-height: 32px;
+      font-size: 13px;
+      border: none;
+      background: transparent;
+      color: var(--dads-text-secondary);
+    }
+
+    .view-toggle .btn.active {
+      background: var(--dads-bg-primary);
+      color: var(--dads-text-primary);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .view-toggle .btn:hover:not(.active) {
+      color: var(--dads-text-primary);
+    }
+
+    /* ==========================================
+       Diff Display
+    ========================================== */
+    .diff-container {
+      overflow-x: auto;
+    }
+
+    .diff-empty {
+      padding: var(--space-8);
+      text-align: center;
+      color: var(--dads-text-muted);
+    }
+
+    .diff-empty-icon {
+      font-size: 48px;
+      margin-bottom: var(--space-4);
+      opacity: 0.5;
+    }
+
+    .diff-empty-text {
+      font-size: 14px;
+    }
+
+    /* Side by Side View */
+    .diff-side-by-side {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @media (max-width: 768px) {
+      .diff-side-by-side {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .diff-side {
+      border-right: 1px solid var(--dads-border-light);
+    }
+
+    .diff-side:last-child {
+      border-right: none;
+    }
+
+    /* Inline View */
+    .diff-inline {
+      width: 100%;
+    }
+
+    /* Diff Lines */
+    .diff-line {
+      display: flex;
+      font-family: 'JetBrains Mono', 'Consolas', 'Monaco', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      min-height: 24px;
+    }
+
+    .diff-line-number {
+      flex-shrink: 0;
+      width: 48px;
+      padding: 0 var(--space-2);
+      text-align: right;
+      color: var(--diff-line-number);
+      background: var(--dads-bg-secondary);
+      border-right: 1px solid var(--dads-border-light);
+      user-select: none;
+    }
+
+    .diff-line-marker {
+      flex-shrink: 0;
+      width: 24px;
+      text-align: center;
+      font-weight: 700;
+      user-select: none;
+    }
+
+    .diff-line-content {
+      flex: 1;
+      padding: 0 var(--space-3);
+      white-space: pre-wrap;
+      word-break: break-all;
+      min-width: 0;
+    }
+
+    /* Line States */
+    .diff-line.added {
+      background: var(--diff-added-bg);
+    }
+
+    .diff-line.added .diff-line-marker {
+      color: var(--diff-added-text);
+    }
+
+    .diff-line.removed {
+      background: var(--diff-removed-bg);
+    }
+
+    .diff-line.removed .diff-line-marker {
+      color: var(--diff-removed-text);
+    }
+
+    .diff-line.unchanged {
+      background: var(--dads-bg-primary);
+    }
+
+    .diff-line.unchanged .diff-line-marker {
+      color: var(--dads-text-muted);
+    }
+
+    .diff-line.empty {
+      background: var(--dads-bg-secondary);
+    }
+
+    .diff-line.empty .diff-line-content {
+      color: var(--dads-text-muted);
+      font-style: italic;
+    }
+
+    /* Character-level highlights */
+    .diff-char-added {
+      background: rgba(52, 208, 88, 0.4);
+      border-radius: 2px;
+    }
+
+    .diff-char-removed {
+      background: rgba(234, 74, 90, 0.4);
+      border-radius: 2px;
+    }
+
+    /* ==========================================
+       Footer
+    ========================================== */
+    .footer {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: var(--space-4) var(--space-5);
+      text-align: center;
+      color: var(--dads-text-muted);
+      font-size: 13px;
+    }
+
+    /* ==========================================
+       Utilities
+    ========================================== */
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* ==========================================
+       Animations
+    ========================================== */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .diff-line {
+      animation: fadeIn 0.15s ease forwards;
+    }
+  </style>
+</head>
+<body>
+  <!-- Skip Link -->
+  <a href="#main-content" class="skip-link">本文へスキップ</a>
+
+  <!-- Header -->
+  <header class="header" role="banner">
+    <div class="header-inner">
+      <h1 class="header-title">
+        <span class="header-title-icon" aria-hidden="true">≠</span>
+        テキスト差分比較ツール
+      </h1>
+      <div class="header-actions">
+        <button type="button" class="btn btn-secondary" id="clearBtn" aria-label="入力をクリア">
+          クリア
+        </button>
+        <button type="button" class="btn btn-secondary" id="swapBtn" aria-label="左右を入れ替え">
+          入れ替え
+        </button>
+        <button type="button" class="btn btn-primary" id="compareBtn">
+          比較する
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main id="main-content" class="main" role="main">
+    <!-- Editor Section -->
+    <section class="editor-section" aria-labelledby="editor-heading">
+      <h2 id="editor-heading" class="visually-hidden">テキスト入力</h2>
+      <div class="editor-grid">
+        <!-- Left Editor -->
+        <div class="editor-pane">
+          <div class="editor-header">
+            <label for="leftText" class="editor-label">
+              <span class="editor-label-icon left" aria-hidden="true">◀</span>
+              元のテキスト
+            </label>
+            <span class="editor-char-count" id="leftCount">0 文字</span>
+          </div>
+          <textarea
+            id="leftText"
+            class="editor-textarea"
+            placeholder="比較元のテキストを入力..."
+            spellcheck="false"
+            aria-describedby="leftCount"
+          ></textarea>
+        </div>
+        <!-- Right Editor -->
+        <div class="editor-pane">
+          <div class="editor-header">
+            <label for="rightText" class="editor-label">
+              <span class="editor-label-icon right" aria-hidden="true">▶</span>
+              変更後のテキスト
+            </label>
+            <span class="editor-char-count" id="rightCount">0 文字</span>
+          </div>
+          <textarea
+            id="rightText"
+            class="editor-textarea"
+            placeholder="比較先のテキストを入力..."
+            spellcheck="false"
+            aria-describedby="rightCount"
+          ></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results Section -->
+    <section class="results-section" aria-labelledby="results-heading">
+      <div class="results-header">
+        <h2 id="results-heading" class="results-title">
+          <span aria-hidden="true">📊</span>
+          比較結果
+        </h2>
+        <div class="results-stats" id="resultStats" aria-live="polite">
+          <span class="stat-item">
+            <span class="stat-badge added" id="addedCount">0</span>
+            追加
+          </span>
+          <span class="stat-item">
+            <span class="stat-badge removed" id="removedCount">0</span>
+            削除
+          </span>
+          <span class="stat-item">
+            <span class="stat-badge unchanged" id="unchangedCount">0</span>
+            変更なし
+          </span>
+        </div>
+        <div class="view-toggle" role="tablist" aria-label="表示形式の切り替え">
+          <button
+            type="button"
+            class="btn active"
+            role="tab"
+            aria-selected="true"
+            aria-controls="diffOutput"
+            id="sideBySideTab"
+            data-view="side-by-side"
+          >
+            左右表示
+          </button>
+          <button
+            type="button"
+            class="btn"
+            role="tab"
+            aria-selected="false"
+            aria-controls="diffOutput"
+            id="inlineTab"
+            data-view="inline"
+          >
+            統合表示
+          </button>
+        </div>
+      </div>
+      <div class="diff-container" id="diffOutput" role="tabpanel" aria-labelledby="sideBySideTab">
+        <div class="diff-empty">
+          <div class="diff-empty-icon" aria-hidden="true">↔</div>
+          <p class="diff-empty-text">テキストを入力して「比較する」ボタンをクリックしてください</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer" role="contentinfo">
+    <p>キーボードショートカット: Ctrl/Cmd + Enter で比較実行</p>
+  </footer>
+
+  <script>
+    // ==========================================
+    // DOM Elements
+    // ==========================================
+    const leftText = document.getElementById('leftText');
+    const rightText = document.getElementById('rightText');
+    const leftCount = document.getElementById('leftCount');
+    const rightCount = document.getElementById('rightCount');
+    const compareBtn = document.getElementById('compareBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const swapBtn = document.getElementById('swapBtn');
+    const diffOutput = document.getElementById('diffOutput');
+    const addedCountEl = document.getElementById('addedCount');
+    const removedCountEl = document.getElementById('removedCount');
+    const unchangedCountEl = document.getElementById('unchangedCount');
+    const sideBySideTab = document.getElementById('sideBySideTab');
+    const inlineTab = document.getElementById('inlineTab');
+
+    let currentView = 'side-by-side';
+    let currentDiff = null;
+
+    // ==========================================
+    // Diff Algorithm (Myers-like LCS based)
+    // ==========================================
+    function computeLCS(arr1, arr2) {
+      const m = arr1.length;
+      const n = arr2.length;
+      const dp = Array(m + 1).fill(null).map(() => Array(n + 1).fill(0));
+
+      for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+          if (arr1[i - 1] === arr2[j - 1]) {
+            dp[i][j] = dp[i - 1][j - 1] + 1;
+          } else {
+            dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+          }
+        }
+      }
+
+      // Backtrack to find LCS
+      const lcs = [];
+      let i = m, j = n;
+      while (i > 0 && j > 0) {
+        if (arr1[i - 1] === arr2[j - 1]) {
+          lcs.unshift({ value: arr1[i - 1], leftIndex: i - 1, rightIndex: j - 1 });
+          i--; j--;
+        } else if (dp[i - 1][j] > dp[i][j - 1]) {
+          i--;
+        } else {
+          j--;
+        }
+      }
+
+      return lcs;
+    }
+
+    function computeDiff(leftLines, rightLines) {
+      const lcs = computeLCS(leftLines, rightLines);
+      const diff = [];
+
+      let leftIdx = 0;
+      let rightIdx = 0;
+      let lcsIdx = 0;
+
+      while (leftIdx < leftLines.length || rightIdx < rightLines.length) {
+        if (lcsIdx < lcs.length) {
+          const lcsItem = lcs[lcsIdx];
+
+          // Add removed lines (from left, not in LCS)
+          while (leftIdx < lcsItem.leftIndex) {
+            diff.push({
+              type: 'removed',
+              leftLine: leftIdx + 1,
+              rightLine: null,
+              content: leftLines[leftIdx]
+            });
+            leftIdx++;
+          }
+
+          // Add added lines (from right, not in LCS)
+          while (rightIdx < lcsItem.rightIndex) {
+            diff.push({
+              type: 'added',
+              leftLine: null,
+              rightLine: rightIdx + 1,
+              content: rightLines[rightIdx]
+            });
+            rightIdx++;
+          }
+
+          // Add unchanged line (in LCS)
+          diff.push({
+            type: 'unchanged',
+            leftLine: leftIdx + 1,
+            rightLine: rightIdx + 1,
+            content: leftLines[leftIdx]
+          });
+          leftIdx++;
+          rightIdx++;
+          lcsIdx++;
+        } else {
+          // Remaining lines after LCS is exhausted
+          while (leftIdx < leftLines.length) {
+            diff.push({
+              type: 'removed',
+              leftLine: leftIdx + 1,
+              rightLine: null,
+              content: leftLines[leftIdx]
+            });
+            leftIdx++;
+          }
+          while (rightIdx < rightLines.length) {
+            diff.push({
+              type: 'added',
+              leftLine: null,
+              rightLine: rightIdx + 1,
+              content: rightLines[rightIdx]
+            });
+            rightIdx++;
+          }
+        }
+      }
+
+      return diff;
+    }
+
+    // ==========================================
+    // Character-level diff for similar lines
+    // ==========================================
+    function computeCharDiff(str1, str2) {
+      const chars1 = str1.split('');
+      const chars2 = str2.split('');
+      const lcs = computeLCS(chars1, chars2);
+
+      let result1 = '';
+      let result2 = '';
+      let idx1 = 0, idx2 = 0, lcsIdx = 0;
+
+      while (idx1 < chars1.length || idx2 < chars2.length) {
+        if (lcsIdx < lcs.length) {
+          const lcsItem = lcs[lcsIdx];
+
+          // Removed chars
+          while (idx1 < lcsItem.leftIndex) {
+            result1 += `<span class="diff-char-removed">${escapeHtml(chars1[idx1])}</span>`;
+            idx1++;
+          }
+
+          // Added chars
+          while (idx2 < lcsItem.rightIndex) {
+            result2 += `<span class="diff-char-added">${escapeHtml(chars2[idx2])}</span>`;
+            idx2++;
+          }
+
+          // Unchanged char
+          result1 += escapeHtml(chars1[idx1]);
+          result2 += escapeHtml(chars2[idx2]);
+          idx1++; idx2++; lcsIdx++;
+        } else {
+          while (idx1 < chars1.length) {
+            result1 += `<span class="diff-char-removed">${escapeHtml(chars1[idx1])}</span>`;
+            idx1++;
+          }
+          while (idx2 < chars2.length) {
+            result2 += `<span class="diff-char-added">${escapeHtml(chars2[idx2])}</span>`;
+            idx2++;
+          }
+        }
+      }
+
+      return { left: result1, right: result2 };
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ==========================================
+    // Rendering
+    // ==========================================
+    function renderSideBySide(diff) {
+      // Group diff for side-by-side display
+      const leftLines = [];
+      const rightLines = [];
+
+      let i = 0;
+      while (i < diff.length) {
+        const item = diff[i];
+
+        if (item.type === 'unchanged') {
+          leftLines.push({ ...item, type: 'unchanged' });
+          rightLines.push({ ...item, type: 'unchanged' });
+          i++;
+        } else if (item.type === 'removed') {
+          // Collect consecutive removed/added for pairing
+          const removedGroup = [];
+          const addedGroup = [];
+
+          while (i < diff.length && diff[i].type === 'removed') {
+            removedGroup.push(diff[i]);
+            i++;
+          }
+          while (i < diff.length && diff[i].type === 'added') {
+            addedGroup.push(diff[i]);
+            i++;
+          }
+
+          // Pair up removed and added lines
+          const maxLen = Math.max(removedGroup.length, addedGroup.length);
+          for (let j = 0; j < maxLen; j++) {
+            const removed = removedGroup[j];
+            const added = addedGroup[j];
+
+            if (removed && added) {
+              // Both exist - compute char diff
+              const charDiff = computeCharDiff(removed.content, added.content);
+              leftLines.push({ ...removed, highlightedContent: charDiff.left });
+              rightLines.push({ ...added, highlightedContent: charDiff.right });
+            } else if (removed) {
+              leftLines.push(removed);
+              rightLines.push({ type: 'empty', content: '' });
+            } else if (added) {
+              leftLines.push({ type: 'empty', content: '' });
+              rightLines.push(added);
+            }
+          }
+        } else if (item.type === 'added') {
+          leftLines.push({ type: 'empty', content: '' });
+          rightLines.push(item);
+          i++;
+        }
+      }
+
+      // Render
+      let html = '<div class="diff-side-by-side">';
+
+      // Left side
+      html += '<div class="diff-side">';
+      leftLines.forEach((line, idx) => {
+        const lineNum = line.leftLine || '';
+        const marker = line.type === 'removed' ? '−' : line.type === 'empty' ? '' : ' ';
+        const content = line.highlightedContent || escapeHtml(line.content);
+        html += `
+          <div class="diff-line ${line.type}" style="animation-delay: ${idx * 10}ms">
+            <span class="diff-line-number">${lineNum}</span>
+            <span class="diff-line-marker">${marker}</span>
+            <span class="diff-line-content">${content || '&nbsp;'}</span>
+          </div>
+        `;
+      });
+      html += '</div>';
+
+      // Right side
+      html += '<div class="diff-side">';
+      rightLines.forEach((line, idx) => {
+        const lineNum = line.rightLine || '';
+        const marker = line.type === 'added' ? '+' : line.type === 'empty' ? '' : ' ';
+        const content = line.highlightedContent || escapeHtml(line.content);
+        html += `
+          <div class="diff-line ${line.type}" style="animation-delay: ${idx * 10}ms">
+            <span class="diff-line-number">${lineNum}</span>
+            <span class="diff-line-marker">${marker}</span>
+            <span class="diff-line-content">${content || '&nbsp;'}</span>
+          </div>
+        `;
+      });
+      html += '</div>';
+
+      html += '</div>';
+      return html;
+    }
+
+    function renderInline(diff) {
+      let html = '<div class="diff-inline">';
+
+      diff.forEach((line, idx) => {
+        const leftNum = line.leftLine || '';
+        const rightNum = line.rightLine || '';
+        let marker = ' ';
+        if (line.type === 'added') marker = '+';
+        if (line.type === 'removed') marker = '−';
+
+        const content = escapeHtml(line.content);
+
+        html += `
+          <div class="diff-line ${line.type}" style="animation-delay: ${idx * 10}ms">
+            <span class="diff-line-number">${leftNum}</span>
+            <span class="diff-line-number">${rightNum}</span>
+            <span class="diff-line-marker">${marker}</span>
+            <span class="diff-line-content">${content || '&nbsp;'}</span>
+          </div>
+        `;
+      });
+
+      html += '</div>';
+      return html;
+    }
+
+    function renderDiff() {
+      if (!currentDiff || currentDiff.length === 0) {
+        diffOutput.innerHTML = `
+          <div class="diff-empty">
+            <div class="diff-empty-icon" aria-hidden="true">✓</div>
+            <p class="diff-empty-text">テキストは同一です（差分なし）</p>
+          </div>
+        `;
+        return;
+      }
+
+      if (currentView === 'side-by-side') {
+        diffOutput.innerHTML = renderSideBySide(currentDiff);
+      } else {
+        diffOutput.innerHTML = renderInline(currentDiff);
+      }
+    }
+
+    // ==========================================
+    // Event Handlers
+    // ==========================================
+    function updateCharCount(textarea, countEl) {
+      const count = textarea.value.length;
+      countEl.textContent = `${count.toLocaleString()} 文字`;
+    }
+
+    function performComparison() {
+      const left = leftText.value;
+      const right = rightText.value;
+
+      if (!left && !right) {
+        diffOutput.innerHTML = `
+          <div class="diff-empty">
+            <div class="diff-empty-icon" aria-hidden="true">↔</div>
+            <p class="diff-empty-text">テキストを入力して「比較する」ボタンをクリックしてください</p>
+          </div>
+        `;
+        addedCountEl.textContent = '0';
+        removedCountEl.textContent = '0';
+        unchangedCountEl.textContent = '0';
+        return;
+      }
+
+      const leftLines = left.split('\n');
+      const rightLines = right.split('\n');
+
+      currentDiff = computeDiff(leftLines, rightLines);
+
+      // Update stats
+      const stats = currentDiff.reduce((acc, item) => {
+        acc[item.type] = (acc[item.type] || 0) + 1;
+        return acc;
+      }, {});
+
+      addedCountEl.textContent = stats.added || 0;
+      removedCountEl.textContent = stats.removed || 0;
+      unchangedCountEl.textContent = stats.unchanged || 0;
+
+      renderDiff();
+    }
+
+    function handleViewChange(view) {
+      currentView = view;
+
+      // Update tab states
+      sideBySideTab.classList.toggle('active', view === 'side-by-side');
+      sideBySideTab.setAttribute('aria-selected', view === 'side-by-side');
+      inlineTab.classList.toggle('active', view === 'inline');
+      inlineTab.setAttribute('aria-selected', view === 'inline');
+
+      // Update tabpanel
+      diffOutput.setAttribute('aria-labelledby', view === 'side-by-side' ? 'sideBySideTab' : 'inlineTab');
+
+      if (currentDiff) {
+        renderDiff();
+      }
+    }
+
+    function clearAll() {
+      leftText.value = '';
+      rightText.value = '';
+      updateCharCount(leftText, leftCount);
+      updateCharCount(rightText, rightCount);
+      currentDiff = null;
+      diffOutput.innerHTML = `
+        <div class="diff-empty">
+          <div class="diff-empty-icon" aria-hidden="true">↔</div>
+          <p class="diff-empty-text">テキストを入力して「比較する」ボタンをクリックしてください</p>
+        </div>
+      `;
+      addedCountEl.textContent = '0';
+      removedCountEl.textContent = '0';
+      unchangedCountEl.textContent = '0';
+      leftText.focus();
+    }
+
+    function swapTexts() {
+      const temp = leftText.value;
+      leftText.value = rightText.value;
+      rightText.value = temp;
+      updateCharCount(leftText, leftCount);
+      updateCharCount(rightText, rightCount);
+      if (currentDiff) {
+        performComparison();
+      }
+    }
+
+    // ==========================================
+    // Event Listeners
+    // ==========================================
+    leftText.addEventListener('input', () => updateCharCount(leftText, leftCount));
+    rightText.addEventListener('input', () => updateCharCount(rightText, rightCount));
+
+    compareBtn.addEventListener('click', performComparison);
+    clearBtn.addEventListener('click', clearAll);
+    swapBtn.addEventListener('click', swapTexts);
+
+    sideBySideTab.addEventListener('click', () => handleViewChange('side-by-side'));
+    inlineTab.addEventListener('click', () => handleViewChange('inline'));
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        performComparison();
+      }
+    });
+
+    // Initialize
+    updateCharCount(leftText, leftCount);
+    updateCharCount(rightText, rightCount);
+  </script>
+</body>
+</html>
