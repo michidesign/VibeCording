@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## プロジェクト概要
 
-**単一ファイルのWebベースタスク管理アプリケーション**です。HTML、CSS、JavaScriptのみで構築されており、アプリケーション全体が `mytasks.html`（約3,300行）に含まれています。ビルドシステム、パッケージマネージャー、外部依存関係は不要です。
+**単一ファイルのWebベースタスク管理アプリケーション**です。HTML、CSS、JavaScriptのみで構築されており、アプリケーション全体が `mytasks.html`（約3,800行）に含まれています。ビルドシステム、パッケージマネージャー、外部依存関係は不要です。
 
 **デザインシステム**: Apple Design System（apple-design skill）に準拠した洗練されたUIを採用。
 
@@ -49,11 +49,16 @@ appData = {
 | `addTask()` / `updateTask()` / `deleteTask()` | タスクCRUD |
 | `toggleComplete()` | タスクのアーカイブ/復元 |
 | `importData()` / `exportData()` | JSONファイル入出力 |
-| `handleDragStart/Over/Drop/End` | ドラッグ&ドロップ並び替え |
+| `handleDragStart/Over/Drop/End` | ドラッグ&ドロップ並び替え（FLIPアニメーション付き） |
 | `handleTouchStart/Move/End` | タッチドラッグ&ドロップ |
 | `showToast()` | トースト通知表示 |
 | `handleGlobalKeydown()` | グローバルキーボード操作 |
 | `closeAllModals()` | 全モーダルを閉じる |
+| `toggleCompactReorderMode()` | コンパクト並び替えモードの切り替え |
+| `toggleQuickMoveMenu()` | クイック移動メニューの表示/非表示 |
+| `quickMoveTask()` | クイック移動メニューからのタスク移動 |
+| `toggleDarkMode()` | ダークモードの切り替え |
+| `updateDarkModeUI()` | ダークモードUI状態の更新 |
 
 ### 表示モード
 `currentView` 変数で制御される3つのビュー:
@@ -123,6 +128,22 @@ CSSは `.claude/skills/apple-design` に定義されたApple Design Systemに準
 | フォーカス管理 | タスク追加後に入力欄にフォーカス |
 | コンパクトUI | タスクカードの縦幅を最適化し一覧性向上 |
 | カスタム矢印 | セレクトボックスにカスタムSVG矢印を採用 |
+| コンパクト並び替え | タスクカードを圧縮表示して並び替えを効率化 |
+| クイック移動 | ドラッグハンドルクリックで移動メニュー表示 |
+| FLIPアニメーション | ドラッグ中のリアルタイムプレビューと滑らかな移動 |
+| ダークモードトグル | トグルスイッチ（☀ — ● — ☾）でモード切替 |
+| サイドバーレイアウト | VIEWS/FILTERS/DATA MANAGEMENTを下部固定配置 |
+
+### 主要なCSSクラス（v2.8追加分）
+| クラス | 用途 |
+|--------|------|
+| `.sidebar-content` | サイドバーコンテンツ（flexbox） |
+| `.sidebar-bottom-section` | サイドバー下部固定セクション |
+| `.compact-reorder-mode` | コンパクト並び替えモード（bodyに付与） |
+| `.quick-move-menu` | クイック移動メニュー |
+| `.btn-mode-toggle` | 並び替えボタン |
+| `.theme-toggle-switch` | ダークモードトグルスイッチ |
+| `.mode-toggle-row` | ボタン横並びコンテナ |
 
 ### デザイン変更時の注意
 - CSS変数を使用して色・サイズを変更

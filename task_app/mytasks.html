@@ -491,7 +491,7 @@
 
         /* FIX: Sidebar Layout Adjustments */
         .input-card>div {
-            margin-bottom: 12px !important;
+            margin-bottom: 8px !important;
             /* Force spacing between inputs */
         }
 
@@ -538,6 +538,22 @@
             overflow-y: auto;
             overflow-x: hidden;
             flex-shrink: 0;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .sidebar-bottom-section {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            overflow-x: hidden;
         }
 
         .sidebar::-webkit-scrollbar {
@@ -961,7 +977,7 @@
         .mode-toggle-row {
             display: flex;
             gap: 8px;
-            margin-top: 16px;
+            margin-top: 8px;
         }
 
         .btn-mode-toggle {
@@ -2068,7 +2084,8 @@
             }
 
             .sidebar.expanded .sidebar-content {
-                display: block;
+                display: flex;
+                flex-direction: column;
                 height: 100vh;
                 overflow-y: auto;
                 padding-bottom: 32px;
@@ -2432,8 +2449,6 @@
 
             <!-- Collapsible Content Wrapper -->
             <div class="sidebar-content" id="sidebarContent">
-                <!-- Round 29: Label Adjustment -->
-                <span class="section-label" style="margin-top:0px;">New Task</span>
                 <div class="input-card" id="inputFormSection">
                     <div class="input-row-main">
                         <!-- Round 29: Japanese Label -->
@@ -2455,7 +2470,7 @@
                         </div>
                     </div>
 
-                    <div style="margin-top:5px;">
+                    <div>
                         <!-- Round 29: Japanese Label -->
                         <label class="input-group-label" for="inputDeadline">期限</label>
                         <!-- Round 27: Hybrid Input -->
@@ -2477,7 +2492,7 @@
                         </div>
                     </div>
 
-                    <div style="margin-top:5px;">
+                    <div>
                         <!-- Round 29: Japanese Label -->
                         <label class="input-group-label" for="inputMemo">メモ</label>
                         <textarea id="inputMemo" class="form-control memo-area" placeholder="詳細を入力" rows="1"
@@ -2488,7 +2503,8 @@
                     <button class="btn-add" onclick="addTask()">タスクを登録</button>
                 </div>
 
-                <div style="display:flex; flex-direction:column; gap:4px; margin-top: 20px;"> <!-- Reduced Gap -->
+                <div class="sidebar-bottom-section">
+                <div style="display:flex; flex-direction:column; gap:4px;"> <!-- Reduced Gap -->
                     <!-- Round 28: VIEWS Label -->
                     <div>
                         <span class="section-label">VIEWS</span>
@@ -2524,7 +2540,7 @@
                     </div>
 
                     <!-- Search Section (ラベルなし) -->
-                    <div class="search-wrapper" style="margin-top: 12px;">
+                    <div class="search-wrapper" style="margin-top: 8px;">
                         <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="11" cy="11" r="8"></circle>
@@ -2605,6 +2621,7 @@
                             onchange="importData(this)">
                     </div>
                 </div>
+                </div><!-- End sidebar-bottom-section -->
             </div><!-- End Sidebar Content -->
         </aside>
 
