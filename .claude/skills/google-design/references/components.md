@@ -46,8 +46,8 @@ Material Design 3 に基づいたUIコンポーネントの完全なリファレ
 }
 
 .md-filled-button:hover {
-  box-shadow: 0 1px 3px 1px rgba(0, 0, 0, 0.15),
-              0 1px 2px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1),
+              0 1px 3px 1px rgba(0, 0, 0, 0.06);
 }
 
 .md-filled-button:focus-visible {
@@ -169,17 +169,15 @@ Material Design 3 に基づいたUIコンポーネントの完全なリファレ
   border-radius: 16px;
   cursor: pointer;
 
-  box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.2),
-              0 6px 10px rgba(0, 0, 0, 0.14),
-              0 1px 18px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08),
+              0 4px 8px rgba(0, 0, 0, 0.06);
 
   transition: box-shadow 200ms cubic-bezier(0.2, 0, 0, 1);
 }
 
 .md-fab:hover {
-  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
-              0 8px 10px 1px rgba(0, 0, 0, 0.14),
-              0 3px 14px 2px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1),
+              0 6px 12px rgba(0, 0, 0, 0.08);
 }
 
 .md-fab-icon {
@@ -230,8 +228,8 @@ Material Design 3 に基づいたUIコンポーネントの完全なリファレ
 
 .md-card-elevated {
   background-color: var(--md-sys-color-surface-container-low);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3),
-              0 1px 3px 1px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1),
+              0 1px 3px 1px rgba(0, 0, 0, 0.06);
 }
 
 .md-card-media {
@@ -628,8 +626,8 @@ Material Design 3 に基づいたUIコンポーネントの完全なリファレ
   border: none;
   border-radius: 28px;
 
-  box-shadow: 0 8px 12px 6px rgba(0, 0, 0, 0.15),
-              0 4px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 8px 3px rgba(0, 0, 0, 0.06),
+              0 1px 3px rgba(0, 0, 0, 0.12);
 }
 
 .md-dialog-icon {
@@ -755,9 +753,8 @@ Material Design 3 に基づいたUIコンポーネントの完全なリファレ
   color: var(--md-sys-color-inverse-on-surface);
   border-radius: 4px;
 
-  box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.2),
-              0 6px 10px rgba(0, 0, 0, 0.14),
-              0 1px 18px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 8px 3px rgba(0, 0, 0, 0.06),
+              0 1px 3px rgba(0, 0, 0, 0.12);
 }
 
 .md-snackbar-text {

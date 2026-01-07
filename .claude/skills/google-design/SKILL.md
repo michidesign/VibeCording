@@ -147,7 +147,7 @@ Google の Material Design 3 (Material You) に基づいた、モダンで表現
 }
 
 .md-filled-button:hover {
-  box-shadow: 0 1px 3px 1px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 3px 1px rgba(0, 0, 0, 0.06);
 }
 ```
 
@@ -158,8 +158,8 @@ Google の Material Design 3 (Material You) に基づいた、モダンで表現
   background-color: var(--md-sys-color-surface);
   border-radius: var(--md-shape-medium);
   padding: 16px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3),
-              0 1px 3px 1px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1),
+              0 1px 3px 1px rgba(0, 0, 0, 0.06);
 }
 ```
 

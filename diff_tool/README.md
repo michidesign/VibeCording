@@ -46,6 +46,4 @@ diff_tool/
 - **対応ブラウザ**: モダンブラウザ（Chrome, Firefox, Safari, Edge）
 - **外部リソース**: Google Fonts（Noto Sans JP, Inter, Roboto, JetBrains Mono）
 
-## ライセンス
 
-MIT License

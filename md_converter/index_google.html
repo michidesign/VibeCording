@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MD Converter - マークダウン変換ツール</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  <style>
+    /* ============================================
+       CSS Variables - Material Design 3
+    ============================================ */
+    :root {
+      /* Primary */
+      --md-sys-color-primary: #6750A4;
+      --md-sys-color-on-primary: #FFFFFF;
+      --md-sys-color-primary-container: #EADDFF;
+      --md-sys-color-on-primary-container: #21005D;
+
+      /* Secondary */
+      --md-sys-color-secondary: #625B71;
+      --md-sys-color-on-secondary: #FFFFFF;
+      --md-sys-color-secondary-container: #E8DEF8;
+      --md-sys-color-on-secondary-container: #1D192B;
+
+      /* Tertiary */
+      --md-sys-color-tertiary: #7D5260;
+      --md-sys-color-on-tertiary: #FFFFFF;
+      --md-sys-color-tertiary-container: #FFD8E4;
+
+      /* Error */
+      --md-sys-color-error: #B3261E;
+      --md-sys-color-on-error: #FFFFFF;
+      --md-sys-color-error-container: #F9DEDC;
+
+      /* Surface */
+      --md-sys-color-surface: #FFFBFE;
+      --md-sys-color-on-surface: #1C1B1F;
+      --md-sys-color-surface-variant: #E7E0EC;
+      --md-sys-color-on-surface-variant: #49454F;
+      --md-sys-color-surface-container: #F3EDF7;
+      --md-sys-color-surface-container-low: #F7F2FA;
+      --md-sys-color-surface-container-high: #ECE6F0;
+
+      /* Outline */
+      --md-sys-color-outline: #79747E;
+      --md-sys-color-outline-variant: #CAC4D0;
+
+      /* Typography */
+      --md-sys-typescale-font: 'Roboto', 'Noto Sans JP', sans-serif;
+
+      /* Motion */
+      --md-sys-motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+      --md-sys-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
+      --md-sys-motion-duration-short3: 150ms;
+      --md-sys-motion-duration-medium2: 300ms;
+      --md-sys-motion-duration-medium4: 400ms;
+
+      /* Shape */
+      --md-shape-extra-small: 4px;
+      --md-shape-small: 8px;
+      --md-shape-medium: 12px;
+      --md-shape-large: 16px;
+      --md-shape-extra-large: 28px;
+      --md-shape-full: 9999px;
+
+      /* Elevation */
+      --md-elevation-1: 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 3px 1px rgba(0, 0, 0, 0.06);
+      --md-elevation-2: 0 1px 2px rgba(0, 0, 0, 0.12), 0 2px 6px 2px rgba(0, 0, 0, 0.06);
+      --md-elevation-3: 0 4px 8px 3px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Dark Theme */
+    .dark-mode {
+      --md-sys-color-primary: #D0BCFF;
+      --md-sys-color-on-primary: #381E72;
+      --md-sys-color-primary-container: #4F378B;
+      --md-sys-color-on-primary-container: #EADDFF;
+
+      --md-sys-color-secondary: #CCC2DC;
+      --md-sys-color-on-secondary: #332D41;
+      --md-sys-color-secondary-container: #4A4458;
+      --md-sys-color-on-secondary-container: #E8DEF8;
+
+      --md-sys-color-tertiary: #EFB8C8;
+      --md-sys-color-tertiary-container: #633B48;
+
+      --md-sys-color-error: #F2B8B5;
+      --md-sys-color-error-container: #8C1D18;
+
+      --md-sys-color-surface: #1C1B1F;
+      --md-sys-color-on-surface: #E6E1E5;
+      --md-sys-color-surface-variant: #49454F;
+      --md-sys-color-on-surface-variant: #CAC4D0;
+      --md-sys-color-surface-container: #211F26;
+      --md-sys-color-surface-container-low: #1D1B20;
+      --md-sys-color-surface-container-high: #2B2930;
+
+      --md-sys-color-outline: #938F99;
+      --md-sys-color-outline-variant: #49454F;
+    }
+
+    /* ============================================
+       Base Styles
+    ============================================ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: var(--md-sys-typescale-font);
+      font-size: 14px;
+      line-height: 1.43;
+      letter-spacing: 0.25px;
+      color: var(--md-sys-color-on-surface);
+      background: var(--md-sys-color-surface-container-low);
+      min-height: 100vh;
+      transition: background-color var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-standard),
+                  color var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-standard);
+    }
+
+    /* Skip Link */
+    .skip-link {
+      position: absolute;
+      top: -100%;
+      left: 16px;
+      padding: 8px 16px;
+      background: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+      border-radius: var(--md-shape-small);
+      z-index: 9999;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .skip-link:focus {
+      top: 16px;
+    }
+
+    /* Material Symbols */
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 24px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      font-feature-settings: 'liga';
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ============================================
+       Layout
+    ============================================ */
+    .app-container {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Top App Bar */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px;
+      min-height: 64px;
+      background: var(--md-sys-color-surface);
+      box-shadow: var(--md-elevation-2);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      transition: background var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-standard);
+    }
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-title h1 {
+      font-size: 22px;
+      font-weight: 400;
+      letter-spacing: 0;
+      line-height: 28px;
+    }
+
+    .header-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--md-sys-color-primary-container);
+      border-radius: var(--md-shape-medium);
+      color: var(--md-sys-color-on-primary-container);
+      font-size: 20px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Icon Buttons - Material Style */
+    .icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      background: transparent;
+      border: none;
+      border-radius: var(--md-shape-full);
+      color: var(--md-sys-color-on-surface-variant);
+      cursor: pointer;
+      font-size: 24px;
+      position: relative;
+      overflow: hidden;
+      transition: background var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
+    }
+
+    .icon-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: currentColor;
+      opacity: 0;
+      transition: opacity var(--md-sys-motion-duration-short3);
+    }
+
+    .icon-btn:hover::before {
+      opacity: 0.08;
+    }
+
+    .icon-btn:focus-visible {
+      outline: none;
+    }
+
+    .icon-btn:focus-visible::before {
+      opacity: 0.12;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 24px;
+      gap: 16px;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Converter Panels */
+    .converter-wrapper {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      min-height: 0;
+    }
+
+    /* Elevated Card */
+    .panel {
+      display: flex;
+      flex-direction: column;
+      background: var(--md-sys-color-surface);
+      border-radius: var(--md-shape-large);
+      box-shadow: var(--md-elevation-1);
+      overflow: hidden;
+      min-height: 420px;
+      transition: box-shadow var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-standard);
+    }
+
+    .panel:hover {
+      box-shadow: var(--md-elevation-2);
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--md-sys-color-outline-variant);
+    }
+
+    .panel-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.1px;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    .panel-badge {
+      padding: 4px 12px;
+      background: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+      border-radius: var(--md-shape-full);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+
+    .panel-badge.text-badge {
+      background: var(--md-sys-color-tertiary);
+      color: var(--md-sys-color-on-tertiary);
+    }
+
+    /* Tonal Button */
+    .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 24px;
+      height: 40px;
+      background: var(--md-sys-color-secondary-container);
+      border: none;
+      border-radius: var(--md-shape-full);
+      color: var(--md-sys-color-on-secondary-container);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.1px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
+    }
+
+    .copy-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: currentColor;
+      opacity: 0;
+      transition: opacity var(--md-sys-motion-duration-short3);
+    }
+
+    .copy-btn:hover {
+      box-shadow: var(--md-elevation-1);
+    }
+
+    .copy-btn:hover::before {
+      opacity: 0.08;
+    }
+
+    .copy-btn:focus-visible {
+      outline: none;
+    }
+
+    .copy-btn:focus-visible::before {
+      opacity: 0.12;
+    }
+
+    .copy-btn.copied {
+      background: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+    }
+
+    .panel-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+    }
+
+    /* Outlined Text Field Style */
+    .text-area {
+      flex: 1;
+      width: 100%;
+      min-height: 320px;
+      padding: 16px;
+      background: transparent;
+      border: 1px solid var(--md-sys-color-outline);
+      border-radius: var(--md-shape-extra-small);
+      font-family: 'Roboto Mono', 'Noto Sans JP', monospace;
+      font-size: 14px;
+      line-height: 1.7;
+      letter-spacing: 0.25px;
+      color: var(--md-sys-color-on-surface);
+      resize: none;
+      transition: all var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
+    }
+
+    .text-area:hover {
+      border-color: var(--md-sys-color-on-surface);
+    }
+
+    .text-area:focus {
+      outline: none;
+      border-color: var(--md-sys-color-primary);
+      border-width: 2px;
+      padding: 15px;
+    }
+
+    .text-area::placeholder {
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    .text-area.active-input {
+      border-color: var(--md-sys-color-primary);
+      border-width: 2px;
+      padding: 15px;
+    }
+
+    /* Direction Indicator - Chip */
+    .direction-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 0;
+    }
+
+    .direction-arrow {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      height: 32px;
+      background: var(--md-sys-color-surface-container-high);
+      border: 1px solid var(--md-sys-color-outline);
+      border-radius: var(--md-shape-small);
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.1px;
+      color: var(--md-sys-color-on-surface-variant);
+      transition: all var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
+    }
+
+    .direction-arrow.md-to-text {
+      background: var(--md-sys-color-primary-container);
+      border-color: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary-container);
+    }
+
+    .direction-arrow.text-to-md {
+      background: var(--md-sys-color-tertiary-container);
+      border-color: var(--md-sys-color-tertiary);
+      color: var(--md-sys-color-on-tertiary-container);
+    }
+
+    /* ============================================
+       Settings Modal - Dialog
+    ============================================ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.32);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-standard);
+      padding: 24px;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 720px;
+      max-height: 80vh;
+      background: var(--md-sys-color-surface-container-high);
+      border-radius: var(--md-shape-extra-large);
+      box-shadow: var(--md-elevation-3);
+      display: flex;
+      flex-direction: column;
+      transform: scale(0.9);
+      transition: transform var(--md-sys-motion-duration-medium4) var(--md-sys-motion-easing-emphasized);
+    }
+
+    .modal-overlay.active .modal {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 24px 16px;
+    }
+
+    .modal-header h2 {
+      font-size: 24px;
+      font-weight: 400;
+      letter-spacing: 0;
+      line-height: 32px;
+    }
+
+    .modal-close {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      border-radius: var(--md-shape-full);
+      color: var(--md-sys-color-on-surface-variant);
+      cursor: pointer;
+      font-size: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .modal-close::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: currentColor;
+      opacity: 0;
+      transition: opacity var(--md-sys-motion-duration-short3);
+    }
+
+    .modal-close:hover::before {
+      opacity: 0.08;
+    }
+
+    .modal-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 24px 24px;
+    }
+
+    .modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 16px 24px 24px;
+      gap: 8px;
+    }
+
+    /* Data Table */
+    .rules-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .rules-table th,
+    .rules-table td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--md-sys-color-outline-variant);
+    }
+
+    .rules-table th {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    .rules-table td {
+      font-size: 14px;
+    }
+
+    .rules-table tbody tr {
+      transition: background var(--md-sys-motion-duration-short3);
+    }
+
+    .rules-table tbody tr:hover {
+      background: rgba(0, 0, 0, 0.04);
+    }
+
+    .dark-mode .rules-table tbody tr:hover {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .rule-input {
+      width: 100%;
+      padding: 8px 12px;
+      background: transparent;
+      border: 1px solid var(--md-sys-color-outline);
+      border-radius: var(--md-shape-extra-small);
+      font-family: 'Roboto Mono', monospace;
+      font-size: 14px;
+      color: var(--md-sys-color-on-surface);
+      transition: all var(--md-sys-motion-duration-short3);
+    }
+
+    .rule-input:hover {
+      border-color: var(--md-sys-color-on-surface);
+    }
+
+    .rule-input:focus {
+      outline: none;
+      border-color: var(--md-sys-color-primary);
+      border-width: 2px;
+      padding: 7px 11px;
+    }
+
+    /* Switch - Material Style */
+    .rule-toggle {
+      appearance: none;
+      width: 52px;
+      height: 32px;
+      background: var(--md-sys-color-surface-container-highest, #E6E0E9);
+      border: 2px solid var(--md-sys-color-outline);
+      border-radius: var(--md-shape-full);
+      cursor: pointer;
+      position: relative;
+      transition: all var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-standard);
+    }
+
+    .rule-toggle::after {
+      content: '';
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      width: 16px;
+      height: 16px;
+      background: var(--md-sys-color-outline);
+      border-radius: var(--md-shape-full);
+      transition: all var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-standard);
+    }
+
+    .rule-toggle:checked {
+      background: var(--md-sys-color-primary);
+      border-color: var(--md-sys-color-primary);
+    }
+
+    .rule-toggle:checked::after {
+      transform: translateX(20px);
+      width: 24px;
+      height: 24px;
+      top: 2px;
+      background: var(--md-sys-color-on-primary);
+    }
+
+    .rule-toggle:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--md-sys-color-surface), 0 0 0 4px var(--md-sys-color-primary);
+    }
+
+    .delete-rule-btn {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      border-radius: var(--md-shape-full);
+      color: var(--md-sys-color-error);
+      cursor: pointer;
+      font-size: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .delete-rule-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--md-sys-color-error);
+      opacity: 0;
+      transition: opacity var(--md-sys-motion-duration-short3);
+    }
+
+    .delete-rule-btn:hover::before {
+      opacity: 0.08;
+    }
+
+    /* Buttons - Material Style */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 24px;
+      height: 40px;
+      border-radius: var(--md-shape-full);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.1px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: currentColor;
+      opacity: 0;
+      transition: opacity var(--md-sys-motion-duration-short3);
+    }
+
+    .btn:hover::before {
+      opacity: 0.08;
+    }
+
+    .btn:focus-visible {
+      outline: none;
+    }
+
+    .btn:focus-visible::before {
+      opacity: 0.12;
+    }
+
+    .btn-primary {
+      background: var(--md-sys-color-primary);
+      border: none;
+      color: var(--md-sys-color-on-primary);
+    }
+
+    .btn-primary:hover {
+      box-shadow: var(--md-elevation-1);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: none;
+      color: var(--md-sys-color-primary);
+    }
+
+    .btn-danger {
+      background: transparent;
+      border: none;
+      color: var(--md-sys-color-error);
+    }
+
+    /* Add Rule Form */
+    .add-rule-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 16px;
+      padding: 16px;
+      background: var(--md-sys-color-surface-container);
+      border-radius: var(--md-shape-medium);
+      margin-bottom: 16px;
+    }
+
+    .add-rule-form .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .add-rule-form label {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    .add-rule-btn {
+      align-self: flex-end;
+    }
+
+    /* ============================================
+       Snackbar
+    ============================================ */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      padding: 14px 16px;
+      min-width: 288px;
+      max-width: 568px;
+      background: var(--md-sys-color-inverse-surface, #313033);
+      color: var(--md-sys-color-inverse-on-surface, #F4EFF4);
+      border-radius: var(--md-shape-extra-small);
+      box-shadow: var(--md-elevation-3);
+      font-size: 14px;
+      font-weight: 400;
+      letter-spacing: 0.25px;
+      opacity: 0;
+      transition: all var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-standard);
+      z-index: 1001;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* ============================================
+       Responsive Design
+    ============================================ */
+    @media (max-width: 768px) {
+      .header {
+        padding: 8px 8px 8px 16px;
+      }
+
+      .header-title h1 {
+        font-size: 18px;
+      }
+
+      .main-content {
+        padding: 16px;
+      }
+
+      .converter-wrapper {
+        grid-template-columns: 1fr;
+      }
+
+      .panel {
+        min-height: 280px;
+      }
+
+      .direction-indicator {
+        transform: rotate(90deg);
+      }
+
+      .add-rule-form {
+        grid-template-columns: 1fr;
+      }
+
+      .add-rule-btn {
+        width: 100%;
+      }
+
+      .modal-footer {
+        flex-direction: column;
+      }
+
+      .modal-footer .btn {
+        width: 100%;
+      }
+    }
+
+    /* ============================================
+       Utility Classes
+    ============================================ */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Reduced Motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Skip Link -->
+  <a href="#main-content" class="skip-link">本文へスキップ</a>
+
+  <div class="app-container">
+    <!-- Top App Bar -->
+    <header class="header" role="banner">
+      <div class="header-title">
+        <div class="header-icon" aria-hidden="true">⇄</div>
+        <h1>MD Converter</h1>
+      </div>
+      <div class="header-actions">
+        <button type="button" class="icon-btn" id="darkModeToggle" aria-label="ダークモード切り替え" title="ダークモード切り替え">
+          🌙
+        </button>
+        <button type="button" class="icon-btn" id="settingsBtn" aria-label="設定を開く" title="設定">
+          ⚙️
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content" class="main-content" role="main">
+      <div class="converter-wrapper">
+        <!-- Markdown Panel -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-label">
+              <span class="panel-badge">MD</span>
+              <span>Markdown</span>
+            </div>
+            <button type="button" class="copy-btn" data-target="mdInput" aria-label="Markdownをコピー">
+              📋 コピー
+            </button>
+          </div>
+          <div class="panel-body">
+            <label for="mdInput" class="sr-only">Markdownテキストを入力</label>
+            <textarea
+              id="mdInput"
+              class="text-area"
+              placeholder="Markdownを入力...&#10;&#10;例:&#10;## 見出し2&#10;### 見出し3&#10;- リスト項目&#10;- [ ] 未完了タスク&#10;- [x] 完了タスク&#10;> 引用文&#10;**太字テキスト**&#10;`インラインコード`"
+              spellcheck="false"
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Text Panel -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-label">
+              <span class="panel-badge text-badge">TEXT</span>
+              <span>一般テキスト</span>
+            </div>
+            <button type="button" class="copy-btn" data-target="textInput" aria-label="テキストをコピー">
+              📋 コピー
+            </button>
+          </div>
+          <div class="panel-body">
+            <label for="textInput" class="sr-only">一般テキストを入力</label>
+            <textarea
+              id="textInput"
+              class="text-area"
+              placeholder="一般テキストを入力...&#10;&#10;例:&#10;■ 見出し2&#10;● 見出し3&#10;・リスト項目&#10;□ 未完了タスク&#10;✓ 完了タスク&#10;│ 引用文&#10;【太字テキスト】&#10;「インラインコード」"
+              spellcheck="false"
+            ></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Direction Indicator -->
+      <div class="direction-indicator">
+        <div class="direction-arrow" id="directionArrow">
+          <span id="directionText">編集中のパネルから変換</span>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modalTitle">変換ルール設定</h2>
+        <button type="button" class="modal-close" id="closeModal" aria-label="閉じる">✕</button>
+      </div>
+      <div class="modal-body">
+        <!-- Add Rule Form -->
+        <form class="add-rule-form" id="addRuleForm">
+          <div class="form-group">
+            <label for="newMdPattern">Markdown パターン</label>
+            <input type="text" id="newMdPattern" class="rule-input" placeholder="例: ## ">
+          </div>
+          <div class="form-group">
+            <label for="newTextPattern">一般テキスト</label>
+            <input type="text" id="newTextPattern" class="rule-input" placeholder="例: ■ ">
+          </div>
+          <button type="submit" class="btn btn-primary add-rule-btn">追加</button>
+        </form>
+
+        <!-- Rules Table -->
+        <table class="rules-table" aria-label="変換ルール一覧">
+          <thead>
+            <tr>
+              <th scope="col">Markdown</th>
+              <th scope="col">一般テキスト</th>
+              <th scope="col">有効</th>
+              <th scope="col"><span class="sr-only">操作</span></th>
+            </tr>
+          </thead>
+          <tbody id="rulesTableBody">
+            <!-- Rules will be populated by JS -->
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" id="resetRulesBtn">初期設定に戻す</button>
+        <button type="button" class="btn btn-secondary" id="closeModalBtn">閉じる</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Snackbar -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    /* ============================================
+       Constants & Default Rules
+    ============================================ */
+    const STORAGE_KEY = 'md_converter_rules_v1';
+    const THEME_KEY = 'md_converter_theme';
+
+    const DEFAULT_RULES = [
+      { md: '#### ', text: '○ ', enabled: true, isRegex: false },
+      { md: '### ', text: '● ', enabled: true, isRegex: false },
+      { md: '## ', text: '■ ', enabled: true, isRegex: false },
+      { md: '- [x] ', text: '✓ ', enabled: true, isRegex: false },
+      { md: '- [ ] ', text: '□ ', enabled: true, isRegex: false },
+      { md: '- ', text: '・', enabled: true, isRegex: false },
+      { md: '* ', text: '・', enabled: true, isRegex: false },
+      { md: '> ', text: '│ ', enabled: true, isRegex: false },
+      { md: '1. ', text: '① ', enabled: true, isRegex: false },
+      { md: '2. ', text: '② ', enabled: true, isRegex: false },
+      { md: '3. ', text: '③ ', enabled: true, isRegex: false },
+      { md: '4. ', text: '④ ', enabled: true, isRegex: false },
+      { md: '5. ', text: '⑤ ', enabled: true, isRegex: false },
+      { md: '6. ', text: '⑥ ', enabled: true, isRegex: false },
+      { md: '7. ', text: '⑦ ', enabled: true, isRegex: false },
+      { md: '8. ', text: '⑧ ', enabled: true, isRegex: false },
+      { md: '9. ', text: '⑨ ', enabled: true, isRegex: false },
+      { md: '`([^`]+)`', text: '「$1」', enabled: true, isRegex: true },
+      { md: '\\*\\*([^*]+)\\*\\*', text: '【$1】', enabled: true, isRegex: true },
+    ];
+
+    /* ============================================
+       State
+    ============================================ */
+    let rules = [];
+    let isConverting = false;
+    let lastActiveInput = null;
+
+    /* ============================================
+       DOM Elements
+    ============================================ */
+    const mdInput = document.getElementById('mdInput');
+    const textInput = document.getElementById('textInput');
+    const settingsBtn = document.getElementById('settingsBtn');
+    const settingsModal = document.getElementById('settingsModal');
+    const closeModal = document.getElementById('closeModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const rulesTableBody = document.getElementById('rulesTableBody');
+    const addRuleForm = document.getElementById('addRuleForm');
+    const resetRulesBtn = document.getElementById('resetRulesBtn');
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const directionArrow = document.getElementById('directionArrow');
+    const directionText = document.getElementById('directionText');
+    const toast = document.getElementById('toast');
+
+    /* ============================================
+       Storage Functions
+    ============================================ */
+    function loadRules() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          rules = JSON.parse(stored);
+        } else {
+          rules = JSON.parse(JSON.stringify(DEFAULT_RULES));
+        }
+      } catch (e) {
+        console.error('Failed to load rules:', e);
+        rules = JSON.parse(JSON.stringify(DEFAULT_RULES));
+      }
+    }
+
+    function saveRules() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(rules));
+      } catch (e) {
+        console.error('Failed to save rules:', e);
+      }
+    }
+
+    function loadTheme() {
+      const savedTheme = localStorage.getItem(THEME_KEY);
+      if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        darkModeToggle.textContent = '☀️';
+      }
+    }
+
+    function toggleTheme() {
+      const isDark = document.body.classList.toggle('dark-mode');
+      localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light');
+      darkModeToggle.textContent = isDark ? '☀️' : '🌙';
+    }
+
+    /* ============================================
+       Conversion Functions
+    ============================================ */
+    function escapeRegExp(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function convertMdToText(input) {
+      let result = input;
+      const lines = result.split('\n');
+      const processedLines = lines.map(line => {
+        let processedLine = line;
+        for (const rule of rules) {
+          if (!rule.enabled || rule.isRegex) continue;
+          if (processedLine.startsWith(rule.md)) {
+            processedLine = rule.text + processedLine.slice(rule.md.length);
+            break;
+          }
+        }
+        return processedLine;
+      });
+      result = processedLines.join('\n');
+      for (const rule of rules) {
+        if (!rule.enabled || !rule.isRegex) continue;
+        try {
+          const regex = new RegExp(rule.md, 'g');
+          result = result.replace(regex, rule.text);
+        } catch (e) {
+          console.error('Invalid regex:', rule.md, e);
+        }
+      }
+      return result;
+    }
+
+    function convertTextToMd(input) {
+      let result = input;
+      const lines = result.split('\n');
+      const processedLines = lines.map(line => {
+        let processedLine = line;
+        for (const rule of rules) {
+          if (!rule.enabled || rule.isRegex) continue;
+          if (processedLine.startsWith(rule.text)) {
+            processedLine = rule.md + processedLine.slice(rule.text.length);
+            break;
+          }
+        }
+        return processedLine;
+      });
+      result = processedLines.join('\n');
+      for (const rule of rules) {
+        if (!rule.enabled || !rule.isRegex) continue;
+        try {
+          if (rule.md.includes('([^`]+)')) {
+            const reverseRegex = /「([^」]+)」/g;
+            result = result.replace(reverseRegex, '`$1`');
+          } else if (rule.md.includes('([^*]+)')) {
+            const reverseRegex = /【([^】]+)】/g;
+            result = result.replace(reverseRegex, '**$1**');
+          }
+        } catch (e) {
+          console.error('Reverse regex error:', rule.text, e);
+        }
+      }
+      return result;
+    }
+
+    /* ============================================
+       UI Functions
+    ============================================ */
+    function updateDirectionIndicator(direction) {
+      directionArrow.classList.remove('md-to-text', 'text-to-md');
+      if (direction === 'md-to-text') {
+        directionArrow.classList.add('md-to-text');
+        directionText.textContent = 'MD → テキスト';
+      } else if (direction === 'text-to-md') {
+        directionArrow.classList.add('text-to-md');
+        directionText.textContent = 'テキスト → MD';
+      } else {
+        directionText.textContent = '編集中のパネルから変換';
+      }
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    function renderRulesTable() {
+      rulesTableBody.innerHTML = '';
+      rules.forEach((rule, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>
+            <input type="text" class="rule-input" value="${escapeHtml(rule.md)}"
+                   data-index="${index}" data-field="md" aria-label="Markdownパターン">
+          </td>
+          <td>
+            <input type="text" class="rule-input" value="${escapeHtml(rule.text)}"
+                   data-index="${index}" data-field="text" aria-label="一般テキストパターン">
+          </td>
+          <td>
+            <input type="checkbox" class="rule-toggle" ${rule.enabled ? 'checked' : ''}
+                   data-index="${index}" aria-label="ルールを有効化">
+          </td>
+          <td>
+            <button type="button" class="delete-rule-btn" data-index="${index}"
+                    aria-label="ルールを削除">🗑</button>
+          </td>
+        `;
+        rulesTableBody.appendChild(tr);
+      });
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    /* ============================================
+       Event Handlers
+    ============================================ */
+    function handleMdInput() {
+      if (isConverting) return;
+      isConverting = true;
+      lastActiveInput = 'md';
+      mdInput.classList.add('active-input');
+      textInput.classList.remove('active-input');
+      updateDirectionIndicator('md-to-text');
+      textInput.value = convertMdToText(mdInput.value);
+      isConverting = false;
+    }
+
+    function handleTextInput() {
+      if (isConverting) return;
+      isConverting = true;
+      lastActiveInput = 'text';
+      textInput.classList.add('active-input');
+      mdInput.classList.remove('active-input');
+      updateDirectionIndicator('text-to-md');
+      mdInput.value = convertTextToMd(textInput.value);
+      isConverting = false;
+    }
+
+    function handleCopyClick(e) {
+      const btn = e.target.closest('.copy-btn');
+      if (!btn) return;
+      const targetId = btn.dataset.target;
+      const targetElement = document.getElementById(targetId);
+      if (targetElement && targetElement.value) {
+        navigator.clipboard.writeText(targetElement.value).then(() => {
+          btn.classList.add('copied');
+          btn.innerHTML = '✓ コピー完了';
+          setTimeout(() => {
+            btn.classList.remove('copied');
+            btn.innerHTML = '📋 コピー';
+          }, 2000);
+        }).catch(() => {
+          showToast('コピーに失敗しました');
+        });
+      }
+    }
+
+    function handleRuleTableChange(e) {
+      const target = e.target;
+      const index = parseInt(target.dataset.index, 10);
+      if (target.classList.contains('rule-input')) {
+        const field = target.dataset.field;
+        rules[index][field] = target.value;
+        saveRules();
+        if (lastActiveInput === 'md') handleMdInput();
+        else if (lastActiveInput === 'text') handleTextInput();
+      } else if (target.classList.contains('rule-toggle')) {
+        rules[index].enabled = target.checked;
+        saveRules();
+        if (lastActiveInput === 'md') handleMdInput();
+        else if (lastActiveInput === 'text') handleTextInput();
+      }
+    }
+
+    function handleDeleteRule(e) {
+      const btn = e.target.closest('.delete-rule-btn');
+      if (!btn) return;
+      const index = parseInt(btn.dataset.index, 10);
+      rules.splice(index, 1);
+      saveRules();
+      renderRulesTable();
+      showToast('ルールを削除しました');
+    }
+
+    function handleAddRule(e) {
+      e.preventDefault();
+      const mdPattern = document.getElementById('newMdPattern').value.trim();
+      const textPattern = document.getElementById('newTextPattern').value.trim();
+      if (!mdPattern || !textPattern) {
+        showToast('両方のパターンを入力してください');
+        return;
+      }
+      rules.push({ md: mdPattern, text: textPattern, enabled: true, isRegex: false });
+      saveRules();
+      renderRulesTable();
+      document.getElementById('newMdPattern').value = '';
+      document.getElementById('newTextPattern').value = '';
+      showToast('ルールを追加しました');
+    }
+
+    function handleResetRules() {
+      if (confirm('すべてのルールを初期設定に戻しますか？')) {
+        rules = JSON.parse(JSON.stringify(DEFAULT_RULES));
+        saveRules();
+        renderRulesTable();
+        showToast('初期設定に戻しました');
+        if (lastActiveInput === 'md') handleMdInput();
+        else if (lastActiveInput === 'text') handleTextInput();
+      }
+    }
+
+    function openModal() {
+      settingsModal.classList.add('active');
+      closeModal.focus();
+    }
+
+    function closeModalFn() {
+      settingsModal.classList.remove('active');
+      settingsBtn.focus();
+    }
+
+    function handleModalKeydown(e) {
+      if (e.key === 'Escape') closeModalFn();
+    }
+
+    function handleModalOverlayClick(e) {
+      if (e.target === settingsModal) closeModalFn();
+    }
+
+    /* ============================================
+       Initialize
+    ============================================ */
+    function init() {
+      loadRules();
+      loadTheme();
+      renderRulesTable();
+      mdInput.addEventListener('input', handleMdInput);
+      textInput.addEventListener('input', handleTextInput);
+      document.addEventListener('click', handleCopyClick);
+      settingsBtn.addEventListener('click', openModal);
+      closeModal.addEventListener('click', closeModalFn);
+      closeModalBtn.addEventListener('click', closeModalFn);
+      settingsModal.addEventListener('click', handleModalOverlayClick);
+      settingsModal.addEventListener('keydown', handleModalKeydown);
+      rulesTableBody.addEventListener('input', handleRuleTableChange);
+      rulesTableBody.addEventListener('click', handleDeleteRule);
+      addRuleForm.addEventListener('submit', handleAddRule);
+      resetRulesBtn.addEventListener('click', handleResetRules);
+      darkModeToggle.addEventListener('click', toggleTheme);
+    }
+
+    init();
+  </script>
+</body>
+</html>
