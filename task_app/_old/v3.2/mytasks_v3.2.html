@@ -1,0 +1,4518 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Tasks</title>
+    <style>
+        /* ============================================
+           Apple Design System - Task App
+           Based on Apple HIG & apple-design skill
+           ============================================ */
+
+        :root {
+            /* ===== Color System (Apple Official) ===== */
+            /* Neutral Colors - Light Mode */
+            --color-label: #1d1d1f;
+            --color-label-secondary: #86868b;
+            --color-label-tertiary: #d2d2d7;
+            --color-background: #ffffff;
+            --color-background-secondary: #f5f5f7;
+            --color-background-tertiary: #e8e8ed;
+            --color-separator: rgba(0, 0, 0, 0.1);
+            --color-separator-opaque: #d2d2d7;
+
+            /* Semantic Colors */
+            --color-blue: #0071e3;
+            --color-blue-hover: #0077ed;
+            --color-green: #34c759;
+            --color-orange: #ff9500;
+            --color-red: #ff3b30;
+            --color-purple: #af52de;
+            --color-teal: #5ac8fa;
+
+            /* Legacy variable mapping (for backward compatibility) */
+            --bg-body: var(--color-background-secondary);
+            --bg-sidebar: rgba(251, 251, 253, 0.72);
+            --bg-card: var(--color-background);
+            --text-main: var(--color-label);
+            --text-sub: var(--color-label-secondary);
+            --text-on-accent: #ffffff;
+            --border-color: var(--color-separator);
+            --border-subtle: rgba(0, 0, 0, 0.04);
+            --accent-blue: var(--color-blue);
+            --accent-green: var(--color-green);
+            --accent-red: var(--color-red);
+            --accent-orange: var(--color-orange);
+            --accent-gray: #8e8e93;
+
+            /* ===== Shadows (Apple-style depth) ===== */
+            --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.04);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.12);
+
+            /* ===== Border Radius (Apple standard) ===== */
+            --radius-xs: 8px;
+            --radius-sm: 12px;
+            --radius-md: 18px;
+            --radius-lg: 24px;
+            --radius-pill: 980px;
+
+            /* ===== Typography ===== */
+            --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', sans-serif;
+            --font-text: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', sans-serif;
+
+            /* ===== Animation ===== */
+            --ease-out: cubic-bezier(0, 0, 0.58, 1);
+            --ease-in-out: cubic-bezier(0.42, 0, 0.58, 1);
+            --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --duration-fast: 150ms;
+            --duration-normal: 300ms;
+            --duration-slow: 500ms;
+
+            /* ===== Layout ===== */
+            --sidebar-width: 320px;
+            --mix-base: var(--color-background);
+        }
+
+        /* ===== Dark Mode Variables (Apple Official) ===== */
+        body.dark-mode {
+            /* Core Colors - Dark Mode */
+            --color-label: #f5f5f7;
+            --color-label-secondary: #a1a1a6;
+            --color-label-tertiary: #424245;
+            --color-background: #000000;
+            --color-background-secondary: #1d1d1f;
+            --color-background-tertiary: #2c2c2e;
+            --color-separator: rgba(255, 255, 255, 0.1);
+            --color-separator-opaque: #424245;
+
+            /* Semantic Colors - Dark Mode */
+            --color-blue: #2997ff;
+            --color-blue-hover: #40a9ff;
+            --color-green: #30d158;
+            --color-orange: #ff9f0a;
+            --color-red: #ff453a;
+
+            /* Legacy mapping */
+            --bg-body: #000000;
+            --bg-sidebar: rgba(29, 29, 31, 0.72);
+            --bg-card: #1d1d1f;
+            --text-main: #f5f5f7;
+            --text-sub: #a1a1a6;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --border-subtle: rgba(255, 255, 255, 0.05);
+            --accent-blue: #2997ff;
+            --accent-green: #30d158;
+            --accent-red: #ff453a;
+            --accent-orange: #ff9f0a;
+
+            /* Shadows - Dark Mode */
+            --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.3);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.6);
+            --mix-base: #1d1d1f;
+        }
+
+        /* ===== Dark Mode Component Overrides ===== */
+
+        /* Navigation */
+        body.dark-mode .nav-group {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        body.dark-mode .nav-btn {
+            color: var(--text-main);
+        }
+
+        body.dark-mode .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        body.dark-mode .nav-btn.active {
+            background: var(--color-background-tertiary);
+            color: #ffffff;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Archived Task Cards */
+        body.dark-mode .task-card.archived {
+            background: var(--color-background-secondary);
+            border-left: 4px solid var(--color-label-secondary) !important;
+            opacity: 0.7;
+        }
+
+        body.dark-mode .task-card.archived .task-title-input {
+            color: var(--color-label-secondary) !important;
+        }
+
+        body.dark-mode .task-card.archived .badge-select {
+            background-color: var(--color-background-tertiary) !important;
+            color: var(--color-label-secondary) !important;
+        }
+
+        body.dark-mode .task-card.archived .timestamps {
+            color: var(--color-label-secondary) !important;
+        }
+
+        /* Toggle Buttons */
+        body.dark-mode .btn-sub-toggle {
+            background: transparent;
+            border: 1px dashed var(--color-label-secondary);
+            color: var(--color-label-secondary);
+        }
+
+        body.dark-mode .btn-sub-toggle:hover {
+            background: var(--color-background-tertiary);
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+        }
+
+        /* Trash Controls */
+        body.dark-mode #trashControls {
+            background: var(--color-background-secondary) !important;
+            border-color: var(--color-background-tertiary) !important;
+        }
+
+        body.dark-mode #trashControls span {
+            color: var(--text-main) !important;
+        }
+
+        /* Form Elements */
+        body.dark-mode .btn-calendar,
+        body.dark-mode .subtask-row .btn-mini,
+        body.dark-mode .badge-select {
+            background-color: var(--color-background-tertiary) !important;
+            color: var(--text-main) !important;
+            border-color: transparent !important;
+        }
+
+        body.dark-mode .btn-calendar:hover,
+        body.dark-mode .subtask-row .btn-mini:hover,
+        body.dark-mode .badge-select:hover {
+            background-color: rgba(255, 255, 255, 0.15) !important;
+        }
+
+        body.dark-mode .badge-select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath stroke='%23a1a1a6' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none' d='M3 4.5L6 7.5L9 4.5'/%3E%3C/svg%3E") !important;
+        }
+
+        body.dark-mode select.btn-mini {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath stroke='%23a1a1a6' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none' d='M3 4.5L6 7.5L9 4.5'/%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 10px center !important;
+        }
+
+        body.dark-mode .form-control,
+        body.dark-mode .memo-area,
+        body.dark-mode .sub-memo-area {
+            background: var(--color-background-secondary) !important;
+            border-color: var(--color-background-tertiary) !important;
+            color: var(--text-main) !important;
+        }
+
+        body.dark-mode .form-control::placeholder,
+        body.dark-mode .memo-area::placeholder,
+        body.dark-mode .sub-memo-area::placeholder {
+            color: var(--color-label-secondary) !important;
+        }
+
+        body.dark-mode .sub-input-name {
+            background: transparent !important;
+            border-color: transparent !important;
+            color: var(--text-main) !important;
+        }
+
+        /* Modal */
+        body.dark-mode .modal-container {
+            background: var(--color-background-secondary);
+            color: var(--text-main);
+        }
+
+        body.dark-mode .modal-title {
+            color: var(--text-main);
+        }
+
+        body.dark-mode .modal-header {
+            border-color: var(--color-background-tertiary);
+        }
+
+        /* Settings Modal */
+        body.dark-mode .settings-list {
+            background: var(--color-background);
+            border-color: var(--color-background-tertiary);
+        }
+
+        body.dark-mode .settings-item {
+            border-color: var(--color-background-tertiary);
+            color: var(--text-main);
+        }
+
+        body.dark-mode .settings-item-name {
+            color: var(--text-main);
+        }
+
+        body.dark-mode .settings-item-dot {
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        body.dark-mode .add-input {
+            background: var(--color-background) !important;
+            border-color: var(--color-background-tertiary) !important;
+            color: var(--text-main) !important;
+        }
+
+        body.dark-mode .add-input::placeholder {
+            color: var(--color-label-secondary);
+        }
+
+        body.dark-mode .btn-add-setting {
+            background: var(--color-blue);
+            color: #ffffff;
+        }
+
+        body.dark-mode .btn-add-setting:hover {
+            background: var(--color-blue-hover);
+        }
+
+        /* Color Picker */
+        body.dark-mode .color-selector-wrapper,
+        body.dark-mode #newStatusColorSelector {
+            background: transparent;
+        }
+
+        body.dark-mode .settings-section>div[style*="background:#F9F9F9"],
+        body.dark-mode .status-color-area {
+            background: var(--color-background) !important;
+            border-color: var(--color-background-tertiary) !important;
+        }
+
+        /* Danger Zone */
+        body.dark-mode .settings-grid>div:last-child {
+            background: rgba(255, 69, 58, 0.15) !important;
+            border-color: rgba(255, 69, 58, 0.3) !important;
+        }
+
+        body.dark-mode .settings-grid>div:last-child span {
+            color: var(--accent-red) !important;
+        }
+
+        /* Modal Buttons */
+        body.dark-mode .btn-danger-modal {
+            color: var(--accent-red);
+            border-color: var(--accent-red);
+        }
+
+        body.dark-mode .btn-primary-modal {
+            background: var(--color-blue);
+            color: #ffffff;
+        }
+
+        body.dark-mode .btn-footer {
+            color: var(--color-label-secondary);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        body.dark-mode .btn-footer:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+        }
+
+        body.dark-mode .edit-input {
+            background: var(--color-background) !important;
+            border: 1px solid var(--color-background-tertiary) !important;
+            color: var(--text-main) !important;
+        }
+
+        body.dark-mode .settings-label {
+            color: var(--color-label-secondary);
+        }
+
+        /* Global Memo */
+        body.dark-mode .global-memo-area {
+            background: var(--color-background-secondary);
+            border-color: var(--color-background-tertiary);
+        }
+
+        body.dark-mode #globalMemo,
+        body.dark-mode #globalMemoView {
+            background: var(--color-background);
+            border: 1px solid var(--color-background-tertiary);
+            color: var(--text-main);
+        }
+
+        body.dark-mode #globalMemoView.empty-memo,
+        body.dark-mode .memo-view-mode.empty-memo,
+        body.dark-mode .sub-memo-area.empty-memo {
+            color: var(--color-label-secondary) !important;
+        }
+
+        body.dark-mode .memo-view-mode {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.08);
+            color: var(--text-main);
+        }
+
+        body.dark-mode .memo-view-mode:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Date Input */
+        body.dark-mode .meta-input {
+            background: var(--color-background-tertiary) !important;
+            border-color: transparent !important;
+            color: var(--text-main) !important;
+        }
+
+        body.dark-mode .meta-input::placeholder,
+        body.dark-mode .memo-area::placeholder,
+        body.dark-mode .sub-memo-area::placeholder {
+            color: var(--color-label-secondary);
+        }
+
+        /* Action Buttons */
+        body.dark-mode .icon-action-btn {
+            background: var(--color-background-tertiary);
+            border-color: transparent;
+            color: var(--text-main);
+        }
+
+        body.dark-mode .icon-action-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+        }
+
+        body.dark-mode .icon-action-btn.btn-del:hover {
+            background: rgba(255, 69, 58, 0.2);
+            color: var(--accent-red);
+            border-color: var(--accent-red);
+        }
+
+        /* Date Picker Icon */
+        body.dark-mode .date-picker-icon {
+            background: var(--color-background-tertiary);
+        }
+
+        body.dark-mode .date-picker-icon svg {
+            stroke: var(--text-main);
+        }
+
+        /* Add Task Button */
+        body.dark-mode .btn-add {
+            background: var(--color-blue);
+            color: #ffffff;
+        }
+
+        body.dark-mode .btn-add:hover {
+            background: var(--color-blue-hover);
+        }
+
+        /* Dark Mode Toggle */
+        .btn-dark-mode-toggle {
+            width: 100%;
+            padding: 12px 16px;
+            margin-top: 12px;
+            background: var(--color-background-tertiary);
+            border: none;
+            border-radius: var(--radius-sm);
+            color: var(--text-main);
+            font-family: var(--font-text);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all var(--duration-normal) var(--ease-out);
+        }
+
+        body.dark-mode .btn-dark-mode-toggle {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .btn-dark-mode-toggle:hover {
+            background: var(--color-background-secondary);
+            transform: translateY(-1px);
+        }
+
+        body.dark-mode .btn-dark-mode-toggle:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        /* ===== RESET & BASE STYLES ===== */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+
+        body {
+            font-family: var(--font-text);
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.5;
+            font-size: 17px;
+            font-weight: 400;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Japanese text optimization */
+        :lang(ja) {
+            font-feature-settings: "palt" 1;
+            line-height: 1.5;
+        }
+
+        /* Form elements inherit font */
+        input,
+        textarea,
+        select,
+        button {
+            font-family: var(--font-text);
+            font-size: inherit;
+        }
+
+        /* FIX: Hide Hamburger on Desktop by default */
+        .btn-sidebar-toggle {
+            display: none;
+        }
+
+        /* FIX: Sidebar Layout Adjustments */
+        .input-card>div {
+            margin-bottom: 12px !important;
+            /* Force spacing between inputs */
+        }
+
+        /* FIX: Deadline Wrapper - Button to Right */
+        .deadline-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .deadline-wrapper .form-control {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .deadline-wrapper .date-picker-icon {
+            flex-shrink: 0;
+            /* Ensure it stays square */
+        }
+
+        /* ===== LAYOUT ===== */
+        .layout-wrapper {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        /* ===== SIDEBAR - Apple Glassmorphism ===== */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-sidebar);
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+            border-right: 1px solid var(--border-color);
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            padding: 20px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 100;
+            overflow-y: auto;
+            overflow-x: hidden;
+            flex-shrink: 0;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--color-fill-tertiary);
+            border-radius: 3px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: var(--color-fill-secondary);
+        }
+
+        .resizer {
+            width: 4px;
+            cursor: col-resize;
+            background: transparent;
+            z-index: 101;
+            margin-left: -2px;
+            transition: background var(--duration-fast) var(--ease-out);
+        }
+
+        .resizer:hover {
+            background: var(--color-blue);
+            opacity: 0.3;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .content {
+            flex: 1;
+            min-width: 0;
+            padding: 48px 56px;
+            display: flex;
+            gap: 48px;
+            align-items: flex-start;
+        }
+
+        .main-tasks-area {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .task-list {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Right Column */
+        .right-memo-column {
+            width: 340px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 48px;
+            height: calc(100vh - 96px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== TYPOGRAPHY & HEADERS ===== */
+        h1 {
+            font-family: var(--font-display);
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: 0;
+            margin: 0;
+            cursor: pointer;
+            transition: opacity var(--duration-normal) var(--ease-out);
+        }
+
+        h1:hover {
+            opacity: 0.7;
+        }
+
+        .section-label,
+        .global-memo-label,
+        .footer-label {
+            font-family: var(--font-text);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-sub);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        /* ===== NAVIGATION BUTTONS ===== */
+        .nav-scroll-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-group {
+            display: flex;
+            gap: 4px;
+            background: var(--color-background-tertiary);
+            padding: 4px;
+            border-radius: var(--radius-sm);
+            overflow-x: auto;
+            flex: 1;
+        }
+
+        .nav-group::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: none;
+            padding: 6px 12px;
+            border-radius: var(--radius-xs);
+            font-family: var(--font-text);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--color-label-secondary);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all var(--duration-normal) var(--ease-out);
+            flex: 0 0 auto;
+        }
+
+        .nav-btn:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .nav-btn.active {
+            background: var(--color-background);
+            color: var(--text-main);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-btn.btn-trash-mode.active {
+            color: var(--accent-red);
+        }
+
+        .scroll-btn {
+            background: var(--color-background);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            color: var(--text-sub);
+            position: absolute;
+            opacity: 0;
+            transition: all var(--duration-normal) var(--ease-out);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-scroll-wrapper:hover .scroll-btn {
+            opacity: 1;
+        }
+
+        .scroll-btn:hover {
+            background: var(--color-background-secondary);
+            color: var(--text-main);
+        }
+
+        .scroll-btn.left {
+            left: -12px;
+        }
+
+        .scroll-btn.right {
+            right: -12px;
+        }
+
+        /* ===== INPUTS & FORMS ===== */
+        .input-card {
+            background: transparent;
+            padding: 0;
+            border: none;
+            box-shadow: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .input-group-label {
+            font-family: var(--font-text);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-sub);
+            margin-bottom: 4px;
+            margin-left: 4px;
+            display: block;
+        }
+
+        .form-control,
+        .badge-select {
+            width: 100%;
+            height: 38px;
+            border: 1px solid transparent;
+            background: var(--color-background-tertiary);
+            border-radius: var(--radius-sm);
+            padding: 0 16px;
+            font-family: var(--font-text);
+            font-size: 14px;
+            color: var(--text-main);
+            transition: all var(--duration-normal) var(--ease-out);
+        }
+
+        .form-control {
+            font-weight: 400;
+        }
+
+        .badge-select {
+            font-weight: 500;
+            cursor: pointer;
+            padding-right: 32px;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath stroke='%2386868b' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none' d='M3 4.5L6 7.5L9 4.5'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+        }
+
+        .form-control::placeholder {
+            color: var(--color-label-tertiary);
+        }
+
+        .form-control:focus,
+        .badge-select:focus {
+            outline: none;
+            background-color: var(--color-background);
+            border-color: var(--color-blue);
+            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.2);
+        }
+
+        textarea.form-control {
+            min-height: 56px;
+            height: auto;
+            padding: 10px 14px;
+            resize: none;
+            line-height: 1.5;
+        }
+
+        /* ===== PRIMARY BUTTON ===== */
+        .btn-add {
+            background: var(--color-blue);
+            color: #ffffff;
+            height: 44px;
+            border: none;
+            border-radius: var(--radius-pill);
+            font-family: var(--font-text);
+            font-weight: 400;
+            font-size: 15px;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            transition: all var(--duration-normal) var(--ease-out);
+            margin-top: 5px;
+            width: 100%;
+        }
+
+        .btn-add:hover {
+            background: var(--color-blue-hover);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-add:active {
+            transform: scale(0.98);
+        }
+
+        .date-picker-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--color-background-tertiary);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            transition: all var(--duration-normal) var(--ease-out);
+        }
+
+        .date-picker-icon:hover {
+            background: var(--color-background-secondary);
+        }
+
+        .date-picker-overlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* ===== TASK CARDS ===== */
+        .task-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-subtle);
+            box-shadow: var(--shadow-sm);
+            padding: 16px;
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            width: 100%;
+            box-sizing: border-box;
+            transition: transform var(--duration-normal) var(--ease-out),
+                box-shadow var(--duration-normal) var(--ease-out);
+        }
+
+        .task-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            z-index: 5;
+        }
+
+        .task-card.dragging {
+            opacity: 0.4;
+            transform: scale(0.98);
+            box-shadow: none;
+            background: var(--color-background-tertiary);
+        }
+
+        /* ドラッグ中のリアルタイム移動アニメーション */
+        .task-card.drag-animated {
+            transition: transform 150ms ease-out;
+        }
+
+        /* Completed/Archived */
+        .task-card.archived {
+            background: var(--color-background-secondary);
+            border-left: 4px solid var(--color-label-tertiary) !important;
+            opacity: 0.75;
+            box-shadow: none;
+        }
+
+        .drag-handle {
+            color: var(--color-label-tertiary);
+            cursor: grab;
+            font-size: 20px;
+            padding-top: 6px;
+            transition: color var(--duration-fast) var(--ease-out);
+        }
+
+        .drag-handle:hover {
+            color: var(--accent-gray);
+        }
+
+        /* ===== QUICK MOVE MENU ===== */
+        .quick-move-menu {
+            position: fixed;
+            z-index: 3000;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-lg);
+            padding: 6px;
+            min-width: 140px;
+            animation: menuFadeIn 150ms var(--ease-out);
+        }
+
+        @keyframes menuFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(-4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .quick-move-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 10px 12px;
+            background: transparent;
+            border: none;
+            border-radius: var(--radius-xs);
+            font-family: var(--font-text);
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: background var(--duration-fast) var(--ease-out);
+            text-align: left;
+        }
+
+        .quick-move-item:hover {
+            background: var(--color-background-tertiary);
+        }
+
+        .quick-move-item:active {
+            background: var(--accent-blue);
+            color: #ffffff;
+        }
+
+        .quick-move-item svg {
+            flex-shrink: 0;
+            stroke: currentColor;
+        }
+
+        /* ===== MODE TOGGLE BUTTONS (並び替え + ダークモード) ===== */
+        .mode-toggle-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .btn-mode-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex: 1;
+            padding: 10px 12px;
+            background: var(--color-background-tertiary);
+            border: 1px solid transparent;
+            border-radius: var(--radius-xs);
+            font-family: var(--font-text);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--color-label-secondary);
+            cursor: pointer;
+            transition: all var(--duration-fast) var(--ease-out);
+        }
+
+        .btn-mode-toggle:hover {
+            background: var(--color-background-secondary);
+            color: var(--text-main);
+        }
+
+        .btn-mode-toggle.active {
+            background: var(--accent-blue);
+            color: #ffffff;
+            border-color: var(--accent-blue);
+        }
+
+        .btn-mode-toggle svg {
+            flex-shrink: 0;
+        }
+
+        /* Theme Toggle Switch */
+        .theme-toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: var(--color-background-tertiary);
+            border: 1px solid transparent;
+            border-radius: var(--radius-xs);
+            cursor: pointer;
+            transition: all var(--duration-fast) var(--ease-out);
+        }
+
+        .theme-toggle-switch:hover {
+            background: var(--color-background-secondary);
+        }
+
+        .theme-toggle-switch:focus {
+            outline: 2px solid var(--accent-blue);
+            outline-offset: 2px;
+        }
+
+        .theme-icon {
+            color: var(--color-label-tertiary);
+            transition: color var(--duration-fast) var(--ease-out);
+            flex-shrink: 0;
+        }
+
+        .theme-icon-light.active {
+            color: var(--color-orange, #FF9500);
+        }
+
+        .theme-icon-dark.active {
+            color: var(--accent-blue);
+        }
+
+        .theme-switch-track {
+            width: 36px;
+            height: 20px;
+            background: var(--color-label-quaternary, #D1D1D6);
+            border-radius: 10px;
+            position: relative;
+            transition: background var(--duration-fast) var(--ease-out);
+        }
+
+        body.dark-mode .theme-switch-track {
+            background: var(--accent-blue);
+        }
+
+        .theme-switch-thumb {
+            width: 16px;
+            height: 16px;
+            background: #ffffff;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: transform var(--duration-fast) var(--ease-out);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        body.dark-mode .theme-switch-thumb {
+            transform: translateX(16px);
+        }
+
+        /* コンパクトモード時のタスクカード */
+        body.compact-reorder-mode .task-card {
+            padding: 10px 16px;
+            gap: 12px;
+            align-items: center;
+            min-height: 44px;
+        }
+
+        body.compact-reorder-mode .task-content-wrapper {
+            flex-direction: row;
+            align-items: center;
+            gap: 12px;
+        }
+
+        body.compact-reorder-mode .task-title-input {
+            font-size: 15px;
+            flex: 1 1 0;
+            padding: 0;
+            width: 100% !important;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* タスク名のラッパーdivを広げる */
+        body.compact-reorder-mode .task-content-wrapper>div:first-child {
+            flex: 1 1 0;
+            min-width: 0;
+        }
+
+        /* コンパクトモードで非表示にする要素（タスクカード内のみ） */
+        body.compact-reorder-mode .task-card .task-meta-row,
+        body.compact-reorder-mode .task-card .memo-area,
+        body.compact-reorder-mode .task-card .memo-view-mode,
+        body.compact-reorder-mode .task-card .subtasks-wrapper,
+        body.compact-reorder-mode .task-card .task-actions,
+        body.compact-reorder-mode .task-card .timestamps {
+            display: none !important;
+        }
+
+        /* カテゴリバッジ表示 */
+        body.compact-reorder-mode .task-content-wrapper::after {
+            content: attr(data-category);
+            font-size: 11px;
+            padding: 3px 8px;
+            background: var(--color-background-tertiary);
+            border-radius: var(--radius-xs);
+            color: var(--color-label-secondary);
+            white-space: nowrap;
+            flex-shrink: 0;
+            max-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ドラッグハンドルのスタイル調整 */
+        body.compact-reorder-mode .drag-handle {
+            padding-top: 0;
+            font-size: 18px;
+        }
+
+        /* ホバー効果を抑制 */
+        body.compact-reorder-mode .task-card:hover {
+            transform: none;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* タッチデバイス対応 */
+        @media (hover: none) {
+            .quick-move-item {
+                padding: 14px 12px;
+            }
+        }
+
+        .task-content-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .task-title-input {
+            width: 100%;
+            font-family: var(--font-display);
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            background: transparent;
+            border: none;
+            padding: 4px 0;
+            color: var(--text-main);
+            transition: all var(--duration-normal) var(--ease-out);
+        }
+
+        .task-title-input:focus {
+            outline: none;
+            border-bottom: 2px solid var(--accent-blue);
+        }
+
+        .task-meta-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .meta-input {
+            height: 36px;
+            border: 1px solid transparent;
+            background: var(--color-background-tertiary);
+            border-radius: var(--radius-xs);
+            padding: 0 12px;
+            font-family: var(--font-text);
+            font-size: 14px;
+            color: var(--text-sub);
+            width: auto;
+            max-width: 140px;
+            transition: all var(--duration-normal) var(--ease-out);
+        }
+
+        .meta-input:focus {
+            background: var(--color-background);
+            border-color: var(--color-blue);
+            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
+        }
+
+        .task-meta-row .badge-select {
+            height: 36px;
+            width: auto;
+            font-size: 14px;
+            border-radius: var(--radius-xs);
+            background-color: var(--color-background-tertiary);
+        }
+
+        /* ===== TASK ACTIONS ===== */
+        .task-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+            width: 160px;
+            flex-shrink: 0;
+        }
+
+        .action-block {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .btn-complete-action {
+            background: var(--accent-green);
+            color: #ffffff;
+            border: none;
+            border-radius: var(--radius-pill);
+            height: 36px;
+            width: 100%;
+            font-family: var(--font-text);
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: var(--shadow-xs);
+            transition: all var(--duration-normal) var(--ease-out);
+        }
+
+        .btn-complete-action:hover {
+            opacity: 0.9;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-complete-action:active {
+            transform: scale(0.98);
+        }
+
+        .action-row-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-action-btn {
+            background: var(--color-background);
+            border: 1px solid var(--color-separator-opaque);
+            color: var(--color-label-secondary);
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-xs);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all var(--duration-normal) var(--ease-out);
+            flex: 1;
+        }
+
+        .icon-action-btn:hover {
+            background: var(--color-background-secondary);
+            color: var(--text-main);
+            border-color: var(--color-separator-opaque);
+        }
+
+        .icon-action-btn.btn-del:hover {
+            color: var(--accent-red);
+            background: rgba(255, 59, 48, 0.1);
+            border-color: rgba(255, 59, 48, 0.3);
+        }
+
+        .timestamps {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            align-items: flex-start;
+            margin-top: 4px;
+        }
+
+        .ts-item {
+            font-family: var(--font-text);
+            font-size: 12px;
+            color: var(--color-label-secondary);
+        }
+
+        .ts-label {
+            font-weight: 600;
+            margin-right: 4px;
+        }
+
+        /* ===== MEMO & LINKIFY ===== */
+        .memo-area,
+        .memo-view-mode {
+            width: 100%;
+            font-family: var(--font-text);
+            font-size: 14px;
+            color: var(--text-sub);
+            line-height: 1.5;
+            background: var(--color-background-secondary);
+            border: 1px solid transparent;
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            min-height: 40px;
+            transition: all var(--duration-normal) var(--ease-out);
+        }
+
+        .memo-view-mode:hover {
+            background: var(--color-background-tertiary);
+        }
+
+        .memo-view-mode.empty-memo,
+        .sub-memo-area.empty-memo {
+            color: var(--color-label-tertiary);
+        }
+
+        .memo-view-mode a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        .memo-view-mode a:hover {
+            text-decoration: underline;
+        }
+
+        /* Sub-memo area */
+        .sub-memo-area {
+            width: 100%;
+            font-family: var(--font-text);
+            font-size: 14px;
+            color: var(--text-sub);
+            line-height: 1.6;
+            background: var(--color-background-secondary);
+            border: 1px solid transparent;
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            min-height: 56px;
+            box-sizing: border-box;
+            resize: none;
+            transition: all var(--duration-normal) var(--ease-out);
+        }
+
+        .sub-memo-area:hover {
+            background: var(--color-background-tertiary);
+        }
+
+        .sub-memo-area:focus {
+            outline: none;
+            background: var(--color-background);
+            border-color: var(--color-blue);
+            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Toggle button for completed subtasks */
+        .btn-sub-toggle {
+            background: transparent;
+            border: 1px dashed var(--color-separator-opaque);
+            color: var(--color-label-secondary);
+            font-family: var(--font-text);
+            font-weight: 500;
+            font-size: 14px;
+            padding: 12px 16px;
+            border-radius: var(--radius-xs);
+            cursor: pointer;
+            width: 100%;
+            margin-top: 12px;
+            transition: all var(--duration-normal) var(--ease-out);
+        }
+
+        .btn-sub-toggle:hover {
+            background: var(--color-background-secondary);
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+        }
+
+        /* ===== SUBTASKS ===== */
+        .subtasks-wrapper {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--color-separator);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            width: 100%;
+        }
+
+        .subtask-row {
+            background: var(--color-background-secondary);
+            border-radius: var(--radius-sm);
+            padding: 10px;
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            border: 1px solid transparent;
+            transition: all var(--duration-normal) var(--ease-out);
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .subtask-row:hover {
+            background: var(--color-background-tertiary);
+        }
+
+        .subtask-row.completed-sub {
+            opacity: 0.6;
+            background: var(--color-background-secondary) !important;
+        }
+
+        .sub-content {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .sub-input-name {
+            font-family: var(--font-text);
+            font-size: 16px;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            width: 100%;
+            color: var(--text-main);
+            padding: 4px 0;
+            transition: border-color var(--duration-fast) var(--ease-out);
+        }
+
+        .sub-input-name:focus,
+        textarea.sub-input-name:focus {
+            outline: none;
+            border-bottom: 2px solid var(--accent-blue) !important;
+        }
+
+        .sub-details-row {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .sub-meta-line {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .btn-mini {
+            height: 32px;
+            padding: 0 12px;
+            font-family: var(--font-text);
+            font-size: 14px;
+            font-weight: 500;
+            background-color: var(--color-background);
+            border: 1px solid var(--color-separator-opaque);
+            border-radius: var(--radius-xs);
+            color: var(--text-sub);
+            cursor: pointer;
+            transition: all var(--duration-normal) var(--ease-out);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-mini:hover {
+            background-color: var(--color-background-secondary);
+            color: var(--text-main);
+        }
+
+        select.btn-mini {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            padding-right: 28px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath stroke='%2386868b' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none' d='M3 4.5L6 7.5L9 4.5'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+        }
+
+        .btn-mini-complete {
+            height: 32px;
+            background: var(--accent-green);
+            color: #ffffff;
+            border: none;
+            border-radius: var(--radius-pill);
+            font-family: var(--font-text);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 0 16px;
+            display: inline-flex;
+            align-items: center;
+            transition: all var(--duration-normal) var(--ease-out);
+        }
+
+        .btn-mini-complete:hover {
+            opacity: 0.9;
+        }
+
+        .btn-add-sub {
+            background: transparent;
+            border: 1px dashed var(--color-separator-opaque);
+            color: var(--color-label-secondary);
+            font-family: var(--font-text);
+            font-weight: 500;
+            font-size: 14px;
+            padding: 10px 20px;
+            border-radius: var(--radius-pill);
+            cursor: pointer;
+            align-self: flex-start;
+            margin-top: 12px;
+            transition: all var(--duration-normal) var(--ease-out);
+        }
+
+        .btn-add-sub:hover {
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+            background: rgba(0, 113, 227, 0.05);
+        }
+
+        /* ===== GLOBAL MEMO ===== */
+        .global-memo-area {
+            background: var(--color-background);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            padding: 24px;
+            border: 1px solid var(--border-subtle);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #globalMemo:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
+        }
+
+        /* Global Memo - unified styles */
+        #globalMemo,
+        #globalMemoView {
+            width: 100%;
+            font-family: var(--font-text);
+            font-size: 14px;
+            color: var(--text-sub);
+            line-height: 1.6;
+            background: var(--color-background-secondary);
+            border: 1px solid transparent;
+            padding: 16px;
+            border-radius: var(--radius-sm);
+            min-height: 56px;
+            box-sizing: border-box;
+            transition: all var(--duration-normal) var(--ease-out);
+        }
+
+        #globalMemo {
+            resize: none;
+            flex: 1;
+        }
+
+        #globalMemoView {
+            cursor: pointer;
+        }
+
+        #globalMemoView:hover {
+            background: var(--color-background-tertiary);
+        }
+
+        /* ===== MODALS ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity var(--duration-normal) var(--ease-out),
+                visibility var(--duration-normal) var(--ease-out);
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-container {
+            background: var(--color-background);
+            width: 100%;
+            max-width: 500px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            padding: 32px;
+            transform: scale(0.95);
+            transition: transform var(--duration-normal) var(--ease-out);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.open .modal-container {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid var(--color-separator);
+            padding-bottom: 20px;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-family: var(--font-display);
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            color: var(--text-main);
+            text-align: center;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 28px;
+            border-top: 1px solid var(--color-separator);
+            padding-top: 24px;
+        }
+
+        .btn-primary-modal {
+            background: var(--color-blue);
+            color: #ffffff;
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 12px 24px;
+            font-family: var(--font-text);
+            font-size: 17px;
+            font-weight: 400;
+            cursor: pointer;
+            transition: all var(--duration-normal) var(--ease-out);
+        }
+
+        .btn-primary-modal:hover {
+            background: var(--color-blue-hover);
+        }
+
+        .btn-danger-modal {
+            background: transparent;
+            color: var(--accent-red);
+            border: 1px solid var(--accent-red);
+            border-radius: var(--radius-sm);
+            padding: 12px 24px;
+            font-family: var(--font-text);
+            font-size: 17px;
+            font-weight: 400;
+            cursor: pointer;
+            transition: all var(--duration-normal) var(--ease-out);
+        }
+
+        .btn-danger-modal:hover {
+            background: rgba(255, 59, 48, 0.1);
+        }
+
+        /* ===== SETTINGS GRID ===== */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .settings-list {
+            list-style: none;
+            border: 1px solid var(--color-separator-opaque);
+            border-radius: var(--radius-sm);
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .settings-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--color-separator);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: var(--font-text);
+            font-size: 14px;
+        }
+
+        .settings-item-name {
+            flex: 1;
+        }
+
+        .settings-item .btn-mini:first-of-type {
+            margin-left: auto;
+        }
+
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+
+        .btn-add-setting {
+            background: var(--color-blue);
+            color: #ffffff;
+            border-radius: var(--radius-xs);
+            padding: 0 16px;
+            height: 40px;
+            border: none;
+            font-family: var(--font-text);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--duration-normal) var(--ease-out);
+        }
+
+        .btn-add-setting:hover {
+            background: var(--color-blue-hover);
+        }
+
+        .add-input {
+            height: 40px;
+            background: var(--color-background) !important;
+            border: 1px solid var(--color-separator-opaque) !important;
+        }
+
+        /* ===== FOOTER ===== */
+        .sidebar-footer {
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid var(--color-separator);
+        }
+
+        .footer-btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn-footer {
+            background: transparent;
+            border: 1px solid var(--color-separator-opaque);
+            color: var(--text-sub);
+            border-radius: var(--radius-xs);
+            padding: 6px 10px;
+            font-family: var(--font-text);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--duration-normal) var(--ease-out);
+        }
+
+        .btn-footer:hover {
+            background: var(--color-background-secondary);
+            color: var(--text-main);
+            border-color: var(--color-separator-opaque);
+        }
+
+        /* FIX: Settings Modal Refinements */
+        #settingsModal .modal-container {
+            max-width: 800px;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .settings-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .settings-list {
+            border: 1px solid #E5E5EA;
+            border-radius: 12px;
+            padding: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .add-row {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            align-items: stretch;
+        }
+
+        .add-row .form-control {
+            flex: 1;
+            height: 40px;
+        }
+
+        .add-row .btn-add-setting {
+            height: 40px;
+            display: flex;
+            align-items: center;
+        }
+
+        .btn-add-setting {
+            height: 40px;
+            /* Match input height */
+            padding: 0 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* FIX: Danger Zone Styling Override */
+        .settings-grid>div:last-child {
+            background: #FFF0F0 !important;
+            border: 2px solid #FFD0D0 !important;
+            padding: 20px !important;
+            margin-top: 16px;
+        }
+
+        /* FIX: Danger Button */
+        .btn-danger-strong {
+            background: var(--accent-red);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 700;
+        }
+
+        .btn-danger-strong:hover {
+            opacity: 0.9;
+        }
+
+        /* FIX: Color Picker Chips */
+        .color-selector-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 8px;
+            padding: 4px 0;
+            flex-wrap: nowrap;
+        }
+
+        .color-opt {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            /* Circle */
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.2s, box-shadow 0.2s;
+            flex-shrink: 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .color-opt:hover {
+            transform: scale(1.15);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .color-opt.selected {
+            border-color: #333;
+            /* Selection ring */
+            transform: scale(1.1);
+        }
+
+        .color-divider {
+            height: 24px;
+            width: 1px;
+            background: #E5E5EA;
+            margin: 0 4px;
+        }
+
+        .custom-color-wrapper input[type="color"] {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        /* FIX: Final Refinements (Fonts, Spacing, Buttons) */
+        /* 1. Global Text Size Increase */
+        .task-title-input {
+            font-size: 18px !important;
+            font-weight: 600 !important;
+        }
+
+        .sub-input-name {
+            font-size: 16px !important;
+            font-weight: 700 !important;
+            /* Textarea styles */
+            resize: none;
+            overflow: hidden;
+            min-height: 24px;
+            line-height: 1.5;
+            padding: 0;
+            margin: 0;
+            field-sizing: content;
+            /* Modern auto-grow if supported, fallback to JS */
+        }
+
+        .memo-view-mode,
+        .memo-area,
+        textarea.memo-area {
+            font-size: 14px !important;
+            font-weight: normal;
+            overflow-wrap: anywhere;
+            word-break: break-all;
+            /* Fallback */
+            white-space: pre-wrap;
+        }
+
+        .meta-input {
+            font-size: 14px !important;
+        }
+
+        .input-group-label {
+            font-size: 13px !important;
+        }
+
+        /* 2. Subtask Styling Refinements */
+        .sub-name-row {
+            margin-bottom: 8px;
+            /* Space below title */
+        }
+
+        /* Subtask Calendar: Blend into gray background */
+        .subtask-row .btn-calendar {
+            background: transparent !important;
+            border-color: transparent !important;
+        }
+
+        .subtask-row .btn-calendar:hover {
+            background: rgba(0, 0, 0, 0.05) !important;
+            border-color: #D1D1D6 !important;
+        }
+
+        /* 3. Gray Controls (Requested Fix) */
+        .btn-calendar,
+        .subtask-row .btn-mini {
+            background-color: #F2F2F7 !important;
+            border: 1px solid transparent !important;
+            /* Cleaner look */
+            color: #555;
+        }
+
+        .btn-calendar:hover,
+        .subtask-row .btn-mini:hover {
+            background-color: #E5E5EA !important;
+        }
+
+        /* 2. Subtask Spacing & Layout */
+        .sub-actions-row {
+            margin-top: 10px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        /* 3. Square Parent Task Buttons */
+        .icon-action-btn {
+            border-radius: 8px !important;
+            /* Soft square */
+        }
+
+        /* 4. Calendar Icon Button */
+        .btn-calendar {
+            border-radius: 8px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.2s;
+            padding: 0;
+        }
+
+        .date-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+        }
+
+        .btn-calendar:hover {
+            background: rgba(0, 0, 0, 0.05);
+            color: #333;
+        }
+
+        /* 5. Subtask Complete Button (Pill) */
+        .btn-mini-complete {
+            border-radius: 100px !important;
+            padding: 0 16px !important;
+        }
+
+        /* ===== RESPONSIVE - Tablet (1068px and below) ===== */
+        @media (max-width: 1068px) {
+            .content {
+                padding: 40px 32px;
+                gap: 32px;
+            }
+
+            .right-memo-column {
+                width: 280px;
+            }
+        }
+
+        /* ===== RESPONSIVE - Tablet (735px - 1068px) ===== */
+        @media (min-width: 735px) and (max-width: 1068px) {
+            .sidebar {
+                padding: 16px 16px;
+                gap: 12px;
+            }
+
+            .section-label,
+            .footer-label {
+                font-size: 10px;
+                margin-bottom: 6px;
+            }
+
+            .sidebar-footer {
+                margin-top: 12px;
+                padding-top: 10px;
+            }
+
+            textarea.form-control {
+                min-height: 60px;
+            }
+
+            .btn-add {
+                height: 40px;
+                font-size: 14px;
+            }
+        }
+
+        /* ===== RESPONSIVE - Mobile (734px and below) ===== */
+        @media (max-width: 734px) {
+            .layout-wrapper {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                position: fixed;
+                width: 100% !important;
+                height: auto;
+                z-index: 2000;
+                background: rgba(251, 251, 253, 0.95);
+                backdrop-filter: saturate(180%) blur(20px);
+                -webkit-backdrop-filter: saturate(180%) blur(20px);
+                border-bottom: 1px solid var(--color-separator);
+                border-right: none;
+                padding: 16px 20px;
+            }
+
+            .sidebar-content {
+                display: none;
+                margin-top: 24px;
+            }
+
+            .sidebar.expanded .sidebar-content {
+                display: block;
+                height: 100vh;
+                overflow-y: auto;
+                padding-bottom: 32px;
+            }
+
+            .sidebar.expanded {
+                height: 100vh !important;
+            }
+
+            .sidebar-header-row {
+                margin-bottom: 0;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .btn-sidebar-toggle {
+                display: flex !important;
+                background: transparent;
+                border: none;
+                font-size: 28px;
+                cursor: pointer;
+                color: var(--text-main);
+                width: 44px;
+                height: 44px;
+                justify-content: center;
+                align-items: center;
+                border-radius: var(--radius-xs);
+                transition: background var(--duration-fast) var(--ease-out);
+            }
+
+            .btn-sidebar-toggle:hover {
+                background: var(--color-background-tertiary);
+            }
+
+            .content {
+                padding: 88px 20px 32px 20px;
+                flex-direction: column;
+                gap: 24px;
+            }
+
+            .main-tasks-area {
+                width: 100%;
+            }
+
+            .right-memo-column {
+                position: static;
+                width: 100%;
+                height: auto;
+                order: -1;
+            }
+
+            .global-memo-area {
+                margin-bottom: 0;
+            }
+
+            .task-card {
+                flex-direction: column;
+                gap: 16px;
+                padding: 20px;
+            }
+
+            .task-title-input {
+                font-size: 19px;
+            }
+
+            .drag-handle {
+                display: flex;
+                font-size: 16px;
+                padding-top: 0;
+            }
+
+            .task-actions {
+                width: 100%;
+                align-items: stretch;
+                flex-direction: row;
+                justify-content: space-between;
+                flex-wrap: wrap;
+            }
+
+            .action-block {
+                width: 100%;
+                flex-direction: row;
+            }
+
+            .btn-complete-action {
+                flex: 1;
+            }
+
+            .timestamps {
+                margin-top: 0;
+                flex-direction: row;
+                justify-content: flex-end;
+                align-items: flex-end;
+                gap: 12px;
+                min-width: 100%;
+                text-align: right;
+            }
+
+            .sub-content {
+                grid-template-columns: 1fr;
+                grid-template-areas: "name" "details" "actions";
+            }
+
+            /* Dark Mode - Mobile */
+            body.dark-mode .sidebar {
+                background: rgba(0, 0, 0, 0.95);
+                border-color: var(--color-separator);
+            }
+
+            body.dark-mode .btn-sidebar-toggle {
+                color: var(--text-main);
+            }
+        }
+
+        /* ===== ACCESSIBILITY ===== */
+
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+
+            .task-card:hover {
+                transform: none;
+            }
+
+            .modal-container {
+                transform: none !important;
+            }
+        }
+
+        /* Focus Visible */
+        :focus-visible {
+            outline: 2px solid var(--color-blue);
+            outline-offset: 2px;
+        }
+
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        textarea:focus-visible {
+            outline: 2px solid var(--color-blue);
+            outline-offset: 2px;
+        }
+
+        /* High Contrast Mode Support */
+        @media (prefers-contrast: high) {
+            :root {
+                --border-subtle: rgba(0, 0, 0, 0.2);
+                --color-separator: rgba(0, 0, 0, 0.2);
+            }
+
+            .task-card {
+                border-width: 2px;
+            }
+
+            .btn-add,
+            .btn-complete-action,
+            .btn-primary-modal {
+                border: 2px solid currentColor;
+            }
+        }
+
+        /* ===== TOAST NOTIFICATIONS ===== */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(0);
+            padding: 14px 28px;
+            border-radius: var(--radius-pill);
+            background: var(--color-label);
+            color: var(--color-background);
+            font-family: var(--font-text);
+            font-size: 15px;
+            font-weight: 500;
+            z-index: 10001;
+            box-shadow: var(--shadow-lg);
+            animation: toast-in 0.3s var(--ease-out);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toast-success::before {
+            content: '✓';
+            font-size: 18px;
+        }
+
+        .toast-error {
+            background: var(--color-red);
+        }
+
+        .toast-error::before {
+            content: '✕';
+            font-size: 18px;
+        }
+
+        .toast-info {
+            background: var(--color-blue);
+        }
+
+        .toast-info::before {
+            content: 'ℹ';
+            font-size: 18px;
+        }
+
+        .toast-fade-out {
+            animation: toast-out 0.3s var(--ease-out) forwards;
+        }
+
+        @keyframes toast-in {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        @keyframes toast-out {
+            from {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+        }
+
+        body.dark-mode .toast {
+            background: var(--color-background-tertiary);
+            color: var(--color-label);
+        }
+
+        body.dark-mode .toast-error {
+            background: var(--color-red);
+            color: #ffffff;
+        }
+
+        body.dark-mode .toast-info {
+            background: var(--color-blue);
+            color: #ffffff;
+        }
+
+        /* ===== TOUCH DRAG STYLES ===== */
+        .task-card.dragging {
+            opacity: 0.5;
+        }
+
+        .task-card.touch-over {
+            border-top: 3px solid var(--color-blue) !important;
+            margin-top: -3px;
+        }
+
+        .touch-drag-clone {
+            border-radius: var(--radius-md);
+            background: var(--color-background);
+        }
+
+        /* Improve drag handle touch target on mobile */
+        @media (max-width: 734px) {
+            .drag-handle {
+                min-width: 44px;
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+
+        /* Search Input Styles */
+        .search-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            color: var(--color-label-tertiary);
+            pointer-events: none;
+        }
+
+        .search-input {
+            width: 100%;
+            height: 38px;
+            padding: 0 36px 0 38px;
+            font-family: var(--font-text);
+            font-size: 14px;
+            color: var(--color-label);
+            background: var(--color-background-secondary);
+            border: 1px solid var(--color-separator);
+            border-radius: var(--radius-sm);
+            outline: none;
+            transition: border-color var(--duration-normal) var(--ease-out),
+                box-shadow var(--duration-normal) var(--ease-out);
+        }
+
+        .search-input::placeholder {
+            color: var(--color-label-tertiary);
+        }
+
+        .search-input:focus {
+            border-color: var(--color-blue);
+            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
+        }
+
+        .search-clear {
+            position: absolute;
+            right: 10px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-fill-tertiary);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            color: var(--color-label-secondary);
+            opacity: 0.7;
+            transition: opacity var(--duration-fast) var(--ease-out),
+                background var(--duration-fast) var(--ease-out);
+        }
+
+        .search-clear:hover {
+            opacity: 1;
+            background: var(--color-fill-secondary);
+        }
+
+        /* Dark mode adjustments for search */
+        body.dark-mode .search-input:focus {
+            box-shadow: 0 0 0 3px rgba(41, 151, 255, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <div class="layout-wrapper">
+        <!-- LEFT SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header-row">
+                <h1 onclick="resetView()">My Tasks</h1>
+                <button class="btn-sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">≡</button>
+            </div>
+
+            <!-- Collapsible Content Wrapper -->
+            <div class="sidebar-content" id="sidebarContent">
+                <!-- Round 29: Label Adjustment -->
+                <span class="section-label" style="margin-top:0px;">New Task</span>
+                <div class="input-card" id="inputFormSection">
+                    <div class="input-row-main">
+                        <!-- Round 29: Japanese Label -->
+                        <label class="input-group-label" for="inputName">タスク名</label>
+                        <input type="text" id="inputName" class="form-control" placeholder="タスク名を入力"
+                            style="font-weight:700;">
+                    </div>
+
+                    <div style="display:flex; flex-direction:row; gap:10px;">
+                        <div style="flex:1;">
+                            <!-- Round 29: Japanese Label -->
+                            <label class="input-group-label" for="inputCategory">カテゴリ</label>
+                            <select id="inputCategory" class="badge-select" onchange="updateSelectColor(this)"></select>
+                        </div>
+                        <div style="flex:1;">
+                            <!-- Round 29: Japanese Label -->
+                            <label class="input-group-label" for="inputStatus">ステータス</label>
+                            <select id="inputStatus" class="badge-select" onchange="updateSelectColor(this)"></select>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:5px;">
+                        <!-- Round 29: Japanese Label -->
+                        <label class="input-group-label" for="inputDeadline">期限</label>
+                        <!-- Round 27: Hybrid Input -->
+                        <div class="deadline-wrapper">
+                            <!-- Round 28: "期限を入力" -->
+                            <input type="text" id="inputDeadline" class="form-control" placeholder="期限を入力"
+                                style="flex:1;">
+                            <div class="date-picker-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                                <input type="date" class="date-picker-overlay"
+                                    onchange="document.getElementById('inputDeadline').value = this.value.replace(/-/g, '/')">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:5px;">
+                        <!-- Round 29: Japanese Label -->
+                        <label class="input-group-label" for="inputMemo">メモ</label>
+                        <textarea id="inputMemo" class="form-control memo-area" placeholder="詳細を入力" rows="1"
+                            oninput="autoResize(this)"
+                            style="resize:none; background:#FAFAFA; border-color:#DDD;"></textarea>
+                    </div>
+
+                    <button class="btn-add" onclick="addTask()">タスクを登録</button>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:4px; margin-top: 20px;"> <!-- Reduced Gap -->
+                    <!-- Round 28: VIEWS Label -->
+                    <div>
+                        <span class="section-label">VIEWS</span>
+                        <!-- Round 51: View Scroll Wrapper -->
+                        <div class="nav-scroll-wrapper">
+                            <button class="scroll-btn left"
+                                onclick="scrollNav('view-buttons-container', 'left')">‹</button>
+                            <div class="nav-group" id="view-buttons-container" role="tablist" aria-label="表示モード切り替え">
+                                <button class="nav-btn active" id="btn-view-active" role="tab" aria-selected="true"
+                                    onclick="setViewMode('active')">すべて</button>
+                                <button class="nav-btn" id="btn-view-archived" role="tab" aria-selected="false"
+                                    onclick="setViewMode('archived')">完了</button>
+                                <button class="nav-btn btn-trash-mode" id="btn-view-trash" role="tab"
+                                    aria-selected="false" onclick="setViewMode('trash')">ゴミ箱</button>
+                            </div>
+                            <button class="scroll-btn right"
+                                onclick="scrollNav('view-buttons-container', 'right')">›</button>
+                        </div>
+                    </div>
+
+                    <!-- Round 28: FILTERS Label -->
+                    <div>
+                        <span class="section-label">FILTERS</span>
+                        <!-- Round 50: Scroll Wrapper -->
+                        <div class="nav-scroll-wrapper">
+                            <button class="scroll-btn left"
+                                onclick="scrollNav('filter-buttons-container', 'left')">‹</button>
+                            <div class="nav-group" id="filter-buttons-container" role="group" aria-label="カテゴリフィルター">
+                            </div>
+                            <button class="scroll-btn right"
+                                onclick="scrollNav('filter-buttons-container', 'right')">›</button>
+                        </div>
+                    </div>
+
+                    <!-- Search Section (ラベルなし) -->
+                    <div class="search-wrapper" style="margin-top: 12px;">
+                        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                        <input type="text" id="searchInput" class="search-input" placeholder="タスクを検索..."
+                            aria-label="タスク検索">
+                        <button class="search-clear" id="searchClear" aria-label="検索をクリア" style="display:none;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M18 6 6 18"></path>
+                                <path d="m6 6 12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Mode Toggle Buttons (横並び) -->
+                    <div class="mode-toggle-row">
+                        <button class="btn-mode-toggle" id="btnReorderMode" onclick="toggleCompactReorderMode()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="3" y1="6" x2="21" y2="6"></line>
+                                <line x1="3" y1="12" x2="21" y2="12"></line>
+                                <line x1="3" y1="18" x2="21" y2="18"></line>
+                                <polyline points="7 8 5 6 7 4"></polyline>
+                                <polyline points="7 20 5 18 7 16"></polyline>
+                            </svg>
+                            並び替え
+                        </button>
+                        <!-- Dark Mode Toggle Switch -->
+                        <div class="theme-toggle-switch" id="themeToggleSwitch" onclick="toggleDarkMode()" role="switch"
+                            aria-checked="false" tabindex="0">
+                            <svg class="theme-icon theme-icon-light" width="14" height="14" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="5"></circle>
+                                <line x1="12" y1="1" x2="12" y2="3"></line>
+                                <line x1="12" y1="21" x2="12" y2="23"></line>
+                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                                <line x1="1" y1="12" x2="3" y2="12"></line>
+                                <line x1="21" y1="12" x2="23" y2="12"></line>
+                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                            </svg>
+                            <div class="theme-switch-track">
+                                <div class="theme-switch-thumb"></div>
+                            </div>
+                            <svg class="theme-icon theme-icon-dark" width="14" height="14" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="trashControls"
+                    style="display:none; padding:12px; background:#F5F5F5; border-radius:var(--radius-sm); border:1px solid #E5E5EA; margin-top:16px;">
+                    <div class="trash-header" style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-weight:600; color:#333;">ゴミ箱編集</span>
+                        <button class="btn-empty-trash" onclick="emptyTrash()"
+                            style="background:#FF3B30; color:#FFF; border:none; border-radius:var(--radius-xs); padding:6px 12px; cursor:pointer; font-weight:600; font-size:12px;">空にする</button>
+                    </div>
+                </div>
+
+                <!-- Sidebar Footer -->
+                <div class="sidebar-footer">
+                    <div class="backup-controls">
+                        <span class="footer-label">DATA MANAGEMENT</span>
+                        <div class="footer-btn-grid">
+                            <button class="btn-footer" onclick="exportData()">保存</button>
+                            <button class="btn-footer" onclick="triggerImport()">読込</button>
+                            <button class="btn-footer" id="btnOpenSettings">設定</button>
+                            <button class="btn-footer" id="btnOpenHelp">使い方</button>
+                        </div>
+                        <input type="file" id="importFile" accept=".json" style="display:none"
+                            onchange="importData(this)">
+                    </div>
+                </div>
+            </div><!-- End Sidebar Content -->
+        </aside>
+
+        <div class="resizer" id="resizer"></div>
+
+        <main class="content">
+            <!-- Center: Task List Area -->
+            <div class="main-tasks-area">
+                <ul id="taskList" class="task-list" role="list" aria-label="タスク一覧"></ul>
+            </div>
+
+            <!-- Right: Global Memo Area -->
+            <div class="right-memo-column">
+                <div class="global-memo-area">
+                    <label class="global-memo-label" for="globalMemo">Global Memo</label>
+                    <!-- Round 56: View/Edit Toggle -->
+                    <div id="globalMemoView" class="memo-view-mode" onclick="toggleGlobalMemoEdit(true)"></div>
+                    <textarea id="globalMemo" class="hidden" placeholder="自由記述のメモエリアです。タスク全体の概略や備忘録にお使いください"
+                        oninput="autoResize(this)" onblur="toggleGlobalMemoEdit(false)"></textarea>
+                </div>
+            </div>
+        </main>
+
+        <!-- Quick Move Menu -->
+        <div class="quick-move-menu" id="quickMoveMenu" style="display: none;">
+            <button class="quick-move-item" data-action="top">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="17 11 12 6 7 11"></polyline>
+                    <line x1="12" y1="6" x2="12" y2="18"></line>
+                </svg>
+                一番上へ
+            </button>
+            <button class="quick-move-item" data-action="up5">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="18 15 12 9 6 15"></polyline>
+                </svg>
+                5つ上へ
+            </button>
+            <button class="quick-move-item" data-action="down5">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+                5つ下へ
+            </button>
+            <button class="quick-move-item" data-action="bottom">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="7 13 12 18 17 13"></polyline>
+                    <line x1="12" y1="6" x2="12" y2="18"></line>
+                </svg>
+                一番下へ
+            </button>
+        </div>
+    </div>
+
+    <!-- SETTINGS MODAL -->
+    <div class="modal-overlay" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle">
+        <div class="modal-container">
+            <div class="modal-header">
+                <div class="modal-title" id="settingsModalTitle">設定 (Settings)</div>
+            </div>
+
+            <!-- Compact Grid Layout -->
+            <div class="settings-grid">
+                <div class="settings-section">
+                    <div class="settings-label">カテゴリ (Categories)</div>
+                    <ul class="settings-list" id="settingsCatList"></ul>
+                    <div class="add-row">
+                        <!-- Round 28: Clean Placeholder -->
+                        <input type="text" id="newCatName" class="form-control add-input" placeholder="新しいカテゴリ名">
+                        <button class="btn-add-setting" onclick="addCategory()">追加</button>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-label">ステータス (Statuses)</div>
+                    <ul class="settings-list" id="settingsStatusList"></ul>
+                    <div class="status-color-area"
+                        style="background:#F9F9F9; padding:10px; border-radius:var(--radius-xs); border:2px solid #EEE;">
+                        <div class="color-selector-wrapper" id="newStatusColorSelector">
+                            <div class="color-opt" style="background:#FF3B30" onclick="selectColor('#FF3B30')"
+                                data-col="#FF3B30" title="Red"></div>
+                            <div class="color-opt" style="background:#007AFF" onclick="selectColor('#007AFF')"
+                                data-col="#007AFF" title="Blue"></div>
+                            <div class="color-opt" style="background:#34C759" onclick="selectColor('#34C759')"
+                                data-col="#34C759" title="Green"></div>
+                            <div class="color-opt" style="background:#FF9500" onclick="selectColor('#FF9500')"
+                                data-col="#FF9500" title="Orange"></div>
+                            <div class="color-opt" style="background:#AF52DE" onclick="selectColor('#AF52DE')"
+                                data-col="#AF52DE" title="Purple"></div>
+                            <div class="color-opt" style="background:#8E8E93" onclick="selectColor('#8E8E93')"
+                                data-col="#8E8E93" title="Gray"></div>
+                            <div class="color-opt" style="background:#000000" onclick="selectColor('#000000')"
+                                data-col="#000000" title="Black"></div>
+
+                            <span class="color-divider"></span>
+
+                            <div class="custom-color-wrapper">
+                                <input type="color" id="customColorPicker" onchange="selectColor(this.value)">
+                            </div>
+                        </div>
+                        <div class="add-row">
+                            <!-- Round 28: Clean Placeholder -->
+                            <input type="text" id="newStatusName" class="form-control add-input"
+                                placeholder="新しいステータス名">
+                            <button class="btn-add-setting" onclick="addStatus()">追加</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Round 28: Factory Reset in Danger Zone -->
+                <!-- Spans 2 columns on grid -->
+                <div
+                    style="grid-column: 1 / -1; background:#ffecec; border:2px solid #ffcccc; padding:10px; border-radius:var(--radius-xs); display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:14px; font-weight:700; color:#d9534f;">危険な操作 (Danger Zone)</span>
+                    <button class="btn-danger-strong" onclick="factoryReset()">全データを削除して初期化</button>
+                </div>
+            </div>
+
+            <!-- Task List -->
+            <div class="modal-footer">
+                <button class="btn-danger-modal" onclick="resetSettings()">設定のみリセット</button>
+                <button class="btn-primary-modal" onclick="closeSettingsModal()">設定を保存して閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HELP MODAL -->
+    <div class="modal-overlay" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpModalTitle">
+        <div class="modal-container" style="max-width: 800px;">
+            <div class="modal-header">
+                <div class="modal-title" id="helpModalTitle">使い方 (How to Use)</div>
+            </div>
+            <div class="modal-content" style="max-height: 60vh; overflow-y: auto;">
+                <h3 style="margin-top: 0;">基本操作</h3>
+                <ul>
+                    <li><strong>タスクの追加</strong>: サイドバー（スマホではメニュー内）からタスク名、カテゴリ、ステータス、期限、メモを入力して登録します。</li>
+                    <li><strong>編集</strong>: タスク名やメモなどの内容は、クリックすることで直接編集できます。</li>
+                    <li><strong>並び替え</strong>: タスクやサブタスクは、項目をドラッグ＆ドロップすることで自由に並び替えが可能です。</li>
+                    <li><strong>完了と削除</strong>: 「完了」ボタンでタスクをアーカイブし、「削除」ボタン（ゴミ箱アイコン）でゴミ箱へ移動します。</li>
+                </ul>
+
+                <h3 style="margin-top: 24px;">サブタスク機能</h3>
+                <ul>
+                    <li><strong>サブタスクの追加</strong>: 各タスクカードの「＋サブタスクを追加」ボタンから追加できます。</li>
+                    <li><strong>サブタスクの完了</strong>: サブタスクの「完了」ボタンをクリックすると完了マークがつきます。</li>
+                    <li><strong>完了サブタスクの表示/非表示</strong>: 完了したサブタスクは折りたたんで非表示にできます。</li>
+                </ul>
+
+                <h3 style="margin-top: 24px;">ビュー機能</h3>
+                <ul>
+                    <li><strong>すべて</strong>: アクティブなタスクを表示します。</li>
+                    <li><strong>完了</strong>: アーカイブしたタスクを表示します。</li>
+                    <li><strong>ゴミ箱</strong>: 削除したタスクを表示します。ここから復元または完全削除が可能です。</li>
+                    <li><strong>カテゴリフィルター</strong>: 特定のカテゴリのタスクのみを表示できます。</li>
+                </ul>
+
+                <h3 style="margin-top: 24px;">データ管理</h3>
+                <ul>
+                    <li><strong>保存</strong>: 現在のデータをJSONファイルとしてエクスポートします。</li>
+                    <li><strong>読込</strong>: 保存したJSONファイルからデータを復元します。</li>
+                    <li><strong>自動保存</strong>: データはブラウザに自動保存されます。</li>
+                </ul>
+
+                <h3 style="margin-top: 24px;">設定</h3>
+                <ul>
+                    <li><strong>カテゴリ管理</strong>: カテゴリの追加、編集、削除ができます。</li>
+                    <li><strong>ステータス管理</strong>: ステータスの追加、編集、削除、色の変更ができます。</li>
+                    <li><strong>ダークモード</strong>: 明るい/暗いテーマを切り替えられます。</li>
+                </ul>
+
+                <h3 style="margin-top: 24px;">グローバルメモ</h3>
+                <ul>
+                    <li>右側のメモエリアは自由に使える備忘録です。URLを入力すると自動的にリンクになります。</li>
+                </ul>
+            </div>
+            <div class="modal-footer" style="justify-content: center;">
+                <button class="btn-primary-modal" onclick="closeHelpModal()">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONFIRM IMPORT MODAL -->
+    <div class="modal-overlay" id="confirmModal" role="alertdialog" aria-modal="true"
+        aria-labelledby="confirmModalTitle">
+        <div class="modal-container" style="max-width: 400px;">
+            <div class="modal-header">
+                <div class="modal-title" id="confirmModalTitle">データの読み込み確認</div>
+            </div>
+            <div class="modal-content" style="text-align: center; padding: 20px 0;">
+                <p style="color: #666; margin-bottom: 16px;">現在のデータを上書きして、ファイルのデータを読み込みますか？</p>
+                <p style="color: var(--accent-red); font-size: 12px;">※この操作は取り消せません</p>
+            </div>
+            <div class="modal-footer" style="justify-content: center;">
+                <button class="btn-danger-modal" onclick="closeConfirmModal()">キャンセル</button>
+                <button class="btn-primary-modal" onclick="executeImport()">読み込む</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUBTASK MODAL -->
+    <div class="modal-overlay" id="subtaskModal" role="dialog" aria-modal="true" aria-labelledby="subtaskModalTitle">
+        <div class="modal-container" style="max-width: 400px;">
+            <div class="modal-header">
+                <div class="modal-title" id="subtaskModalTitle">サブタスクを追加</div>
+            </div>
+            <div class="modal-content" style="padding: 20px 0;">
+                <input type="text" id="newSubtaskInput" class="form-control" placeholder="サブタスク名を入力"
+                    onkeydown="if(event.key === 'Enter') submitNewSubtask()">
+            </div>
+            <div class="modal-footer" style="justify-content: center;">
+                <button class="btn-danger-modal" onclick="closeSubtaskModal()">キャンセル</button>
+                <button class="btn-primary-modal" onclick="submitNewSubtask()">追加</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUCCESS MODAL (Legacy - replaced with toast) -->
+    <div class="modal-overlay" id="successModal" role="dialog" aria-modal="true" aria-label="成功">
+        <div class="modal-container" style="max-width: 300px; text-align: center;">
+            <div style="font-size: 48px; margin-bottom: 16px;" aria-hidden="true">✓</div>
+            <div class="modal-title" style="margin-bottom: 16px;">タスクを登録しました</div>
+            <button class="btn-primary-modal" onclick="closeSuccessModal()" style="width: 100%;">OK</button>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'task_app_data_v25_ux';
+        const DEFAULT_SETTINGS = {
+            categories: [
+                { id: 'none', name: '未設定' },
+                { id: 'customer', name: '顧客案件' },
+                { id: 'office', name: '社内業務' }
+            ],
+            statuses: [
+                { id: 'not_started', name: '未着手', color: '#999999' },
+                { id: 'requires_action', name: '要対応', color: '#D44C47' },
+                { id: 'waiting', name: '待ち', color: '#2383E2' }
+            ]
+        };
+
+        let appData = {
+            tasks: [],
+            globalMemo: '',
+            settings: JSON.parse(JSON.stringify(DEFAULT_SETTINGS))
+        };
+
+        // Round 58: Missing Globals Restored
+        let viewMode = 'active';
+        let filterCategory = 'all';
+        let searchQuery = '';
+        let expandedSubtasksMap = {};
+
+        // Round 59: Additional Missing Globals
+        let draggedItem = null;
+        let pendingImportData = null;
+        let editingCatIndex = -1;
+        let editingStatusIndex = -1;
+        let currentHeaderSubtaskTaskId = null;
+        let selectedNewStatusColor = '#007AFF';
+
+        function loadData() {
+            const json = localStorage.getItem(STORAGE_KEY);
+            if (json) {
+                try {
+                    const data = JSON.parse(json);
+                    if (data) {
+                        appData = data;
+                        // Ensure settings exist
+                        if (!appData.settings) appData.settings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+                        // Ensure tasks exist
+                        if (!Array.isArray(appData.tasks)) appData.tasks = [];
+                    }
+                } catch (e) {
+                    console.error('Load Error:', e);
+                    // Reset on error to prevent broken state
+                    appData = {
+                        tasks: [],
+                        globalMemo: '',
+                        settings: JSON.parse(JSON.stringify(DEFAULT_SETTINGS))
+                    };
+                }
+            }
+
+            // Initialize UI
+            if (typeof initDarkMode === 'function') initDarkMode();
+            const memoEl = document.getElementById('globalMemo');
+            if (memoEl) {
+                memoEl.value = appData.globalMemo || '';
+                if (typeof autoResize === 'function') autoResize(memoEl);
+            }
+
+            // Update Global Memo View
+            const memoView = document.getElementById('globalMemoView');
+            const memoText = appData.globalMemo || '';
+            if (memoView) {
+                if (memoText.trim()) {
+                    memoView.innerHTML = linkify(escapeHtml(memoText));
+                    memoView.classList.remove('empty-memo');
+                } else {
+                    memoView.innerHTML = '自由記述のメモエリアです。タスク全体の概略や備忘録にお使いください';
+                    memoView.classList.add('empty-memo');
+                }
+            }
+
+            // Render
+            if (typeof renderApp === 'function') renderApp();
+
+            // Setup Search Listener
+            const searchEl = document.getElementById('searchInput');
+            const searchClearBtn = document.getElementById('searchClear');
+            if (searchEl) {
+                searchEl.addEventListener('input', (e) => {
+                    searchQuery = e.target.value.toLowerCase().trim();
+                    // Show/hide clear button
+                    if (searchClearBtn) {
+                        searchClearBtn.style.display = e.target.value ? 'flex' : 'none';
+                    }
+                    renderTasks();
+                });
+            }
+            if (searchClearBtn) {
+                searchClearBtn.addEventListener('click', () => {
+                    if (searchEl) {
+                        searchEl.value = '';
+                        searchQuery = '';
+                        searchClearBtn.style.display = 'none';
+                        renderTasks();
+                        searchEl.focus();
+                    }
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            initResizer();
+
+            // Setup Settings Button
+            const btnSettings = document.getElementById('btnOpenSettings');
+            if (btnSettings) btnSettings.addEventListener('click', openSettingsModal);
+
+            // Setup Help Button
+            const btnHelp = document.getElementById('btnOpenHelp');
+            if (btnHelp) btnHelp.addEventListener('click', openHelpModal);
+
+            // Setup Global Memo View
+            updateGlobalMemoView();
+
+            // Global Keyboard Handler
+            document.addEventListener('keydown', handleGlobalKeydown);
+        });
+
+        // Global Keyboard Handler
+        function handleGlobalKeydown(e) {
+            // Escape key: Close all open modals
+            if (e.key === 'Escape') {
+                closeAllModals();
+            }
+        }
+
+        // Close All Modals
+        function closeAllModals() {
+            const modals = document.querySelectorAll('.modal-overlay.open');
+            modals.forEach(m => m.classList.remove('open'));
+        }
+        function exportData() {
+            // Round 57: Sync Global Memo before export
+            const memoEl = document.getElementById('globalMemo');
+            if (memoEl) appData.globalMemo = memoEl.value;
+
+            const str = JSON.stringify(appData, null, 2);
+            const url = URL.createObjectURL(new Blob([str], { type: "application/json" }));
+
+            // Generate Filename: mytasks_backup_yyyymmdd_hhmm.json
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            const hh = String(now.getHours()).padStart(2, '0');
+            const min = String(now.getMinutes()).padStart(2, '0');
+            const filename = `mytasks_backup_${yyyy}${mm}${dd}${hh}${min}.json`;
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+        function triggerImport() { document.getElementById('importFile').click(); }
+        function importData(input) {
+            if (!input.files[0]) return;
+            const r = new FileReader();
+            r.onload = e => {
+                try {
+                    const l = JSON.parse(e.target.result);
+                    // Validate Structure
+                    if (l.settings && l.tasks) {
+                        pendingImportData = l;
+                        openConfirmModal();
+                    } else {
+                        alert("無効なデータ形式です。");
+                        input.value = '';
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert("読込失敗: ファイルが破損している可能性があります。");
+                    input.value = '';
+                }
+            };
+            r.readAsText(input.files[0]);
+        }
+
+        function renderApp() { renderInputOptions(); renderFilters(); renderTasks(); }
+
+        function renderInputOptions() {
+            const cat = document.getElementById('inputCategory');
+            const st = document.getElementById('inputStatus');
+            const currentCat = cat.value; const currentSt = st.value;
+            cat.innerHTML = appData.settings.categories.map(c => `<option value="${c.id}">${c.name}</option>
+                    `).join('');
+            st.innerHTML = appData.settings.statuses.map(s => `<option value="${s.id}">${s.name}</option>
+                    `).join('');
+            // Restore value if exists
+            if (appData.settings.categories.some(c => c.id === currentCat)) cat.value = currentCat;
+            if (appData.settings.statuses.some(s => s.id === currentSt)) st.value = currentSt;
+            updateSelectColor(cat); updateSelectColor(st);
+        }
+
+        function renderFilters() {
+            const container = document.getElementById('filter-buttons-container');
+            let html = `<button class="nav-btn ${filterCategory === 'all' ? 'active' : ''}"
+                        onclick="setFilter('all')">すべて</button>`;
+            appData.settings.categories.forEach(c => {
+                let label = c.name.replace(/^[\uD800-\uDBFF][\uDC00-\uDFFF]\s*/, '');
+                if (label.length === 0) label = c.name;
+                html += `<button class="nav-btn ${filterCategory === c.id ? 'active' : ''}"
+                        onclick="setFilter('${c.id}')">${label}</button>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderTasks() {
+            const list = document.getElementById('taskList');
+            list.innerHTML = '';
+            const showActive = viewMode === 'active';
+            const showArchived = viewMode === 'archived';
+            const showTrash = viewMode === 'trash';
+
+            const filtered = appData.tasks.filter(t => {
+                // Category filter
+                if (filterCategory !== 'all' && t.category !== filterCategory) return false;
+
+                // Search filter
+                if (searchQuery) {
+                    const nameMatch = t.name.toLowerCase().includes(searchQuery);
+                    const memoMatch = t.memo && t.memo.toLowerCase().includes(searchQuery);
+                    const subtaskMatch = t.subtasks && t.subtasks.some(s =>
+                        s.name.toLowerCase().includes(searchQuery) ||
+                        (s.memo && s.memo.toLowerCase().includes(searchQuery))
+                    );
+                    if (!nameMatch && !memoMatch && !subtaskMatch) return false;
+                }
+
+                // View mode filter
+                if (viewMode === 'active') return !t.isDeleted && !t.isArchived;
+                if (viewMode === 'archived') return !t.isDeleted && t.isArchived;
+                if (viewMode === 'trash') return t.isDeleted;
+                return false;
+            });
+
+            if (filtered.length === 0) {
+                list.innerHTML = `<li style="text-align:center; padding:32px; color:#bbb;">タスクはありません</li>`; return;
+            }
+
+            filtered.forEach(task => {
+                const li = document.createElement('li'); li.className = `task-card`;
+                const sConfig = appData.settings.statuses.find(s => s.id === task.status) || { color: '#999' };
+
+                if (task.isDeleted) li.classList.add('deleted');
+                else if (task.isArchived) li.classList.add('archived');
+                else {
+                    li.style.backgroundColor = `color-mix(in srgb, ${sConfig.color} 5%, var(--mix-base))`;
+                    li.style.borderLeft = `5px solid ${sConfig.color}`;
+                }
+
+                if (showActive) {
+                    li.classList.add('draggable'); li.draggable = false; li.dataset.id = task.id;
+                    // Only allow drag from drag-handle
+                    li.addEventListener('mousedown', function (e) {
+                        if (e.target.closest('.drag-handle')) {
+                            this.draggable = true;
+                        } else {
+                            this.draggable = false;
+                        }
+                    });
+                    li.addEventListener('dragstart', handleDragStart); li.addEventListener('dragover',
+                        handleDragOver); li.addEventListener('drop', handleDrop); li.addEventListener('dragend',
+                            handleDragEnd);
+                    // Touch drag support
+                    li.addEventListener('touchstart', handleTouchStart, { passive: true });
+                    li.addEventListener('touchmove', handleTouchMove, { passive: false });
+                    li.addEventListener('touchend', handleTouchEnd);
+                }
+                const ro = showTrash || showArchived;
+
+                let subHtml = '';
+                if (task.subtasks && task.subtasks.length) {
+                    const active = task.subtasks.filter(s => !s.isArchived);
+                    const compl = task.subtasks.filter(s => s.isArchived);
+                    const genRow = (s) => {
+                        const st = appData.settings.statuses.find(x => x.id === s.status) || { color: '#999' };
+                        const rowCls = s.isArchived ? 'subtask-row completed-sub' : 'subtask-row';
+                        const style = s.isArchived ? '' : `border-left: 5px solid ${st.color}; background: color-mix(in
+                    srgb, ${st.color} 5%, var(--mix-base));`;
+                        const sOpts = appData.settings.statuses.map(o => `<option value="${o.id}" ${s.status === o.id
+                            ? 'selected' : ''}>${o.name}</option>`).join('');
+
+                        // Draggable attributes
+                        const draggableAttrs = !ro && !s.isArchived ? `draggable="false" data-parent-id="${task.id}"
+                    data-sub-id="${s.id}" onmousedown="if(event.target.closest('.sub-drag-handle')){this.draggable=true}else{this.draggable=false}" ondragstart="handleSubtaskDragStart(event)"
+                    ondragover="handleSubtaskDragOver(event)" ondrop="handleSubtaskDrop(event)"
+                    ondragend="handleSubtaskDragEnd(event)"` : '';
+                        const dragClass = !ro && !s.isArchived ? 'sub-draggable' : '';
+
+                        return `<div class="${rowCls} ${dragClass}" style="${style}" ${draggableAttrs}>
+                        ${!ro && !s.isArchived ? `<div class="sub-drag-handle"
+                            style="cursor:grab; color:#DDD; padding-top:6px; margin-right:8px; font-size:16px;">⋮⋮</div>
+                        ` : ''}
+                        <div class="sub-content">
+                            <div class="sub-name-row">
+                                <textarea class="sub-input-name" rows="1" oninput="autoResize(this)"
+                                    onblur="updateSubtask('${task.id}','${s.id}','name',this.value)" ${ro ? 'disabled'
+                                : ''}>${escapeHtml(s.name)}</textarea>
+                            </div>
+                            <div class="sub-details-row">
+                                <div class="sub-meta-line">
+                                    <select class="btn-mini"
+                                        onchange="updateSubtask('${task.id}','${s.id}','status',this.value)" ${ro
+                                ? 'disabled' : ''}>${sOpts}</select>
+                                    <div class="date-input-wrapper">
+                                        <input type="text" class="meta-input has-picker" value="${escapeHtml(s.deadline)}"
+                                            placeholder="期限を入力" id="sub-deadline-${task.id}-${s.id}"
+                                            onchange="updateSubtask('${task.id}','${s.id}','deadline',this.value)" ${ro
+                                ? 'disabled' : ''}>
+                                        ${!ro ? `<button class="btn-calendar"
+                                            onclick="document.getElementById('sub-dp-${task.id}-${s.id}').showPicker()"><svg
+                                                width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round">
+                                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                                            </svg></button>
+                                        <input type="date" id="sub-dp-${task.id}-${s.id}"
+                                            style="visibility:hidden; position:absolute; width:0; height:0;"
+                                            onchange="const v = this.value.replace(/-/g, '/'); document.getElementById('sub-deadline-${task.id}-${s.id}').value = v; updateSubtask('${task.id}', '${s.id}', 'deadline', v)">`
+                                : ''}
+                                    </div>
+                                </div>
+                                <!-- Round 56: Subtask Memo Toggle -->
+                                ${!ro ? `
+                                <div id="sub-memo-view-${task.id}-${s.id}"
+                                    class="sub-memo-area memo-view-mode ${!s.memo ? 'empty-memo' : ''}"
+                                    onclick="toggleMemoEdit('${task.id}', '${s.id}', true, 'sub')">${s.memo ?
+                                    linkify(escapeHtml(s.memo)) : '詳細を入力'}</div>
+                                <textarea id="sub-memo-edit-${task.id}-${s.id}" class="sub-memo-area hidden"
+                                    placeholder="詳細を入力" oninput="autoResize(this)"
+                                    onblur="toggleMemoEdit('${task.id}', '${s.id}', false, 'sub'); updateSubtask('${task.id}','${s.id}','memo',this.value)">${escapeHtml(s.memo)}</textarea>
+                                ` : `
+                                <div class="sub-memo-area memo-view-mode">${s.memo ? linkify(escapeHtml(s.memo)) : '(詳細なし)'}
+                                </div>
+                                `}
+                            </div>
+                            <div class="sub-actions-row">
+                                ${!ro ? `<button class="btn-mini-complete"
+                                    onclick="toggleSubtaskComplete('${task.id}','${s.id}')">${s.isArchived ? '戻す' :
+                                    '完了'}</button>
+                                <button class="btn-mini" onclick="moveSubtask('${task.id}','${s.id}','up')"><svg
+                                        width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="18 15 12 9 6 15"></polyline>
+                                    </svg></button>
+                                <button class="btn-mini" onclick="moveSubtask('${task.id}','${s.id}','down')"><svg
+                                        width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg></button>
+                                <button class="btn-mini del" onclick="deleteSubtask('${task.id}','${s.id}')"><svg
+                                        width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path
+                                            d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                        </path>
+                                    </svg></button>` : ''}
+                            </div>
+                        </div>
+                    </div>`;
+                    };
+                    active.forEach(s => subHtml += genRow(s));
+                    if (compl.length) {
+                        if (expandedSubtasksMap[task.id]) {
+                            compl.forEach(s => subHtml += genRow(s)); subHtml +=
+                                `<button class="btn-sub-toggle"
+                        onclick="toggleSubtaskVisibility('${task.id}')">完了したサブタスクを隠す</button>`;
+                        }
+                        else subHtml += `<button class="btn-sub-toggle"
+                        onclick="toggleSubtaskVisibility('${task.id}')">完了したサブタスクを表示 (${compl.length})</button>`;
+                    }
+                }
+
+                const cOpts = appData.settings.categories.map(c => `<option value="${c.id}" ${task.category === c.id
+                    ? 'selected' : ''}>${c.name}</option>`).join('');
+                const categoryName = appData.settings.categories.find(c => c.id === task.category)?.name || '';
+                const sOpts = appData.settings.statuses.map(s => `<option value="${s.id}" ${task.status === s.id
+                    ? 'selected' : ''}>${s.name}</option>`).join('');
+
+                let btns = '';
+                if (showActive) btns = `<div class="action-block"><button class="btn-complete-action"
+                            onclick="toggleComplete('${task.id}')">完了</button>
+                        <div class="action-row-buttons"><button class="icon-action-btn"
+                                onclick="moveTask('${task.id}','up')"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <polyline points="18 15 12 9 6 15"></polyline>
+                                </svg></button><button class="icon-action-btn"
+                                onclick="moveTask('${task.id}','down')"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg></button><button class="icon-action-btn btn-del"
+                                onclick="deleteTask('${task.id}')"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path
+                                        d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                    </path>
+                                </svg></button>
+                        </div>
+                    </div>`;
+                else if (showArchived) btns = `<div class="action-block"><button class="btn-complete-action clean"
+                            onclick="toggleComplete('${task.id}')">戻す</button>
+                        <div class="action-row-buttons"><button class="icon-action-btn btn-del"
+                                onclick="deleteTask('${task.id}')"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path
+                                        d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                    </path>
+                                </svg></button></div>
+                    </div>`;
+                else if (showTrash) btns = `<div class="action-block"><button class="btn-complete-action clean"
+                            onclick="restoreTask('${task.id}')">復元</button>
+                        <div class="action-row-buttons"><button class="icon-action-btn btn-del"
+                                onclick="deleteTask('${task.id}')"><svg width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg></button></div>
+                    </div>`;
+
+                const tsCreated = `<span class="ts-item"><span
+                            class="ts-label">作成日:</span>${formatDate(task.createdAt)}</span>`;
+                const tsUpdated = task.updatedAt !== task.createdAt ? `<span class="ts-item"><span
+                            class="ts-label">更新日:</span>${formatDate(task.updatedAt)}</span>` : '';
+                const tsCompleted = task.isArchived && task.archivedAt ? `<span class="ts-item"><span
+                            class="ts-label" style="color:#45B06C">完了日:</span>${formatDate(task.archivedAt)}</span>` :
+                    '';
+
+                li.innerHTML = `
+                    ${showActive ? `<div class="drag-handle" onclick="event.stopPropagation(); toggleQuickMoveMenu(event, '${task.id}')">⋮⋮</div>` : ''}
+                    <div class="task-content-wrapper" data-category="${escapeHtml(categoryName)}">
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <input type="text" class="task-title-input" value="${escapeHtml(task.name)}"
+                                onchange="updateTask('${task.id}','name',this.value)" ${ro ? 'disabled' : ''}>
+                        </div>
+                        <div class="task-meta-row">
+                            <select class="badge-select" onchange="updateTask('${task.id}','category',this.value)" ${ro
+                        ? 'disabled' : ''}>${cOpts}</select>
+                            <select class="badge-select" onchange="updateTask('${task.id}','status',this.value)"
+                                style="color:${sConfig.color}" ${ro ? 'disabled' : ''}>${sOpts}</select>
+                            <div class="date-input-wrapper">
+                                <input type="text" class="meta-input has-picker" value="${escapeHtml(task.deadline)}"
+                                    placeholder="期限を入力" id="deadline-${task.id}"
+                                    onchange="updateTask('${task.id}','deadline',this.value)" ${ro ? 'disabled' : ''}>
+                                ${!ro ? `<button class="btn-calendar"
+                                    onclick="document.getElementById('dp-${task.id}').showPicker()"><svg width="14"
+                                        height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                                    </svg></button>
+                                <input type="date" id="dp-${task.id}"
+                                    style="visibility:hidden; position:absolute; width:0; height:0;"
+                                    onchange="const v = this.value.replace(/-/g, '/'); document.getElementById('deadline-${task.id}').value = v; updateTask('${task.id}', 'deadline', v)">`
+                        : ''}
+                            </div>
+                        </div>
+
+                        <!-- Round 56: Task Memo Toggle -->
+                        ${!ro ? `
+                        <div id="memo-view-${task.id}"
+                            class="memo-area memo-view-mode ${!task.memo ? 'empty-memo' : ''}"
+                            onclick="toggleMemoEdit('${task.id}', null, true, 'main')">${task.memo ?
+                            linkify(escapeHtml(task.memo)) : '詳細を入力'}</div>
+                        <textarea id="memo-edit-${task.id}" class="memo-area hidden" rows="1" placeholder="詳細を入力"
+                            oninput="autoResize(this)"
+                            onblur="toggleMemoEdit('${task.id}', null, false, 'main'); updateTask('${task.id}','memo',this.value)">${escapeHtml(task.memo)}</textarea>
+                        ` : `
+                        <div class="memo-area memo-view-mode">${task.memo ? linkify(escapeHtml(task.memo)) : '(詳細なし)'}</div>
+                        `}
+
+                        <div class="subtasks-wrapper">
+                            ${subHtml}
+                            ${!ro ? `<button class="btn-add-sub" onclick="addSubtask('${task.id}')">＋
+                                サブタスクを追加</button>` : ''}
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        ${btns}
+                        <div class="timestamps">
+                            ${tsCreated}
+                            ${tsUpdated}
+                            ${tsCompleted}
+                        </div>
+                    </div>
+                    `;
+                list.appendChild(li);
+            });
+
+            // Round 28: Auto-Resize Memo after Render
+            setTimeout(() => {
+                document.querySelectorAll('textarea').forEach(el => autoResize(el));
+            }, 0);
+        }
+
+        function updateSelectColor(sel) {
+            const s = appData.settings.statuses.find(x => x.id === sel.value);
+            if (s) { sel.style.color = s.color; sel.style.fontWeight = '700'; } else sel.style.color =
+                '#333';
+        }
+
+        // CRUD
+        function autoResize(el) {
+            el.style.height = 'auto'; // Reset
+            el.style.height = (el.scrollHeight + 2) + 'px'; // +2 for border safety
+        }
+        function escapeHtml(s) {
+            return s ? s.replace(/[&<>"']/g, m => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": ' &#039;'
+            }[m])) : '';
+        }
+        function formatDate(is) {
+            if (!is) return '';
+            const d = new Date(is);
+            return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} ${d.getHours()}:${d.getMinutes().toString().padStart(2, '0')}`;
+        }
+
+        // Restored Dark Mode
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateDarkModeUI(isDark);
+        }
+
+        function initDarkMode() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.body.classList.add('dark-mode');
+                updateDarkModeUI(true);
+            } else {
+                updateDarkModeUI(false);
+            }
+
+            // キーボード操作対応
+            const toggleSwitch = document.getElementById('themeToggleSwitch');
+            if (toggleSwitch) {
+                toggleSwitch.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggleDarkMode();
+                    }
+                });
+            }
+        }
+
+        function updateDarkModeUI(isDark) {
+            const toggleSwitch = document.getElementById('themeToggleSwitch');
+            const lightIcon = document.querySelector('.theme-icon-light');
+            const darkIcon = document.querySelector('.theme-icon-dark');
+
+            if (toggleSwitch) {
+                toggleSwitch.setAttribute('aria-checked', isDark);
+            }
+            if (lightIcon) {
+                lightIcon.classList.toggle('active', !isDark);
+            }
+            if (darkIcon) {
+                darkIcon.classList.toggle('active', isDark);
+            }
+        }
+
+        function saveData() {
+            const memoEl = document.getElementById('globalMemo');
+            if (memoEl) {
+                appData.globalMemo = memoEl.value;
+            }
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+        }
+
+        function resetView() {
+            setViewMode('active');
+            setFilter('all');
+        }
+
+        function setFilter(c) {
+            filterCategory = c;
+            renderApp();
+        }
+
+        function setViewMode(m) {
+            viewMode = m;
+            const f = document.getElementById('inputFormSection');
+            const t = document.getElementById('trashControls');
+
+            // Always show form, but disable it if not active
+            f.style.display = 'block';
+            if (m === 'active') {
+                f.classList.remove('disabled-area');
+            } else {
+                f.classList.add('disabled-area');
+            }
+
+            // Toggle Trash Controls (below disabled form)
+            if (m === 'trash') {
+                t.style.display = 'block';
+            } else {
+                t.style.display = 'none';
+            }
+
+            // Update active button state and aria-selected
+            ['active', 'archived', 'trash'].forEach(mode => {
+                const btn = document.getElementById('btn-view-' + mode);
+                if (btn) {
+                    btn.classList.toggle('active', mode === m);
+                    btn.setAttribute('aria-selected', mode === m ? 'true' : 'false');
+                }
+            });
+
+            renderTasks();
+        }
+
+        // Initial Render call
+        renderTasks();
+
+
+        function addTask() {
+            const n = document.getElementById('inputName'); if (!n.value.trim()) {
+                alert('入力してください'); return;
+            }
+            const now = new Date().toISOString();
+            appData.tasks.unshift({
+                id: Date.now().toString(), name: n.value, status:
+                    document.getElementById('inputStatus').value, category:
+                    document.getElementById('inputCategory').value, deadline:
+                    document.getElementById('inputDeadline').value, memo:
+                    document.getElementById('inputMemo').value, isArchived: false, isDeleted: false,
+                createdAt: now, updatedAt: now, archivedAt: '', subtasks: []
+            });
+            saveData(); renderTasks(); n.value = ''; document.getElementById('inputDeadline').value
+                = ''; document.getElementById('inputMemo').value = '';
+
+            // Show success toast and return focus
+            openSuccessModal();
+            n.focus();
+        }
+        function updateTask(id, f, v) {
+            const t = appData.tasks.find(x => x.id === id); if (t) {
+                t[f] = v; t.updatedAt = new Date().toISOString(); saveData(); if (['status',
+                    'category'].includes(f)) renderTasks();
+            }
+        }
+
+        function toggleComplete(id) {
+            const t = appData.tasks.find(x => x.id === id);
+            if (t) {
+                t.isArchived = !t.isArchived;
+                t.updatedAt = new Date().toISOString();
+                if (t.isArchived) t.archivedAt = new Date().toISOString();
+                else t.archivedAt = '';
+                saveData(); renderTasks();
+            }
+        }
+
+        function deleteTask(id) {
+            if (viewMode === 'trash') {
+                if (confirm('完全削除?'))
+                    appData.tasks = appData.tasks.filter(x => x.id !== id);
+            } else {
+                const t =
+                    appData.tasks.find(x => x.id === id); if (t) t.isDeleted = true;
+            } saveData();
+            renderTasks();
+        }
+        function restoreTask(id) {
+            const t = appData.tasks.find(x => x.id === id); if (t)
+                t.isDeleted = false; saveData(); renderTasks();
+        }
+        function emptyTrash() {
+            if (confirm('空にする?')) appData.tasks = appData.tasks.filter(x =>
+                !x.isDeleted); saveData(); renderTasks();
+        }
+        function moveTask(id, d) {
+            const i = appData.tasks.findIndex(x => x.id === id);
+            if (i < 0) return;
+
+            if (d === 'up' && i > 0) {
+                [appData.tasks[i], appData.tasks[i - 1]] = [appData.tasks[i - 1], appData.tasks[i]];
+                saveData();
+                renderTasks();
+            } else if (d === 'down' && i < appData.tasks.length - 1) {
+                [appData.tasks[i], appData.tasks[i + 1]] = [appData.tasks[i + 1], appData.tasks[i]];
+                saveData();
+                renderTasks();
+            }
+        }
+
+        function addSubtask(tid) {
+            // Round 48: Use Custom Modal
+            openSubtaskModal(tid);
+        }
+        function updateSubtask(tid, sid, f, v) {
+            const
+                t = appData.tasks.find(x => x.id === tid);
+            if (t) {
+                const s = t.subtasks.find(y => y.id === sid);
+                if (s) {
+                    s[f] = v;
+                    saveData();
+                    if (f === 'status') renderTasks();
+                }
+            }
+        }
+        function toggleSubtaskComplete(tid, sid) {
+            const t = appData.tasks.find(x =>
+                x.id === tid); if (t) {
+                    const s = t.subtasks.find(y => y.id === sid); if (s) {
+                        s.isArchived = !s.isArchived; saveData(); renderTasks();
+                    }
+                }
+        }
+        function deleteSubtask(tid, sid) {
+            const t = appData.tasks.find(x => x.id ===
+                tid); if (t) {
+                    t.subtasks = t.subtasks.filter(y => y.id !== sid); saveData();
+                    renderTasks();
+                }
+        }
+        function toggleSubtaskVisibility(tid) {
+            expandedSubtasksMap[tid] =
+                !expandedSubtasksMap[tid]; renderTasks();
+        }
+
+        function moveSubtask(taskId, subtaskId, direction) {
+            const t = appData.tasks.find(x => x.id === taskId);
+            if (!t || !t.subtasks) return;
+            const idx = t.subtasks.findIndex(s => s.id === subtaskId);
+            if (idx === -1) return;
+
+            if (direction === 'up') {
+                if (idx > 0) {
+                    const temp = t.subtasks[idx];
+                    t.subtasks[idx] = t.subtasks[idx - 1];
+                    t.subtasks[idx - 1] = temp;
+                    saveData(); renderTasks();
+                }
+            } else {
+                if (idx < t.subtasks.length - 1) {
+                    const temp = t.subtasks[idx];
+                    t.subtasks[idx] = t.subtasks[idx + 1]; t.subtasks[idx + 1] = temp; saveData();
+                    renderTasks();
+                }
+            }
+        } // Subtask DnD Globals let draggedSubtask=null; let
+        draggedSubtaskParentId = null; window.handleSubtaskDragStart = function (e) {
+            e.stopPropagation(); // Critical: Prevent parent drag
+            draggedSubtask = e.currentTarget;
+            draggedSubtaskParentId = e.currentTarget.dataset.parentId;
+            e.currentTarget.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', e.currentTarget.dataset.subId);
+            e.dataTransfer.setData('application/x-subtask-id',
+                e.currentTarget.dataset.subId); // Custom type 
+        };
+        window.handleSubtaskDragOver = function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const target = e.currentTarget;
+
+            // Only allow dropping if parents match
+            if (target.dataset.parentId !== draggedSubtaskParentId) {
+                e.dataTransfer.dropEffect = 'none';
+                return;
+            }
+            e.dataTransfer.dropEffect = 'move';
+
+            if (target === draggedSubtask) return;
+
+            const rect = target.getBoundingClientRect();
+            const offset = e.clientY - rect.top;
+            const midY = rect.height / 2;
+
+            // Real-time DOM Sorting
+            const parent = target.parentNode;
+            if (offset < midY) {
+                parent.insertBefore(draggedSubtask, target);
+            } else {
+                parent.insertBefore(draggedSubtask, target.nextSibling);
+            }
+        };
+
+        window.handleSubtaskDrop = function (e) {
+            e.stopPropagation();
+            const target = e.currentTarget;
+            if (draggedSubtask) {
+                draggedSubtask.classList.remove('dragging');
+            }
+            if (target.dataset.parentId !== draggedSubtaskParentId) return;
+
+            const t = appData.tasks.find(x => x.id === draggedSubtaskParentId);
+            if (!t) return;
+            if (!draggedSubtask) return;
+
+            const container = draggedSubtask.parentNode;
+            const newSubtasks = [];
+            const rows = Array.from(container.children).filter(c => c.classList.contains('subtask-row'));
+
+            rows.forEach(row => {
+                const sid = row.dataset.subId;
+                const sub = t.subtasks.find(s => s.id === sid);
+                if (sub) newSubtasks.push(sub);
+            });
+
+            const archived = t.subtasks.filter(s => s.isArchived);
+            t.subtasks = [...newSubtasks, ...archived];
+
+            saveData();
+            renderTasks();
+
+            draggedSubtask = null;
+            draggedSubtaskParentId = null;
+        };
+
+        window.handleSubtaskDragEnd = function (e) {
+            e.stopPropagation();
+            if (draggedSubtask) {
+                draggedSubtask.classList.remove('dragging');
+            }
+            draggedSubtask = null;
+            draggedSubtaskParentId = null;
+        };
+
+        /* Round 56: Generic Memo Toggle & Linkify */
+        window.toggleMemoEdit = function (taskId, subId, edit, type) {
+            let viewId, editId;
+            if (type === 'main') {
+                viewId = `memo-view-${taskId}`;
+                editId = `memo-edit-${taskId}`;
+            } else {
+                viewId = `sub-memo-view-${taskId}-${subId}`;
+                editId = `sub-memo-edit-${taskId}-${subId}`;
+            }
+
+            const view = document.getElementById(viewId);
+            const area = document.getElementById(editId);
+            if (!view || !area) return;
+
+            if (edit) {
+                view.classList.add('hidden');
+                area.classList.remove('hidden');
+                autoResize(area); // Ensure correct height
+                area.focus();
+            } else {
+                area.classList.add('hidden');
+                view.classList.remove('hidden');
+
+                // Update view content immediately
+                const text = area.value;
+                if (!text.trim()) {
+                    view.innerHTML = type === 'main' ? '詳細を入力' : '詳細を入力'; // Placeholder
+                    view.classList.add('empty-memo');
+                } else {
+                    view.innerHTML = linkify(escapeHtml(text));
+                    view.classList.remove('empty-memo');
+                }
+            }
+        };
+
+        function linkify(text) {
+            // URL Pattern: starting with http/https
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            return text.replace(urlRegex, function (url) {
+                return '<a href="' + url + '" target="_blank" onclick="event.stopPropagation()">' + url + '</a>';
+            }).replace(/\n/g, '<br>');
+        }
+
+        // Resizer
+        function initResizer() {
+            const r = document.getElementById('resizer');
+            r.addEventListener('mousedown', e => {
+                e.preventDefault();
+                r.classList.add('resizing'); document.body.style.cursor = 'col-resize'; const mv
+                    = me => {
+                        const w = me.clientX;
+                        // Added checks for min/max width
+                        if (w < 200) return; // Min width if (w> 600) return; // Max width
+                        document.documentElement.style.setProperty('--sidebar-width', w + 'px');
+                    };
+                const up = () => {
+                    r.classList.remove('resizing'); document.body.style.cursor =
+                        'default'; document.removeEventListener('mousemove', mv);
+                    document.removeEventListener('mouseup', up);
+                };
+                document.addEventListener('mousemove', mv);
+                document.addEventListener('mouseup', up);
+            });
+        }
+        // DnD
+        function handleDragStart(e) {
+            draggedItem = this;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            // Set data to ensure drag works on some browsers
+            e.dataTransfer.setData('text/plain', this.dataset.id);
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+
+            const target = this;
+            if (target === draggedItem || !draggedItem) return;
+
+            // Calculate position to decide insertion (Before or After)
+            const rect = target.getBoundingClientRect();
+            const offset = e.clientY - rect.top;
+            const midY = rect.height / 2;
+
+            const list = document.getElementById('taskList');
+            const items = Array.from(list.querySelectorAll('.task-card'));
+            const draggedIndex = items.indexOf(draggedItem);
+            const targetIndex = items.indexOf(target);
+
+            if (draggedIndex === -1 || targetIndex === -1) return;
+
+            let shouldMove = false;
+            if (offset < midY && draggedIndex > targetIndex) {
+                shouldMove = true;
+            } else if (offset >= midY && draggedIndex < targetIndex) {
+                shouldMove = true;
+            }
+
+            if (shouldMove) {
+                // FLIP: First - 移動前の位置を記録
+                const movingCards = items.filter(item => item !== draggedItem);
+                const firstPositions = new Map();
+                movingCards.forEach(card => {
+                    firstPositions.set(card, card.getBoundingClientRect());
+                });
+
+                // 実際のDOM移動
+                if (offset < midY && draggedIndex > targetIndex) {
+                    list.insertBefore(draggedItem, target);
+                } else {
+                    list.insertBefore(draggedItem, target.nextSibling);
+                }
+
+                // FLIP: Last, Invert, Play - アニメーション実行
+                movingCards.forEach(card => {
+                    const first = firstPositions.get(card);
+                    const last = card.getBoundingClientRect();
+                    const deltaY = first.top - last.top;
+
+                    if (Math.abs(deltaY) > 1) {
+                        card.style.transform = `translateY(${deltaY}px)`;
+                        card.style.transition = 'none';
+
+                        requestAnimationFrame(() => {
+                            card.style.transition = 'transform 150ms ease-out';
+                            card.style.transform = '';
+
+                            card.addEventListener('transitionend', function handler() {
+                                card.style.transition = '';
+                                card.removeEventListener('transitionend', handler);
+                            });
+                        });
+                    }
+                });
+            }
+
+            return false;
+        }
+
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+            // Clean up any remaining visual artifacts if needed
+            const list = document.getElementById('taskList');
+            Array.from(list.children).forEach(item => {
+                item.classList.remove('over'); // if we used this class
+            });
+        }
+
+        // Round 59: Missing handleDrop function
+        function handleDrop(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (!draggedItem) return;
+
+            // DOM操作は handleDragOver で完了しているため、データモデルの更新のみ
+            const list = document.getElementById('taskList');
+            const visibleTaskIds = Array.from(list.querySelectorAll('.task-card')).map(el => el.dataset.id);
+            const reorderedTasks = [];
+            const otherTasks = [];
+
+            appData.tasks.forEach(task => {
+                const index = visibleTaskIds.indexOf(task.id);
+                if (index !== -1) {
+                    reorderedTasks[index] = task;
+                } else {
+                    otherTasks.push(task);
+                }
+            });
+
+            appData.tasks = [...reorderedTasks.filter(t => t), ...otherTasks];
+            saveData();
+            draggedItem = null;
+        }
+
+        // Touch Drag & Drop Support
+        let touchDragItem = null;
+        let touchDragClone = null;
+        let touchStartY = 0;
+        let touchTimeout = null;
+        let isTouchDragging = false;
+
+        function handleTouchStart(e) {
+            const dragHandle = e.target.closest('.drag-handle');
+            if (!dragHandle) return;
+
+            const taskCard = e.target.closest('.task-card');
+            if (!taskCard) return;
+
+            touchStartY = e.touches[0].clientY;
+
+            // Long press to start drag (300ms)
+            touchTimeout = setTimeout(() => {
+                startTouchDrag(taskCard, e.touches[0]);
+            }, 300);
+        }
+
+        function startTouchDrag(element, touch) {
+            isTouchDragging = true;
+            touchDragItem = element;
+            element.classList.add('dragging');
+
+            // Create clone for visual feedback
+            touchDragClone = element.cloneNode(true);
+            touchDragClone.classList.add('touch-drag-clone');
+            touchDragClone.style.cssText = `
+                position: fixed;
+                left: ${element.getBoundingClientRect().left}px;
+                top: ${touch.clientY - 30}px;
+                width: ${element.offsetWidth}px;
+                opacity: 0.9;
+                z-index: 9999;
+                pointer-events: none;
+                transform: scale(1.02);
+                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            `;
+            document.body.appendChild(touchDragClone);
+
+            // Vibration feedback if available
+            if (navigator.vibrate) navigator.vibrate(50);
+        }
+
+        function handleTouchMove(e) {
+            if (!isTouchDragging || !touchDragClone) {
+                // Cancel long press if moved too much
+                if (touchTimeout && Math.abs(e.touches[0].clientY - touchStartY) > 10) {
+                    clearTimeout(touchTimeout);
+                    touchTimeout = null;
+                }
+                return;
+            }
+
+            e.preventDefault();
+            const touch = e.touches[0];
+            touchDragClone.style.top = `${touch.clientY - 30}px`;
+
+            // Find target element
+            const elementsBelow = document.elementsFromPoint(touch.clientX, touch.clientY);
+            const targetCard = elementsBelow.find(el =>
+                el.classList.contains('task-card') && el !== touchDragItem
+            );
+
+            if (targetCard && touchDragItem) {
+                const list = document.getElementById('taskList');
+                const items = Array.from(list.querySelectorAll('.task-card'));
+                const draggedIndex = items.indexOf(touchDragItem);
+                const targetIndex = items.indexOf(targetCard);
+
+                if (draggedIndex !== -1 && targetIndex !== -1) {
+                    const rect = targetCard.getBoundingClientRect();
+                    const offset = touch.clientY - rect.top;
+                    const midY = rect.height / 2;
+
+                    let shouldMove = false;
+                    if (offset < midY && draggedIndex > targetIndex) {
+                        shouldMove = true;
+                    } else if (offset >= midY && draggedIndex < targetIndex) {
+                        shouldMove = true;
+                    }
+
+                    if (shouldMove) {
+                        // FLIP: First - 移動前の位置を記録
+                        const movingCards = items.filter(item => item !== touchDragItem);
+                        const firstPositions = new Map();
+                        movingCards.forEach(card => {
+                            firstPositions.set(card, card.getBoundingClientRect());
+                        });
+
+                        // 実際のDOM移動
+                        if (offset < midY && draggedIndex > targetIndex) {
+                            list.insertBefore(touchDragItem, targetCard);
+                        } else {
+                            list.insertBefore(touchDragItem, targetCard.nextSibling);
+                        }
+
+                        // FLIP: Last, Invert, Play - アニメーション実行
+                        movingCards.forEach(card => {
+                            const first = firstPositions.get(card);
+                            const last = card.getBoundingClientRect();
+                            const deltaY = first.top - last.top;
+
+                            if (Math.abs(deltaY) > 1) {
+                                card.style.transform = `translateY(${deltaY}px)`;
+                                card.style.transition = 'none';
+
+                                requestAnimationFrame(() => {
+                                    card.style.transition = 'transform 150ms ease-out';
+                                    card.style.transform = '';
+
+                                    card.addEventListener('transitionend', function handler() {
+                                        card.style.transition = '';
+                                        card.removeEventListener('transitionend', handler);
+                                    });
+                                });
+                            }
+                        });
+                    }
+                }
+            }
+        }
+
+        function handleTouchEnd(e) {
+            clearTimeout(touchTimeout);
+            touchTimeout = null;
+
+            if (!isTouchDragging) return;
+
+            // DOM操作は handleTouchMove で完了しているため、データモデルの更新のみ
+            const list = document.getElementById('taskList');
+            const visibleTaskIds = Array.from(list.querySelectorAll('.task-card')).map(el => el.dataset.id);
+            const reorderedTasks = [];
+            const otherTasks = [];
+
+            appData.tasks.forEach(task => {
+                const index = visibleTaskIds.indexOf(task.id);
+                if (index !== -1) {
+                    reorderedTasks[index] = task;
+                } else {
+                    otherTasks.push(task);
+                }
+            });
+
+            appData.tasks = [...reorderedTasks.filter(t => t), ...otherTasks];
+            saveData();
+
+            // Cleanup
+            if (touchDragItem) touchDragItem.classList.remove('dragging');
+            if (touchDragClone) touchDragClone.remove();
+
+            touchDragItem = null;
+            touchDragClone = null;
+            isTouchDragging = false;
+        }
+
+        // Round 59: Missing toggleGlobalMemoEdit function
+        function toggleGlobalMemoEdit(isEdit) {
+            const view = document.getElementById('globalMemoView');
+            const edit = document.getElementById('globalMemo');
+
+            if (!view || !edit) return;
+
+            if (isEdit) {
+                view.classList.add('hidden');
+                edit.classList.remove('hidden');
+                autoResize(edit);
+                edit.focus();
+            } else {
+                edit.classList.add('hidden');
+                view.classList.remove('hidden');
+                updateGlobalMemoView();
+                saveData();
+            }
+        }
+
+        // Round 59: Missing updateGlobalMemoView function
+        function updateGlobalMemoView() {
+            const view = document.getElementById('globalMemoView');
+            const edit = document.getElementById('globalMemo');
+
+            if (!view || !edit) return;
+
+            const text = edit.value || appData.globalMemo || '';
+            if (!text.trim()) {
+                view.innerHTML = '自由記述のメモエリアです。タスク全体の概略や備忘録にお使いください';
+                view.classList.add('empty-memo');
+            } else {
+                view.innerHTML = linkify(escapeHtml(text));
+                view.classList.remove('empty-memo');
+            }
+        }
+
+        function submitNewSubtask() {
+            if (!currentHeaderSubtaskTaskId) return;
+            const input = document.getElementById('newSubtaskInput');
+            const name = input.value.trim();
+            if (!name) return;
+
+            const t = appData.tasks.find(x => x.id === currentHeaderSubtaskTaskId);
+            if (t) {
+                t.subtasks.push({
+                    id: Date.now().toString(),
+                    name: name,
+                    status: appData.settings.statuses[0].id,
+                    isArchived: false,
+                    // Round 29 Support
+                    deadline: '',
+                    memo: ''
+                });
+                saveData();
+                renderTasks();
+                closeSubtaskModal();
+            }
+        }
+
+        // Modal Management - Success (legacy)
+        function openSuccessModal() {
+            // Replaced with toast notification
+            showToast('タスクを登録しました', 'success');
+        }
+        function closeSuccessModal() {
+            const m = document.getElementById('successModal');
+            if (m) m.classList.remove('open');
+        }
+
+        // Toast Notification System
+        function showToast(message, type = 'success') {
+            // Remove existing toasts
+            document.querySelectorAll('.toast').forEach(t => t.remove());
+
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'polite');
+            document.body.appendChild(toast);
+
+            // Auto dismiss after 2.5 seconds
+            setTimeout(() => {
+                toast.classList.add('toast-fade-out');
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
+        }
+
+        // Modal Global Functions
+        window.openSettingsModal = function () {
+            console.log('Open Settings Modal Triggered');
+            const m = document.getElementById('settingsModal');
+            if (m) { m.classList.add('open'); renderSettingsLists(); }
+        }
+        window.closeSettingsModal = function () {
+            const m = document.getElementById('settingsModal');
+            if (m) { m.classList.remove('open'); renderApp(); }
+        }
+        window.openHelpModal = function () {
+            console.log('Open Help Modal Triggered');
+            const m = document.getElementById('helpModal');
+            if (m) m.classList.add('open');
+        }
+        window.closeHelpModal = function () {
+            const m = document.getElementById('helpModal');
+            if (m) m.classList.remove('open');
+        }
+        window.toggleSidebar = function () {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar) {
+                sidebar.classList.toggle('expanded');
+            }
+        }
+        window.openSubtaskModal = function (parentId) {
+            currentHeaderSubtaskTaskId = parentId;
+            const m = document.getElementById('subtaskModal');
+            if (m) {
+                m.classList.add('open');
+                setTimeout(() => document.getElementById('newSubtaskInput').focus(),
+                    100);
+            }
+        }
+        window.closeSubtaskModal = function () {
+            const m = document.getElementById('subtaskModal');
+            if (m) m.classList.remove('open');
+            // Cleanup input
+            const i = document.getElementById('newSubtaskInput');
+            if (i) i.value = '';
+        }
+
+        // Import Confirmation Modal Logic
+        window.openConfirmModal = function () {
+            const m = document.getElementById('confirmModal');
+            if (m) m.classList.add('open');
+        }
+        window.closeConfirmModal = function () {
+            const m = document.getElementById('confirmModal');
+            if (m) m.classList.remove('open');
+            pendingImportData = null; // Clear pending data
+            document.getElementById('importFile').value = ''; // Reset input
+        }
+        window.executeImport = function () {
+            if (pendingImportData) {
+                appData = pendingImportData;
+                pendingImportData = null; // Clear after use
+
+                // Update Global Memo UI BEFORE saveData (saveData reads from memoEl.value)
+                const memoEl = document.getElementById('globalMemo');
+                const memoView = document.getElementById('globalMemoView');
+                const memoText = appData.globalMemo || '';
+
+                if (memoEl) {
+                    memoEl.value = memoText;
+                    if (typeof autoResize === 'function') autoResize(memoEl);
+                }
+
+                // Now save data (will read correct memoEl.value)
+                saveData();
+
+                if (memoView) {
+                    if (memoText.trim()) {
+                        memoView.innerHTML = linkify(escapeHtml(memoText));
+                        memoView.classList.remove('empty-memo');
+                    } else {
+                        memoView.innerHTML = '自由記述のメモエリアです。タスク全体の概略や備忘録にお使いください';
+                        memoView.classList.add('empty-memo');
+                    }
+                }
+
+                renderApp();
+                closeConfirmModal();
+                alert('データを読み込みました。');
+            }
+        }
+
+        // Round 51: Generic Horizontal Scroll Logic
+        window.scrollNav = function (elementId, direction) {
+            const container = document.getElementById(elementId);
+            if (container) {
+                const scrollAmount = 150; // Increased responsiveness
+                if (direction === 'left') {
+                    container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+                } else {
+                    container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                }
+            }
+        }
+
+        function renderSettingsLists() {
+            const cl = document.getElementById('settingsCatList'), sl =
+                document.getElementById('settingsStatusList');
+            cl.innerHTML = appData.settings.categories.map((c, i) => {
+                if (editingCatIndex === i) return `<li class="settings-item"><input
+                                                        type="text" class="edit-input" id="editCatInput-${i}"
+                                                        value="${escapeHtml(c.name)}"><button class="btn-mini"
+                                                        onclick="saveEditCategory(${i})">保存</button></li>`;
+                return `<li class="settings-item"><span
+                                                        class="settings-item-name">${c.name}</span><button
+                                                        class="btn-mini" onclick="startEditCategory(${i})"><svg
+                                                            width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                                            stroke="currentColor" stroke-width="2"
+                                                            stroke-linecap="round" stroke-linejoin="round">
+                                                            <path d="M12 20h9"></path>
+                                                            <path
+                                                                d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z">
+                                                            </path>
+                                                        </svg></button><button class="btn-mini del"
+                                                        onclick="deleteCategory(${i})"><svg width="14" height="14"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                            stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round">
+                                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                                            <path
+                                                                d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                                            </path>
+                                                        </svg></button>
+                                                </li>`;
+            }).join('');
+            sl.innerHTML = appData.settings.statuses.map((s, i) => {
+                if (editingStatusIndex === i) return `<li class="settings-item"
+                                                    style="background:#f0f0f0;"><input type="color"
+                                                        id="editStatusColor-${i}" value="${s.color}"
+                                                        style="border:none;width:24px;height:24px;margin-right:4px;"><input
+                                                        type="text" class="edit-input" id="editStatusName-${i}"
+                                                        value="${escapeHtml(s.name)}"><button class="btn-mini"
+                                                        onclick="saveEditStatus(${i})">保存</button></li>`;
+                return `<li class="settings-item">
+                                                    <div class="settings-item-dot" style="background:${s.color}"></div>
+                                                    <span class="settings-item-name">${s.name}</span><button
+                                                        class="btn-mini" onclick="startEditStatus(${i})"><svg width="14"
+                                                            height="14" viewBox="0 0 24 24" fill="none"
+                                                            stroke="currentColor" stroke-width="2"
+                                                            stroke-linecap="round" stroke-linejoin="round">
+                                                            <path d="M12 20h9"></path>
+                                                            <path
+                                                                d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z">
+                                                            </path>
+                                                        </svg></button><button class="btn-mini del"
+                                                        onclick="deleteStatus(${i})"><svg width="14" height="14"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                            stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round">
+                                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                                            <path
+                                                                d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                                            </path>
+                                                        </svg></button>
+                                                </li>`;
+            }).join('');
+        }
+
+        // Round 28: Initial Version (Soft Reset)
+        function resetSettings() {
+            if
+                (confirm("カスタム設定（カテゴリ・ステータス）をすべてリセットし、初期状態に戻しますか？\n※既存のタスクデータは削除されませんが、カテゴリの割り当てなどが無効になる可能性があります。")) {
+                appData.settings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+                saveData();
+                closeSettingsModal();
+            }
+        }
+
+        // Round 28: Factory Reset (Hard Reset)
+        function factoryReset() {
+            if
+                (confirm("【警告】\nタスクを含むすべてのデータを完全に削除し、アプリを初期状態に戻します。\n削除されたデータは復元できません。\n\n本当によろしいですか？")) {
+                localStorage.removeItem(STORAGE_KEY);
+                // Also remove legacy keys if any
+                localStorage.removeItem('task_app_data_v25_ux');
+                localStorage.removeItem('task_app_data_v24_settings');
+                location.reload();
+            }
+        }
+
+        function addCategory() {
+            const v =
+                document.getElementById('newCatName').value.trim(); if (v) {
+                    appData.settings.categories.push({ id: 'c_' + Date.now(), name: v });
+                    saveData(); document.getElementById('newCatName').value = '';
+                    renderSettingsLists();
+                }
+        }
+        function startEditCategory(i) {
+            editingCatIndex = i; renderSettingsLists();
+        }
+        function saveEditCategory(i) {
+            const v =
+                document.getElementById(`editCatInput-${i}`).value.trim(); if (v) {
+                    appData.settings.categories[i].name = v; saveData();
+                } editingCatIndex = -1;
+            renderSettingsLists();
+        }
+        function deleteCategory(i) {
+            if (appData.settings.categories.length > 1 &&
+                confirm("削除してよいですか？")) {
+                appData.settings.categories.splice(i, 1); saveData();
+                renderSettingsLists();
+            }
+        }
+
+        function selectColor(c) {
+            selectedNewStatusColor = c;
+            document.getElementById('customColorPicker').value = c;
+            document.querySelectorAll('.color-opt').forEach(e =>
+                e.classList.toggle('selected', e.dataset.col === c));
+        }
+        function addStatus() {
+            const v =
+                document.getElementById('newStatusName').value.trim(); if (v) {
+                    appData.settings.statuses.push({
+                        id: 's_' + Date.now(), name: v, color:
+                            selectedNewStatusColor
+                    }); saveData();
+                    document.getElementById('newStatusName').value = '';
+                    renderSettingsLists();
+                }
+        }
+        function startEditStatus(i) {
+            editingStatusIndex = i; renderSettingsLists();
+        }
+        function saveEditStatus(i) {
+            const v =
+                document.getElementById(`editStatusName-${i}`).value.trim(); const c =
+                    document.getElementById(`editStatusColor-${i}`).value; if (v) {
+                        appData.settings.statuses[i].name = v;
+                        appData.settings.statuses[i].color =
+                            c; saveData();
+                    } editingStatusIndex = -1; renderSettingsLists();
+        }
+        function deleteStatus(i) {
+            if (appData.settings.statuses.length > 1 &&
+                confirm("削除してよいですか？")) {
+                appData.settings.statuses.splice(i, 1); saveData();
+                renderSettingsLists();
+            }
+        }
+
+        // ===== QUICK MOVE MENU =====
+        let currentQuickMoveTaskId = null;
+
+        function toggleQuickMoveMenu(event, taskId) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const menu = document.getElementById('quickMoveMenu');
+            const handle = event.currentTarget;
+
+            // 既に開いている場合は閉じる
+            if (menu.style.display !== 'none' && currentQuickMoveTaskId === taskId) {
+                closeQuickMoveMenu();
+                return;
+            }
+
+            currentQuickMoveTaskId = taskId;
+
+            // メニュー位置を計算
+            const rect = handle.getBoundingClientRect();
+            const menuWidth = 160;
+            const menuHeight = 200;
+
+            let left = rect.left;
+            let top = rect.bottom + 8;
+
+            // 画面外に出る場合の調整
+            if (left + menuWidth > window.innerWidth) {
+                left = window.innerWidth - menuWidth - 16;
+            }
+            if (top + menuHeight > window.innerHeight) {
+                top = rect.top - menuHeight - 8;
+            }
+
+            menu.style.left = left + 'px';
+            menu.style.top = top + 'px';
+            menu.style.display = 'block';
+
+            // 外側クリックで閉じる
+            setTimeout(() => {
+                document.addEventListener('click', closeQuickMoveMenuOnOutsideClick);
+                document.addEventListener('touchstart', closeQuickMoveMenuOnOutsideClick);
+            }, 0);
+        }
+
+        function closeQuickMoveMenu() {
+            const menu = document.getElementById('quickMoveMenu');
+            menu.style.display = 'none';
+            currentQuickMoveTaskId = null;
+            document.removeEventListener('click', closeQuickMoveMenuOnOutsideClick);
+            document.removeEventListener('touchstart', closeQuickMoveMenuOnOutsideClick);
+        }
+
+        function closeQuickMoveMenuOnOutsideClick(e) {
+            const menu = document.getElementById('quickMoveMenu');
+            if (!menu.contains(e.target) && !e.target.closest('.drag-handle')) {
+                closeQuickMoveMenu();
+            }
+        }
+
+        function quickMoveTask(action) {
+            if (!currentQuickMoveTaskId) return;
+
+            // フィルタリングされたタスク（表示中のタスク）を取得
+            const visibleTasks = appData.tasks.filter(t => {
+                if (filterCategory !== 'all' && t.category !== filterCategory) return false;
+                if (viewMode === 'active') return !t.isDeleted && !t.isArchived;
+                if (viewMode === 'archived') return !t.isDeleted && t.isArchived;
+                if (viewMode === 'trash') return t.isDeleted;
+                return false;
+            });
+
+            const taskIndex = visibleTasks.findIndex(t => t.id === currentQuickMoveTaskId);
+            if (taskIndex === -1) {
+                closeQuickMoveMenu();
+                return;
+            }
+
+            let newIndex;
+
+            switch (action) {
+                case 'top':
+                    newIndex = 0;
+                    break;
+                case 'bottom':
+                    newIndex = visibleTasks.length - 1;
+                    break;
+                case 'up5':
+                    newIndex = Math.max(0, taskIndex - 5);
+                    break;
+                case 'down5':
+                    newIndex = Math.min(visibleTasks.length - 1, taskIndex + 5);
+                    break;
+                default:
+                    closeQuickMoveMenu();
+                    return;
+            }
+
+            if (newIndex === taskIndex) {
+                closeQuickMoveMenu();
+                return;
+            }
+
+            // appData.tasks 内での実際のインデックスを特定
+            const globalFromIndex = appData.tasks.findIndex(t => t.id === currentQuickMoveTaskId);
+            const targetTask = visibleTasks[newIndex];
+            const globalToIndex = appData.tasks.findIndex(t => t.id === targetTask.id);
+
+            // 配列から削除
+            const [movedTask] = appData.tasks.splice(globalFromIndex, 1);
+
+            // 挿入位置を再計算（削除後のインデックス）
+            let insertIndex = appData.tasks.findIndex(t => t.id === targetTask.id);
+            if (globalFromIndex < globalToIndex) {
+                insertIndex++; // 下へ移動する場合は後ろに挿入
+            }
+
+            appData.tasks.splice(insertIndex, 0, movedTask);
+
+            saveData();
+            renderTasks();
+            closeQuickMoveMenu();
+
+            // フィードバック
+            if (navigator.vibrate) navigator.vibrate(30);
+            showToast('タスクを移動しました', 'success');
+        }
+
+        // クイック移動メニューのボタンイベント初期化
+        function initQuickMoveMenu() {
+            document.querySelectorAll('.quick-move-item').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    quickMoveTask(btn.dataset.action);
+                });
+            });
+        }
+
+        // ===== COMPACT REORDER MODE =====
+        let isCompactReorderMode = false;
+
+        function toggleCompactReorderMode() {
+            isCompactReorderMode = !isCompactReorderMode;
+            document.body.classList.toggle('compact-reorder-mode', isCompactReorderMode);
+
+            const btn = document.getElementById('btnReorderMode');
+            btn.classList.toggle('active', isCompactReorderMode);
+
+            // アクセシビリティ
+            btn.setAttribute('aria-pressed', isCompactReorderMode);
+
+            // フィードバック
+            if (isCompactReorderMode) {
+                showToast('並び替えモードON', 'success');
+            }
+        }
+
+        // DOMContentLoaded時に初期化
+        document.addEventListener('DOMContentLoaded', function () {
+            // 既存の初期化処理の後に追加
+            setTimeout(() => {
+                initQuickMoveMenu();
+            }, 100);
+        });
+
+    </script>
+</body>
+
+</html>
