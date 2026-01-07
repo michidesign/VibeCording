@@ -472,7 +472,7 @@
         /* Japanese text optimization */
         :lang(ja) {
             font-feature-settings: "palt" 1;
-            line-height: 1.7;
+            line-height: 1.5;
         }
 
         /* Form elements inherit font */
@@ -613,7 +613,7 @@
             font-size: 32px;
             font-weight: 700;
             color: var(--text-main);
-            letter-spacing: 0.05em;
+            letter-spacing: 0;
             margin: 0;
             cursor: pointer;
             transition: opacity var(--duration-normal) var(--ease-out);
@@ -660,10 +660,10 @@
         .nav-btn {
             background: transparent;
             border: none;
-            padding: 8px 16px;
+            padding: 6px 12px;
             border-radius: var(--radius-xs);
             font-family: var(--font-text);
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
             color: var(--color-label-secondary);
             cursor: pointer;
@@ -869,9 +869,15 @@
         }
 
         .task-card.dragging {
-            opacity: 0.6;
+            opacity: 0.4;
             transform: scale(0.98);
             box-shadow: none;
+            background: var(--color-background-tertiary);
+        }
+
+        /* ドラッグ中のリアルタイム移動アニメーション */
+        .task-card.drag-animated {
+            transition: transform 150ms ease-out;
         }
 
         /* Completed/Archived */
@@ -892,6 +898,242 @@
 
         .drag-handle:hover {
             color: var(--accent-gray);
+        }
+
+        /* ===== QUICK MOVE MENU ===== */
+        .quick-move-menu {
+            position: fixed;
+            z-index: 3000;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-lg);
+            padding: 6px;
+            min-width: 140px;
+            animation: menuFadeIn 150ms var(--ease-out);
+        }
+
+        @keyframes menuFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(-4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .quick-move-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 10px 12px;
+            background: transparent;
+            border: none;
+            border-radius: var(--radius-xs);
+            font-family: var(--font-text);
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: background var(--duration-fast) var(--ease-out);
+            text-align: left;
+        }
+
+        .quick-move-item:hover {
+            background: var(--color-background-tertiary);
+        }
+
+        .quick-move-item:active {
+            background: var(--accent-blue);
+            color: #ffffff;
+        }
+
+        .quick-move-item svg {
+            flex-shrink: 0;
+            stroke: currentColor;
+        }
+
+        /* ===== MODE TOGGLE BUTTONS (並び替え + ダークモード) ===== */
+        .mode-toggle-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .btn-mode-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex: 1;
+            padding: 10px 12px;
+            background: var(--color-background-tertiary);
+            border: 1px solid transparent;
+            border-radius: var(--radius-xs);
+            font-family: var(--font-text);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--color-label-secondary);
+            cursor: pointer;
+            transition: all var(--duration-fast) var(--ease-out);
+        }
+
+        .btn-mode-toggle:hover {
+            background: var(--color-background-secondary);
+            color: var(--text-main);
+        }
+
+        .btn-mode-toggle.active {
+            background: var(--accent-blue);
+            color: #ffffff;
+            border-color: var(--accent-blue);
+        }
+
+        .btn-mode-toggle svg {
+            flex-shrink: 0;
+        }
+
+        /* Theme Toggle Switch */
+        .theme-toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: var(--color-background-tertiary);
+            border: 1px solid transparent;
+            border-radius: var(--radius-xs);
+            cursor: pointer;
+            transition: all var(--duration-fast) var(--ease-out);
+        }
+
+        .theme-toggle-switch:hover {
+            background: var(--color-background-secondary);
+        }
+
+        .theme-toggle-switch:focus {
+            outline: 2px solid var(--accent-blue);
+            outline-offset: 2px;
+        }
+
+        .theme-icon {
+            color: var(--color-label-tertiary);
+            transition: color var(--duration-fast) var(--ease-out);
+            flex-shrink: 0;
+        }
+
+        .theme-icon-light.active {
+            color: var(--color-orange, #FF9500);
+        }
+
+        .theme-icon-dark.active {
+            color: var(--accent-blue);
+        }
+
+        .theme-switch-track {
+            width: 36px;
+            height: 20px;
+            background: var(--color-label-quaternary, #D1D1D6);
+            border-radius: 10px;
+            position: relative;
+            transition: background var(--duration-fast) var(--ease-out);
+        }
+
+        body.dark-mode .theme-switch-track {
+            background: var(--accent-blue);
+        }
+
+        .theme-switch-thumb {
+            width: 16px;
+            height: 16px;
+            background: #ffffff;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: transform var(--duration-fast) var(--ease-out);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        body.dark-mode .theme-switch-thumb {
+            transform: translateX(16px);
+        }
+
+        /* コンパクトモード時のタスクカード */
+        body.compact-reorder-mode .task-card {
+            padding: 10px 16px;
+            gap: 12px;
+            align-items: center;
+            min-height: 44px;
+        }
+
+        body.compact-reorder-mode .task-content-wrapper {
+            flex-direction: row;
+            align-items: center;
+            gap: 12px;
+        }
+
+        body.compact-reorder-mode .task-title-input {
+            font-size: 15px;
+            flex: 1 1 0;
+            padding: 0;
+            width: 100% !important;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* タスク名のラッパーdivを広げる */
+        body.compact-reorder-mode .task-content-wrapper>div:first-child {
+            flex: 1 1 0;
+            min-width: 0;
+        }
+
+        /* コンパクトモードで非表示にする要素（タスクカード内のみ） */
+        body.compact-reorder-mode .task-card .task-meta-row,
+        body.compact-reorder-mode .task-card .memo-area,
+        body.compact-reorder-mode .task-card .memo-view-mode,
+        body.compact-reorder-mode .task-card .subtasks-wrapper,
+        body.compact-reorder-mode .task-card .task-actions,
+        body.compact-reorder-mode .task-card .timestamps {
+            display: none !important;
+        }
+
+        /* カテゴリバッジ表示 */
+        body.compact-reorder-mode .task-content-wrapper::after {
+            content: attr(data-category);
+            font-size: 11px;
+            padding: 3px 8px;
+            background: var(--color-background-tertiary);
+            border-radius: var(--radius-xs);
+            color: var(--color-label-secondary);
+            white-space: nowrap;
+            flex-shrink: 0;
+            max-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ドラッグハンドルのスタイル調整 */
+        body.compact-reorder-mode .drag-handle {
+            padding-top: 0;
+            font-size: 18px;
+        }
+
+        /* ホバー効果を抑制 */
+        body.compact-reorder-mode .task-card:hover {
+            transform: none;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* タッチデバイス対応 */
+        @media (hover: none) {
+            .quick-move-item {
+                padding: 14px 12px;
+            }
         }
 
         .task-content-wrapper {
@@ -2247,29 +2489,8 @@
                 </div>
 
                 <div style="display:flex; flex-direction:column; gap:4px; margin-top: 20px;"> <!-- Reduced Gap -->
-                    <!-- Search Section -->
-                    <div>
-                        <span class="section-label">SEARCH</span>
-                        <div class="search-wrapper">
-                            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="11" cy="11" r="8"></circle>
-                                <path d="m21 21-4.35-4.35"></path>
-                            </svg>
-                            <input type="text" id="searchInput" class="search-input" placeholder="タスクを検索..."
-                                aria-label="タスク検索">
-                            <button class="search-clear" id="searchClear" aria-label="検索をクリア" style="display:none;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M18 6 6 18"></path>
-                                    <path d="m6 6 12 12"></path>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-
                     <!-- Round 28: VIEWS Label -->
-                    <div style="margin-top: 4px;">
+                    <div>
                         <span class="section-label">VIEWS</span>
                         <!-- Round 51: View Scroll Wrapper -->
                         <div class="nav-scroll-wrapper">
@@ -2301,6 +2522,64 @@
                                 onclick="scrollNav('filter-buttons-container', 'right')">›</button>
                         </div>
                     </div>
+
+                    <!-- Search Section (ラベルなし) -->
+                    <div class="search-wrapper" style="margin-top: 12px;">
+                        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                        <input type="text" id="searchInput" class="search-input" placeholder="タスクを検索..."
+                            aria-label="タスク検索">
+                        <button class="search-clear" id="searchClear" aria-label="検索をクリア" style="display:none;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M18 6 6 18"></path>
+                                <path d="m6 6 12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Mode Toggle Buttons (横並び) -->
+                    <div class="mode-toggle-row">
+                        <button class="btn-mode-toggle" id="btnReorderMode" onclick="toggleCompactReorderMode()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="3" y1="6" x2="21" y2="6"></line>
+                                <line x1="3" y1="12" x2="21" y2="12"></line>
+                                <line x1="3" y1="18" x2="21" y2="18"></line>
+                                <polyline points="7 8 5 6 7 4"></polyline>
+                                <polyline points="7 20 5 18 7 16"></polyline>
+                            </svg>
+                            並び替え
+                        </button>
+                        <!-- Dark Mode Toggle Switch -->
+                        <div class="theme-toggle-switch" id="themeToggleSwitch" onclick="toggleDarkMode()" role="switch"
+                            aria-checked="false" tabindex="0">
+                            <svg class="theme-icon theme-icon-light" width="14" height="14" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="5"></circle>
+                                <line x1="12" y1="1" x2="12" y2="3"></line>
+                                <line x1="12" y1="21" x2="12" y2="23"></line>
+                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                                <line x1="1" y1="12" x2="3" y2="12"></line>
+                                <line x1="21" y1="12" x2="23" y2="12"></line>
+                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                            </svg>
+                            <div class="theme-switch-track">
+                                <div class="theme-switch-thumb"></div>
+                            </div>
+                            <svg class="theme-icon theme-icon-dark" width="14" height="14" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                            </svg>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="trashControls"
@@ -2322,10 +2601,6 @@
                             <button class="btn-footer" id="btnOpenSettings">設定</button>
                             <button class="btn-footer" id="btnOpenHelp">使い方</button>
                         </div>
-                        <button class="btn-dark-mode-toggle" id="btnToggleDarkMode" onclick="toggleDarkMode()">
-                            <span id="darkModeIcon"></span>
-                            <span id="darkModeLabel">ダークモード</span>
-                        </button>
                         <input type="file" id="importFile" accept=".json" style="display:none"
                             onchange="importData(this)">
                     </div>
@@ -2352,6 +2627,36 @@
                 </div>
             </div>
         </main>
+
+        <!-- Quick Move Menu -->
+        <div class="quick-move-menu" id="quickMoveMenu" style="display: none;">
+            <button class="quick-move-item" data-action="top">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="17 11 12 6 7 11"></polyline>
+                    <line x1="12" y1="6" x2="12" y2="18"></line>
+                </svg>
+                一番上へ
+            </button>
+            <button class="quick-move-item" data-action="up5">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="18 15 12 9 6 15"></polyline>
+                </svg>
+                5つ上へ
+            </button>
+            <button class="quick-move-item" data-action="down5">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+                5つ下へ
+            </button>
+            <button class="quick-move-item" data-action="bottom">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="7 13 12 18 17 13"></polyline>
+                    <line x1="12" y1="6" x2="12" y2="18"></line>
+                </svg>
+                一番下へ
+            </button>
+        </div>
     </div>
 
     <!-- SETTINGS MODAL -->
@@ -2915,6 +3220,7 @@
 
                 const cOpts = appData.settings.categories.map(c => `<option value="${c.id}" ${task.category === c.id
                     ? 'selected' : ''}>${c.name}</option>`).join('');
+                const categoryName = appData.settings.categories.find(c => c.id === task.category)?.name || '';
                 const sOpts = appData.settings.statuses.map(s => `<option value="${s.id}" ${task.status === s.id
                     ? 'selected' : ''}>${s.name}</option>`).join('');
 
@@ -2974,8 +3280,8 @@
                     '';
 
                 li.innerHTML = `
-                    ${showActive ? `<div class="drag-handle">⋮⋮</div>` : ''}
-                    <div class="task-content-wrapper">
+                    ${showActive ? `<div class="drag-handle" onclick="event.stopPropagation(); toggleQuickMoveMenu(event, '${task.id}')">⋮⋮</div>` : ''}
+                    <div class="task-content-wrapper" data-category="${escapeHtml(categoryName)}">
                         <div style="display:flex; gap:8px; align-items:center;">
                             <input type="text" class="task-title-input" value="${escapeHtml(task.name)}"
                                 onchange="updateTask('${task.id}','name',this.value)" ${ro ? 'disabled' : ''}>
@@ -3080,14 +3386,32 @@
             } else {
                 updateDarkModeUI(false);
             }
+
+            // キーボード操作対応
+            const toggleSwitch = document.getElementById('themeToggleSwitch');
+            if (toggleSwitch) {
+                toggleSwitch.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggleDarkMode();
+                    }
+                });
+            }
         }
 
         function updateDarkModeUI(isDark) {
-            const icon = document.getElementById('darkModeIcon');
-            const label = document.getElementById('darkModeLabel');
-            if (icon && label) {
-                icon.textContent = ''; // Text only
-                label.textContent = isDark ? 'ライトモードに切り替え' : 'ダークモードに切り替え';
+            const toggleSwitch = document.getElementById('themeToggleSwitch');
+            const lightIcon = document.querySelector('.theme-icon-light');
+            const darkIcon = document.querySelector('.theme-icon-dark');
+
+            if (toggleSwitch) {
+                toggleSwitch.setAttribute('aria-checked', isDark);
+            }
+            if (lightIcon) {
+                lightIcon.classList.toggle('active', !isDark);
+            }
+            if (darkIcon) {
+                darkIcon.classList.toggle('active', isDark);
             }
         }
 
@@ -3429,7 +3753,7 @@
             e.dataTransfer.dropEffect = 'move';
 
             const target = this;
-            if (target === draggedItem) return;
+            if (target === draggedItem || !draggedItem) return;
 
             // Calculate position to decide insertion (Before or After)
             const rect = target.getBoundingClientRect();
@@ -3437,6 +3761,56 @@
             const midY = rect.height / 2;
 
             const list = document.getElementById('taskList');
+            const items = Array.from(list.querySelectorAll('.task-card'));
+            const draggedIndex = items.indexOf(draggedItem);
+            const targetIndex = items.indexOf(target);
+
+            if (draggedIndex === -1 || targetIndex === -1) return;
+
+            let shouldMove = false;
+            if (offset < midY && draggedIndex > targetIndex) {
+                shouldMove = true;
+            } else if (offset >= midY && draggedIndex < targetIndex) {
+                shouldMove = true;
+            }
+
+            if (shouldMove) {
+                // FLIP: First - 移動前の位置を記録
+                const movingCards = items.filter(item => item !== draggedItem);
+                const firstPositions = new Map();
+                movingCards.forEach(card => {
+                    firstPositions.set(card, card.getBoundingClientRect());
+                });
+
+                // 実際のDOM移動
+                if (offset < midY && draggedIndex > targetIndex) {
+                    list.insertBefore(draggedItem, target);
+                } else {
+                    list.insertBefore(draggedItem, target.nextSibling);
+                }
+
+                // FLIP: Last, Invert, Play - アニメーション実行
+                movingCards.forEach(card => {
+                    const first = firstPositions.get(card);
+                    const last = card.getBoundingClientRect();
+                    const deltaY = first.top - last.top;
+
+                    if (Math.abs(deltaY) > 1) {
+                        card.style.transform = `translateY(${deltaY}px)`;
+                        card.style.transition = 'none';
+
+                        requestAnimationFrame(() => {
+                            card.style.transition = 'transform 150ms ease-out';
+                            card.style.transform = '';
+
+                            card.addEventListener('transitionend', function handler() {
+                                card.style.transition = '';
+                                card.removeEventListener('transitionend', handler);
+                            });
+                        });
+                    }
+                });
+            }
 
             return false;
         }
@@ -3457,30 +3831,8 @@
 
             if (!draggedItem) return;
 
-            const target = this;
-            if (target === draggedItem) return;
-
+            // DOM操作は handleDragOver で完了しているため、データモデルの更新のみ
             const list = document.getElementById('taskList');
-            const items = Array.from(list.querySelectorAll('.task-card'));
-
-            const fromIndex = items.indexOf(draggedItem);
-            const toIndex = items.indexOf(target);
-
-            if (fromIndex === -1 || toIndex === -1) return;
-
-            // Calculate position based on mouse position
-            const rect = target.getBoundingClientRect();
-            const offset = e.clientY - rect.top;
-            const midY = rect.height / 2;
-
-            // DOM manipulation for visual feedback
-            if (offset < midY) {
-                list.insertBefore(draggedItem, target);
-            } else {
-                list.insertBefore(draggedItem, target.nextSibling);
-            }
-
-            // Update data model - reorder based on current DOM order
             const visibleTaskIds = Array.from(list.querySelectorAll('.task-card')).map(el => el.dataset.id);
             const reorderedTasks = [];
             const otherTasks = [];
@@ -3496,6 +3848,7 @@
 
             appData.tasks = [...reorderedTasks.filter(t => t), ...otherTasks];
             saveData();
+            draggedItem = null;
         }
 
         // Touch Drag & Drop Support
@@ -3565,13 +3918,62 @@
                 el.classList.contains('task-card') && el !== touchDragItem
             );
 
-            // Update visual feedback
-            document.querySelectorAll('.task-card.touch-over').forEach(el =>
-                el.classList.remove('touch-over')
-            );
+            if (targetCard && touchDragItem) {
+                const list = document.getElementById('taskList');
+                const items = Array.from(list.querySelectorAll('.task-card'));
+                const draggedIndex = items.indexOf(touchDragItem);
+                const targetIndex = items.indexOf(targetCard);
 
-            if (targetCard) {
-                targetCard.classList.add('touch-over');
+                if (draggedIndex !== -1 && targetIndex !== -1) {
+                    const rect = targetCard.getBoundingClientRect();
+                    const offset = touch.clientY - rect.top;
+                    const midY = rect.height / 2;
+
+                    let shouldMove = false;
+                    if (offset < midY && draggedIndex > targetIndex) {
+                        shouldMove = true;
+                    } else if (offset >= midY && draggedIndex < targetIndex) {
+                        shouldMove = true;
+                    }
+
+                    if (shouldMove) {
+                        // FLIP: First - 移動前の位置を記録
+                        const movingCards = items.filter(item => item !== touchDragItem);
+                        const firstPositions = new Map();
+                        movingCards.forEach(card => {
+                            firstPositions.set(card, card.getBoundingClientRect());
+                        });
+
+                        // 実際のDOM移動
+                        if (offset < midY && draggedIndex > targetIndex) {
+                            list.insertBefore(touchDragItem, targetCard);
+                        } else {
+                            list.insertBefore(touchDragItem, targetCard.nextSibling);
+                        }
+
+                        // FLIP: Last, Invert, Play - アニメーション実行
+                        movingCards.forEach(card => {
+                            const first = firstPositions.get(card);
+                            const last = card.getBoundingClientRect();
+                            const deltaY = first.top - last.top;
+
+                            if (Math.abs(deltaY) > 1) {
+                                card.style.transform = `translateY(${deltaY}px)`;
+                                card.style.transition = 'none';
+
+                                requestAnimationFrame(() => {
+                                    card.style.transition = 'transform 150ms ease-out';
+                                    card.style.transform = '';
+
+                                    card.addEventListener('transitionend', function handler() {
+                                        card.style.transition = '';
+                                        card.removeEventListener('transitionend', handler);
+                                    });
+                                });
+                            }
+                        });
+                    }
+                }
             }
         }
 
@@ -3581,48 +3983,27 @@
 
             if (!isTouchDragging) return;
 
+            // DOM操作は handleTouchMove で完了しているため、データモデルの更新のみ
             const list = document.getElementById('taskList');
+            const visibleTaskIds = Array.from(list.querySelectorAll('.task-card')).map(el => el.dataset.id);
+            const reorderedTasks = [];
+            const otherTasks = [];
 
-            // Find drop target
-            const touchOverElement = document.querySelector('.task-card.touch-over');
-            if (touchOverElement && touchDragItem) {
-                const items = Array.from(list.querySelectorAll('.task-card'));
-                const fromIndex = items.indexOf(touchDragItem);
-                const toIndex = items.indexOf(touchOverElement);
-
-                if (fromIndex !== -1 && toIndex !== -1 && fromIndex !== toIndex) {
-                    // Determine position (before or after)
-                    if (fromIndex < toIndex) {
-                        list.insertBefore(touchDragItem, touchOverElement.nextSibling);
-                    } else {
-                        list.insertBefore(touchDragItem, touchOverElement);
-                    }
-
-                    // Update data model
-                    const visibleTaskIds = Array.from(list.querySelectorAll('.task-card')).map(el => el.dataset.id);
-                    const reorderedTasks = [];
-                    const otherTasks = [];
-
-                    appData.tasks.forEach(task => {
-                        const index = visibleTaskIds.indexOf(task.id);
-                        if (index !== -1) {
-                            reorderedTasks[index] = task;
-                        } else {
-                            otherTasks.push(task);
-                        }
-                    });
-
-                    appData.tasks = [...reorderedTasks.filter(t => t), ...otherTasks];
-                    saveData();
+            appData.tasks.forEach(task => {
+                const index = visibleTaskIds.indexOf(task.id);
+                if (index !== -1) {
+                    reorderedTasks[index] = task;
+                } else {
+                    otherTasks.push(task);
                 }
-            }
+            });
+
+            appData.tasks = [...reorderedTasks.filter(t => t), ...otherTasks];
+            saveData();
 
             // Cleanup
             if (touchDragItem) touchDragItem.classList.remove('dragging');
             if (touchDragClone) touchDragClone.remove();
-            document.querySelectorAll('.task-card.touch-over').forEach(el =>
-                el.classList.remove('touch-over')
-            );
 
             touchDragItem = null;
             touchDragClone = null;
@@ -3965,6 +4346,171 @@
                 renderSettingsLists();
             }
         }
+
+        // ===== QUICK MOVE MENU =====
+        let currentQuickMoveTaskId = null;
+
+        function toggleQuickMoveMenu(event, taskId) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const menu = document.getElementById('quickMoveMenu');
+            const handle = event.currentTarget;
+
+            // 既に開いている場合は閉じる
+            if (menu.style.display !== 'none' && currentQuickMoveTaskId === taskId) {
+                closeQuickMoveMenu();
+                return;
+            }
+
+            currentQuickMoveTaskId = taskId;
+
+            // メニュー位置を計算
+            const rect = handle.getBoundingClientRect();
+            const menuWidth = 160;
+            const menuHeight = 200;
+
+            let left = rect.left;
+            let top = rect.bottom + 8;
+
+            // 画面外に出る場合の調整
+            if (left + menuWidth > window.innerWidth) {
+                left = window.innerWidth - menuWidth - 16;
+            }
+            if (top + menuHeight > window.innerHeight) {
+                top = rect.top - menuHeight - 8;
+            }
+
+            menu.style.left = left + 'px';
+            menu.style.top = top + 'px';
+            menu.style.display = 'block';
+
+            // 外側クリックで閉じる
+            setTimeout(() => {
+                document.addEventListener('click', closeQuickMoveMenuOnOutsideClick);
+                document.addEventListener('touchstart', closeQuickMoveMenuOnOutsideClick);
+            }, 0);
+        }
+
+        function closeQuickMoveMenu() {
+            const menu = document.getElementById('quickMoveMenu');
+            menu.style.display = 'none';
+            currentQuickMoveTaskId = null;
+            document.removeEventListener('click', closeQuickMoveMenuOnOutsideClick);
+            document.removeEventListener('touchstart', closeQuickMoveMenuOnOutsideClick);
+        }
+
+        function closeQuickMoveMenuOnOutsideClick(e) {
+            const menu = document.getElementById('quickMoveMenu');
+            if (!menu.contains(e.target) && !e.target.closest('.drag-handle')) {
+                closeQuickMoveMenu();
+            }
+        }
+
+        function quickMoveTask(action) {
+            if (!currentQuickMoveTaskId) return;
+
+            // フィルタリングされたタスク（表示中のタスク）を取得
+            const visibleTasks = appData.tasks.filter(t => {
+                if (filterCategory !== 'all' && t.category !== filterCategory) return false;
+                if (viewMode === 'active') return !t.isDeleted && !t.isArchived;
+                if (viewMode === 'archived') return !t.isDeleted && t.isArchived;
+                if (viewMode === 'trash') return t.isDeleted;
+                return false;
+            });
+
+            const taskIndex = visibleTasks.findIndex(t => t.id === currentQuickMoveTaskId);
+            if (taskIndex === -1) {
+                closeQuickMoveMenu();
+                return;
+            }
+
+            let newIndex;
+
+            switch (action) {
+                case 'top':
+                    newIndex = 0;
+                    break;
+                case 'bottom':
+                    newIndex = visibleTasks.length - 1;
+                    break;
+                case 'up5':
+                    newIndex = Math.max(0, taskIndex - 5);
+                    break;
+                case 'down5':
+                    newIndex = Math.min(visibleTasks.length - 1, taskIndex + 5);
+                    break;
+                default:
+                    closeQuickMoveMenu();
+                    return;
+            }
+
+            if (newIndex === taskIndex) {
+                closeQuickMoveMenu();
+                return;
+            }
+
+            // appData.tasks 内での実際のインデックスを特定
+            const globalFromIndex = appData.tasks.findIndex(t => t.id === currentQuickMoveTaskId);
+            const targetTask = visibleTasks[newIndex];
+            const globalToIndex = appData.tasks.findIndex(t => t.id === targetTask.id);
+
+            // 配列から削除
+            const [movedTask] = appData.tasks.splice(globalFromIndex, 1);
+
+            // 挿入位置を再計算（削除後のインデックス）
+            let insertIndex = appData.tasks.findIndex(t => t.id === targetTask.id);
+            if (globalFromIndex < globalToIndex) {
+                insertIndex++; // 下へ移動する場合は後ろに挿入
+            }
+
+            appData.tasks.splice(insertIndex, 0, movedTask);
+
+            saveData();
+            renderTasks();
+            closeQuickMoveMenu();
+
+            // フィードバック
+            if (navigator.vibrate) navigator.vibrate(30);
+            showToast('タスクを移動しました', 'success');
+        }
+
+        // クイック移動メニューのボタンイベント初期化
+        function initQuickMoveMenu() {
+            document.querySelectorAll('.quick-move-item').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    quickMoveTask(btn.dataset.action);
+                });
+            });
+        }
+
+        // ===== COMPACT REORDER MODE =====
+        let isCompactReorderMode = false;
+
+        function toggleCompactReorderMode() {
+            isCompactReorderMode = !isCompactReorderMode;
+            document.body.classList.toggle('compact-reorder-mode', isCompactReorderMode);
+
+            const btn = document.getElementById('btnReorderMode');
+            btn.classList.toggle('active', isCompactReorderMode);
+
+            // アクセシビリティ
+            btn.setAttribute('aria-pressed', isCompactReorderMode);
+
+            // フィードバック
+            if (isCompactReorderMode) {
+                showToast('並び替えモードON', 'success');
+            }
+        }
+
+        // DOMContentLoaded時に初期化
+        document.addEventListener('DOMContentLoaded', function () {
+            // 既存の初期化処理の後に追加
+            setTimeout(() => {
+                initQuickMoveMenu();
+            }, 100);
+        });
 
     </script>
 </body>
