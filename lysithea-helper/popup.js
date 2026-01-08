@@ -5,6 +5,10 @@
 
 // グローバル変数
 let workData = [];
+let currentFileName = '';
+
+// LocalStorageキー
+const STORAGE_KEY = 'lysithea_helper_data';
 
 // DOM要素
 const fileInput = document.getElementById('fileInput');
@@ -21,6 +25,61 @@ fileInput.addEventListener('change', handleFileSelect);
 // 入力ボタンイベント
 fillButton.addEventListener('click', handleFillButton);
 
+// ページ読み込み時に保存データを復元
+document.addEventListener('DOMContentLoaded', restoreSavedData);
+
+/**
+ * 保存済みデータを復元
+ */
+function restoreSavedData() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const data = JSON.parse(saved);
+      if (data.workData && data.workData.length > 0) {
+        workData = data.workData;
+        currentFileName = data.fileName || '';
+
+        // UI復元
+        if (currentFileName) {
+          fileName.textContent = `📄 ${currentFileName}`;
+        }
+        displayPreview();
+        fillButton.disabled = false;
+        showStatus('info', `前回のデータ(${workData.length}件)を復元しました`);
+      }
+    }
+  } catch (e) {
+    console.log('データ復元エラー:', e);
+  }
+}
+
+/**
+ * データをLocalStorageに保存
+ */
+function saveData() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      workData: workData,
+      fileName: currentFileName,
+      savedAt: new Date().toISOString()
+    }));
+  } catch (e) {
+    console.log('データ保存エラー:', e);
+  }
+}
+
+/**
+ * 保存データをクリア
+ */
+function clearSavedData() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch (e) {
+    console.log('データクリアエラー:', e);
+  }
+}
+
 /**
  * ファイル選択ハンドラー
  */
@@ -28,6 +87,7 @@ function handleFileSelect(event) {
   const file = event.target.files[0];
   if (!file) return;
 
+  currentFileName = file.name;
   fileName.textContent = `📄 ${file.name}`;
   showStatus('info', 'ファイルを読み込み中...');
 
@@ -100,6 +160,9 @@ function parseExcel(data) {
   displayPreview();
   showStatus('success', `${workData.length}件のデータを読み込みました`);
   fillButton.disabled = false;
+
+  // データを保存（ポップアップが閉じても復元できるように）
+  saveData();
 }
 
 /**
@@ -260,14 +323,44 @@ async function handleFillButton() {
     // 少し待ってからメッセージを送信
     await new Promise(resolve => setTimeout(resolve, 100));
 
-    // Content Scriptにメッセージを送信
+    // リシテア画面から現在の日付を取得
+    const dateResponse = await chrome.tabs.sendMessage(tab.id, {
+      action: 'getCurrentDate'
+    });
+
+    if (!dateResponse || !dateResponse.success) {
+      showStatus('error', 'リシテアの日付を取得できません。勤怠入力画面を開いてください。');
+      fillButton.disabled = false;
+      return;
+    }
+
+    const currentDate = dateResponse.date; // "YYYY/MM/DD"形式
+    console.log('リシテア画面の日付:', currentDate);
+
+    // 日付でフィルタリング
+    const filteredData = workData.filter(row => {
+      if (!row.date) return false;
+      return row.date === currentDate;
+    });
+
+    if (filteredData.length === 0) {
+      showStatus('warning', `${currentDate} のデータがExcelに見つかりません`);
+      fillButton.disabled = false;
+      return;
+    }
+
+    showStatus('info', `${currentDate} のデータ ${filteredData.length}件を入力中...`);
+
+    // Content Scriptにフィルタリング済みデータを送信
     const response = await chrome.tabs.sendMessage(tab.id, {
       action: 'fillWorkData',
-      data: workData
+      data: filteredData
     });
 
     if (response && response.success) {
       showStatus('success', `✅ ${response.filledCount}件のデータを入力しました`);
+      // 入力成功したら保存データをクリア
+      clearSavedData();
     } else {
       showStatus('error', response?.message || '入力に失敗しました');
       fillButton.disabled = false;

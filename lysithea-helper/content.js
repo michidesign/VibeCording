@@ -8,9 +8,66 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === 'fillWorkData') {
         const result = fillWorkData(request.data);
         sendResponse(result);
+    } else if (request.action === 'getCurrentDate') {
+        const result = getCurrentDate();
+        sendResponse(result);
     }
     return true; // 非同期レスポンスを許可
 });
+
+/**
+ * リシテア画面から現在の日付を取得
+ */
+function getCurrentDate() {
+    try {
+        // mod-daily-control 内の date 要素から日付を取得
+        const dateDiv = document.querySelector('.mod-daily-control .date');
+        if (!dateDiv) {
+            return { success: false, message: '日付が見つかりません' };
+        }
+
+        // 年、月、日を取得
+        const yearSpan = dateDiv.querySelector('.year');
+        const spans = dateDiv.querySelectorAll('span:not(.year):not(.sla):not(.divider):not(.kakko)');
+
+        let year = '';
+        let month = '';
+        let day = '';
+
+        if (yearSpan) {
+            year = yearSpan.textContent.trim();
+        }
+
+        // 月と日を取得（sla, divider, kakko以外のspan）
+        const values = [];
+        spans.forEach(span => {
+            const text = span.textContent.trim();
+            if (text && !isNaN(text)) {
+                values.push(text);
+            }
+        });
+
+        if (values.length >= 2) {
+            month = values[0].padStart(2, '0');
+            day = values[1].padStart(2, '0');
+        }
+
+        if (year && month && day) {
+            return {
+                success: true,
+                date: `${year}/${month}/${day}`,
+                year: year,
+                month: month,
+                day: day
+            };
+        }
+
+        return { success: false, message: '日付の解析に失敗しました' };
+    } catch (error) {
+        console.error('日付取得エラー:', error);
+        return { success: false, message: error.message };
+    }
+}
 
 /**
  * 稼働データをリシテアに入力
