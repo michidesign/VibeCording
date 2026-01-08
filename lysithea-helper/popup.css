@@ -1,0 +1,266 @@
+/* ========================================
+   リシテア勤怠ヘルパー - ポップアップスタイル
+   ======================================== */
+
+:root {
+  --primary-color: #2196F3;
+  --primary-hover: #1976D2;
+  --success-color: #4CAF50;
+  --error-color: #f44336;
+  --warning-color: #ff9800;
+  --bg-color: #f5f7fa;
+  --card-bg: #ffffff;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --border-color: #e0e0e0;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', 'Hiragino Sans', 'Meiryo', sans-serif;
+  background: var(--bg-color);
+  color: var(--text-primary);
+  width: 480px;
+  min-height: 300px;
+}
+
+.container {
+  padding: 16px;
+}
+
+/* ヘッダー */
+.header {
+  text-align: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--primary-color);
+}
+
+.header h1 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* ファイルアップロード */
+.upload-section {
+  margin-bottom: 16px;
+}
+
+.file-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+  background: var(--card-bg);
+  border: 2px dashed var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.file-label:hover {
+  border-color: var(--primary-color);
+  background: rgba(33, 150, 243, 0.05);
+}
+
+.file-icon {
+  font-size: 24px;
+}
+
+.file-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.file-name {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--success-color);
+  text-align: center;
+}
+
+/* プレビューセクション */
+.preview-section {
+  background: var(--card-bg);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+
+.preview-section h2 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.table-wrapper {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+
+#previewTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+#previewTable th,
+#previewTable td {
+  padding: 6px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+#previewTable th {
+  background: var(--bg-color);
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+}
+
+#previewTable tr:hover {
+  background: rgba(33, 150, 243, 0.05);
+}
+
+#previewTable td:nth-child(1) {
+  width: 30px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+#previewTable td:nth-child(3),
+#previewTable td:nth-child(4),
+#previewTable td:nth-child(5) {
+  width: 50px;
+  text-align: center;
+  font-family: monospace;
+}
+
+.row-count {
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-align: right;
+}
+
+/* アクションセクション */
+.action-section {
+  margin-bottom: 12px;
+}
+
+.btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+}
+
+.btn-primary:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* ステータスメッセージ */
+.status-section {
+  min-height: 24px;
+}
+
+.status-message {
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  text-align: center;
+  display: none;
+}
+
+.status-message.success {
+  display: block;
+  background: rgba(76, 175, 80, 0.1);
+  color: var(--success-color);
+  border: 1px solid var(--success-color);
+}
+
+.status-message.error {
+  display: block;
+  background: rgba(244, 67, 54, 0.1);
+  color: var(--error-color);
+  border: 1px solid var(--error-color);
+}
+
+.status-message.warning {
+  display: block;
+  background: rgba(255, 152, 0, 0.1);
+  color: var(--warning-color);
+  border: 1px solid var(--warning-color);
+}
+
+.status-message.info {
+  display: block;
+  background: rgba(33, 150, 243, 0.1);
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+}
+
+/* フッター */
+.footer {
+  text-align: center;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+}
+
+.footer p {
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+/* スクロールバー */
+.table-wrapper::-webkit-scrollbar {
+  width: 6px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+  background: var(--bg-color);
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}

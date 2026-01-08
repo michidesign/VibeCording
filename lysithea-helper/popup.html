@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>リシテア勤怠ヘルパー</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>📋 リシテア勤怠ヘルパー</h1>
+      <p class="subtitle">Excelから稼働データを自動入力</p>
+    </header>
+
+    <section class="upload-section">
+      <label for="fileInput" class="file-label">
+        <span class="file-icon">📁</span>
+        <span class="file-text">Excelファイルを選択</span>
+        <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" hidden>
+      </label>
+      <div id="fileName" class="file-name"></div>
+    </section>
+
+    <section class="preview-section" id="previewSection" style="display: none;">
+      <h2>プレビュー</h2>
+      <div class="table-wrapper">
+        <table id="previewTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>日付</th>
+              <th>JOBコード</th>
+              <th>開始</th>
+              <th>終了</th>
+              <th>時間</th>
+              <th>コメント</th>
+            </tr>
+          </thead>
+          <tbody id="previewBody"></tbody>
+        </table>
+      </div>
+      <div class="row-count" id="rowCount"></div>
+    </section>
+
+    <section class="action-section">
+      <button id="fillButton" class="btn btn-primary" disabled>
+        ✨ リシテアに入力
+      </button>
+    </section>
+
+    <section class="status-section">
+      <div id="statusMessage" class="status-message"></div>
+    </section>
+
+    <footer class="footer">
+      <p>⚠️ ローカル専用 - 外部通信なし</p>
+    </footer>
+  </div>
+
+  <script src="lib/xlsx.min.js"></script>
+  <script src="popup.js"></script>
+</body>
+
+</html>
