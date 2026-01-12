@@ -13,6 +13,8 @@
 | `index-dads.html` | Digital Agency Design System | 行政機関向けデザイン、Noto Sans JP |
 | `index_apple.html` | Apple Design | ミニマル、ガラスモーフィズム |
 | `index_google.html` | Material Design 3 | Google風、エレベーション表現 |
+| `index_paypay.html` | PayPay Design | PayPayレッド、親しみやすい角丸デザイン |
+| `index_spindle.html` | Spindle (Ameba) | プライマリグリーン、アクセシブルなデザイン |
 
 ※ すべてのファイルは同一機能で、デザインのみ異なります。
 

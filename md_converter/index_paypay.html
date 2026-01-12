@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MD Converter - マークダウン変換ツール</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================
+       CSS Variables - PayPay Design System
+    ============================================ */
+    :root {
+      /* PayPay カラー */
+      --paypay-red: #FF0033;
+      --paypay-red-light: #FF3366;
+      --paypay-red-dark: #CC0029;
+      --paypay-red-bg: #FFF0F3;
+
+      /* 背景色 */
+      --color-background: #FFFFFF;
+      --color-background-secondary: #F5F5F5;
+      --color-background-card: #FFFFFF;
+
+      /* テキストカラー */
+      --color-text-primary: #333333;
+      --color-text-secondary: #666666;
+      --color-text-tertiary: #999999;
+      --color-text-inverse: #FFFFFF;
+
+      /* セマンティックカラー */
+      --color-success: #00C853;
+      --color-warning: #FFB300;
+      --color-error: #FF3B30;
+      --color-info: #007AFF;
+
+      /* グレースケール */
+      --color-gray-100: #F5F5F5;
+      --color-gray-200: #EEEEEE;
+      --color-gray-300: #DDDDDD;
+      --color-gray-400: #CCCCCC;
+      --color-gray-500: #999999;
+      --color-gray-600: #666666;
+      --color-gray-700: #333333;
+
+      /* タイポグラフィ */
+      --font-ja: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+      --font-mono: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+
+      /* スペーシング */
+      --spacing-xs: 4px;
+      --spacing-sm: 8px;
+      --spacing-md: 16px;
+      --spacing-lg: 24px;
+      --spacing-xl: 32px;
+      --spacing-2xl: 48px;
+
+      /* 角丸 */
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --radius-full: 9999px;
+
+      /* シャドウ */
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+      /* アニメーション */
+      --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      --duration-fast: 150ms;
+      --duration-normal: 250ms;
+    }
+
+    /* Dark Theme */
+    .dark-mode {
+      --color-background: #1A1A1A;
+      --color-background-secondary: #2A2A2A;
+      --color-background-card: #2A2A2A;
+      --color-text-primary: #FFFFFF;
+      --color-text-secondary: #CCCCCC;
+      --color-text-tertiary: #999999;
+      --color-gray-100: #2A2A2A;
+      --color-gray-200: #3A3A3A;
+      --color-gray-300: #4A4A4A;
+      --color-gray-400: #5A5A5A;
+      --paypay-red-bg: #3D1A20;
+    }
+
+    /* ============================================
+       Base Styles
+    ============================================ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: var(--font-ja);
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--color-text-primary);
+      background: var(--color-background-secondary);
+      min-height: 100vh;
+      transition: background-color var(--duration-normal) var(--ease-out),
+                  color var(--duration-normal) var(--ease-out);
+    }
+
+    /* Skip Link */
+    .skip-link {
+      position: absolute;
+      top: -100%;
+      left: var(--spacing-md);
+      padding: var(--spacing-sm) var(--spacing-md);
+      background: var(--paypay-red);
+      color: var(--color-text-inverse);
+      border-radius: var(--radius-sm);
+      z-index: 9999;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .skip-link:focus {
+      top: var(--spacing-md);
+    }
+
+    /* ============================================
+       Layout
+    ============================================ */
+    .app-container {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Header - PayPay Style */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--spacing-sm) var(--spacing-md);
+      min-height: 64px;
+      background: var(--paypay-red);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+    }
+
+    .header-title h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--color-text-inverse);
+      letter-spacing: 0.5px;
+    }
+
+    .header-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius-md);
+      color: var(--color-text-inverse);
+      font-size: 18px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+    }
+
+    /* Icon Buttons */
+    .icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      background: rgba(255, 255, 255, 0.15);
+      border: none;
+      border-radius: var(--radius-full);
+      color: var(--color-text-inverse);
+      cursor: pointer;
+      font-size: 20px;
+      transition: all var(--duration-fast) var(--ease-out);
+    }
+
+    .icon-btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: scale(1.05);
+    }
+
+    .icon-btn:active {
+      transform: scale(0.95);
+    }
+
+    .icon-btn:focus-visible {
+      outline: 2px solid var(--color-text-inverse);
+      outline-offset: 2px;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: var(--spacing-lg);
+      gap: var(--spacing-md);
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Converter Panels */
+    .converter-wrapper {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-lg);
+      min-height: 0;
+    }
+
+    /* Card Style Panel */
+    .panel {
+      display: flex;
+      flex-direction: column;
+      background: var(--color-background-card);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+      min-height: 420px;
+      transition: box-shadow var(--duration-normal) var(--ease-out),
+                  transform var(--duration-fast) var(--ease-out);
+    }
+
+    .panel:hover {
+      box-shadow: var(--shadow-lg);
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-bottom: 1px solid var(--color-gray-200);
+      background: var(--color-background);
+    }
+
+    .panel-label {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+    }
+
+    .panel-badge {
+      padding: 6px 14px;
+      background: var(--paypay-red);
+      color: var(--color-text-inverse);
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .panel-badge.text-badge {
+      background: var(--color-gray-600);
+    }
+
+    .dark-mode .panel-badge.text-badge {
+      background: var(--color-gray-400);
+    }
+
+    /* Copy Button - PayPay Style */
+    .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      padding: 10px 20px;
+      height: 40px;
+      background: var(--color-background);
+      border: 2px solid var(--paypay-red);
+      border-radius: var(--radius-full);
+      color: var(--paypay-red);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-out);
+    }
+
+    .copy-btn:hover {
+      background: var(--paypay-red-bg);
+      transform: scale(1.02);
+    }
+
+    .copy-btn:active {
+      transform: scale(0.98);
+    }
+
+    .copy-btn:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(255, 0, 51, 0.3);
+    }
+
+    .copy-btn.copied {
+      background: var(--paypay-red);
+      color: var(--color-text-inverse);
+    }
+
+    .panel-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: var(--spacing-md);
+      background: var(--color-background);
+    }
+
+    /* Text Area - PayPay Style */
+    .text-area {
+      flex: 1;
+      width: 100%;
+      min-height: 320px;
+      padding: var(--spacing-md);
+      background: var(--color-gray-100);
+      border: 2px solid transparent;
+      border-radius: var(--radius-lg);
+      font-family: var(--font-mono);
+      font-size: 14px;
+      line-height: 1.8;
+      color: var(--color-text-primary);
+      resize: none;
+      transition: all var(--duration-fast) var(--ease-out);
+    }
+
+    .text-area:hover {
+      background: var(--color-gray-200);
+    }
+
+    .text-area:focus {
+      outline: none;
+      background: var(--color-background);
+      border-color: var(--paypay-red);
+      box-shadow: 0 0 0 3px rgba(255, 0, 51, 0.15);
+    }
+
+    .text-area::placeholder {
+      color: var(--color-text-tertiary);
+    }
+
+    .text-area.active-input {
+      background: var(--color-background);
+      border-color: var(--paypay-red);
+      box-shadow: 0 0 0 3px rgba(255, 0, 51, 0.15);
+    }
+
+    /* Direction Indicator - Chip */
+    .direction-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--spacing-sm) 0;
+    }
+
+    .direction-arrow {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      padding: 8px 20px;
+      height: 36px;
+      background: var(--color-gray-100);
+      border: 1px solid var(--color-gray-300);
+      border-radius: var(--radius-full);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+      transition: all var(--duration-fast) var(--ease-out);
+    }
+
+    .direction-arrow.md-to-text {
+      background: var(--paypay-red-bg);
+      border-color: var(--paypay-red);
+      color: var(--paypay-red);
+    }
+
+    .direction-arrow.text-to-md {
+      background: var(--color-gray-200);
+      border-color: var(--color-gray-500);
+      color: var(--color-text-primary);
+    }
+
+    /* ============================================
+       Settings Modal
+    ============================================ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all var(--duration-normal) var(--ease-out);
+      padding: var(--spacing-lg);
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 720px;
+      max-height: 80vh;
+      background: var(--color-background-card);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      flex-direction: column;
+      transform: scale(0.9) translateY(20px);
+      transition: transform var(--duration-normal) var(--ease-out);
+    }
+
+    .modal-overlay.active .modal {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-md);
+      border-bottom: 1px solid var(--color-gray-200);
+    }
+
+    .modal-header h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--color-text-primary);
+    }
+
+    .modal-close {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-gray-100);
+      border: none;
+      border-radius: var(--radius-full);
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      font-size: 18px;
+      transition: all var(--duration-fast) var(--ease-out);
+    }
+
+    .modal-close:hover {
+      background: var(--color-gray-200);
+      color: var(--color-text-primary);
+    }
+
+    .modal-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--spacing-lg);
+    }
+
+    .modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg);
+      gap: var(--spacing-sm);
+      border-top: 1px solid var(--color-gray-200);
+    }
+
+    /* Rules Table */
+    .rules-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .rules-table th,
+    .rules-table td {
+      padding: var(--spacing-sm) var(--spacing-md);
+      text-align: left;
+      border-bottom: 1px solid var(--color-gray-200);
+    }
+
+    .rules-table th {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: var(--color-text-tertiary);
+      text-transform: uppercase;
+    }
+
+    .rules-table td {
+      font-size: 14px;
+    }
+
+    .rules-table tbody tr {
+      transition: background var(--duration-fast);
+    }
+
+    .rules-table tbody tr:hover {
+      background: var(--color-gray-100);
+    }
+
+    .rule-input {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--color-gray-100);
+      border: 2px solid transparent;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 14px;
+      color: var(--color-text-primary);
+      transition: all var(--duration-fast);
+    }
+
+    .rule-input:hover {
+      background: var(--color-gray-200);
+    }
+
+    .rule-input:focus {
+      outline: none;
+      background: var(--color-background);
+      border-color: var(--paypay-red);
+    }
+
+    /* Switch - PayPay Style */
+    .rule-toggle {
+      appearance: none;
+      width: 52px;
+      height: 32px;
+      background: var(--color-gray-300);
+      border: none;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      position: relative;
+      transition: all var(--duration-normal) var(--ease-out);
+    }
+
+    .rule-toggle::after {
+      content: '';
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      width: 24px;
+      height: 24px;
+      background: var(--color-background);
+      border-radius: var(--radius-full);
+      box-shadow: var(--shadow-sm);
+      transition: all var(--duration-normal) var(--ease-out);
+    }
+
+    .rule-toggle:checked {
+      background: var(--paypay-red);
+    }
+
+    .rule-toggle:checked::after {
+      transform: translateX(20px);
+    }
+
+    .rule-toggle:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(255, 0, 51, 0.3);
+    }
+
+    .delete-rule-btn {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-full);
+      color: var(--color-error);
+      cursor: pointer;
+      font-size: 18px;
+      transition: all var(--duration-fast) var(--ease-out);
+    }
+
+    .delete-rule-btn:hover {
+      background: rgba(255, 59, 48, 0.1);
+    }
+
+    /* Buttons - PayPay Style */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--spacing-sm);
+      padding: 12px 24px;
+      height: 44px;
+      border-radius: var(--radius-full);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-out);
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: var(--paypay-red);
+      border: none;
+      color: var(--color-text-inverse);
+    }
+
+    .btn-primary:hover {
+      background: var(--paypay-red-dark);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-primary:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(255, 0, 51, 0.3);
+    }
+
+    .btn-secondary {
+      background: var(--color-gray-100);
+      border: none;
+      color: var(--color-text-primary);
+    }
+
+    .btn-secondary:hover {
+      background: var(--color-gray-200);
+    }
+
+    .btn-danger {
+      background: transparent;
+      border: 2px solid var(--color-error);
+      color: var(--color-error);
+    }
+
+    .btn-danger:hover {
+      background: rgba(255, 59, 48, 0.1);
+    }
+
+    /* Add Rule Form */
+    .add-rule-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: var(--spacing-md);
+      padding: var(--spacing-md);
+      background: var(--color-gray-100);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .add-rule-form .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-xs);
+    }
+
+    .add-rule-form label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: var(--color-text-secondary);
+    }
+
+    .add-rule-btn {
+      align-self: flex-end;
+    }
+
+    /* ============================================
+       Toast / Snackbar
+    ============================================ */
+    .toast {
+      position: fixed;
+      bottom: var(--spacing-lg);
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      padding: 14px 24px;
+      min-width: 288px;
+      max-width: 568px;
+      background: var(--color-gray-700);
+      color: var(--color-text-inverse);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      font-size: 14px;
+      font-weight: 500;
+      text-align: center;
+      opacity: 0;
+      transition: all var(--duration-normal) var(--ease-out);
+      z-index: 1001;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* ============================================
+       Responsive Design
+    ============================================ */
+    @media (max-width: 768px) {
+      .header {
+        padding: var(--spacing-sm);
+      }
+
+      .header-title h1 {
+        font-size: 18px;
+      }
+
+      .main-content {
+        padding: var(--spacing-md);
+      }
+
+      .converter-wrapper {
+        grid-template-columns: 1fr;
+      }
+
+      .panel {
+        min-height: 280px;
+      }
+
+      .direction-indicator {
+        transform: rotate(90deg);
+      }
+
+      .add-rule-form {
+        grid-template-columns: 1fr;
+      }
+
+      .add-rule-btn {
+        width: 100%;
+      }
+
+      .modal-footer {
+        flex-direction: column;
+      }
+
+      .modal-footer .btn {
+        width: 100%;
+      }
+    }
+
+    /* ============================================
+       Utility Classes
+    ============================================ */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Reduced Motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Skip Link -->
+  <a href="#main-content" class="skip-link">本文へスキップ</a>
+
+  <div class="app-container">
+    <!-- Header - PayPay Style -->
+    <header class="header" role="banner">
+      <div class="header-title">
+        <div class="header-icon" aria-hidden="true">⇄</div>
+        <h1>MD Converter</h1>
+      </div>
+      <div class="header-actions">
+        <button type="button" class="icon-btn" id="darkModeToggle" aria-label="ダークモード切り替え" title="ダークモード切り替え">
+          🌙
+        </button>
+        <button type="button" class="icon-btn" id="settingsBtn" aria-label="設定を開く" title="設定">
+          ⚙️
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content" class="main-content" role="main">
+      <div class="converter-wrapper">
+        <!-- Markdown Panel -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-label">
+              <span class="panel-badge">MD</span>
+              <span>Markdown</span>
+            </div>
+            <button type="button" class="copy-btn" data-target="mdInput" aria-label="Markdownをコピー">
+              📋 コピー
+            </button>
+          </div>
+          <div class="panel-body">
+            <label for="mdInput" class="sr-only">Markdownテキストを入力</label>
+            <textarea
+              id="mdInput"
+              class="text-area"
+              placeholder="Markdownを入力...&#10;&#10;例:&#10;## 見出し2&#10;### 見出し3&#10;- リスト項目&#10;- [ ] 未完了タスク&#10;- [x] 完了タスク&#10;> 引用文&#10;**太字テキスト**&#10;`インラインコード`"
+              spellcheck="false"
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Text Panel -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-label">
+              <span class="panel-badge text-badge">TEXT</span>
+              <span>一般テキスト</span>
+            </div>
+            <button type="button" class="copy-btn" data-target="textInput" aria-label="テキストをコピー">
+              📋 コピー
+            </button>
+          </div>
+          <div class="panel-body">
+            <label for="textInput" class="sr-only">一般テキストを入力</label>
+            <textarea
+              id="textInput"
+              class="text-area"
+              placeholder="一般テキストを入力...&#10;&#10;例:&#10;■ 見出し2&#10;● 見出し3&#10;・リスト項目&#10;□ 未完了タスク&#10;✓ 完了タスク&#10;│ 引用文&#10;【太字テキスト】&#10;「インラインコード」"
+              spellcheck="false"
+            ></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Direction Indicator -->
+      <div class="direction-indicator">
+        <div class="direction-arrow" id="directionArrow">
+          <span id="directionText">編集中のパネルから変換</span>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modalTitle">変換ルール設定</h2>
+        <button type="button" class="modal-close" id="closeModal" aria-label="閉じる">✕</button>
+      </div>
+      <div class="modal-body">
+        <!-- Add Rule Form -->
+        <form class="add-rule-form" id="addRuleForm">
+          <div class="form-group">
+            <label for="newMdPattern">Markdown パターン</label>
+            <input type="text" id="newMdPattern" class="rule-input" placeholder="例: ## ">
+          </div>
+          <div class="form-group">
+            <label for="newTextPattern">一般テキスト</label>
+            <input type="text" id="newTextPattern" class="rule-input" placeholder="例: ■ ">
+          </div>
+          <button type="submit" class="btn btn-primary add-rule-btn">追加</button>
+        </form>
+
+        <!-- Rules Table -->
+        <table class="rules-table" aria-label="変換ルール一覧">
+          <thead>
+            <tr>
+              <th scope="col">Markdown</th>
+              <th scope="col">一般テキスト</th>
+              <th scope="col">有効</th>
+              <th scope="col"><span class="sr-only">操作</span></th>
+            </tr>
+          </thead>
+          <tbody id="rulesTableBody">
+            <!-- Rules will be populated by JS -->
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" id="resetRulesBtn">初期設定に戻す</button>
+        <button type="button" class="btn btn-secondary" id="closeModalBtn">閉じる</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    /* ============================================
+       Constants & Default Rules
+    ============================================ */
+    const STORAGE_KEY = 'md_converter_rules_v1';
+    const THEME_KEY = 'md_converter_theme';
+
+    const DEFAULT_RULES = [
+      { md: '#### ', text: '○ ', enabled: true, isRegex: false },
+      { md: '### ', text: '● ', enabled: true, isRegex: false },
+      { md: '## ', text: '■ ', enabled: true, isRegex: false },
+      { md: '- [x] ', text: '✓ ', enabled: true, isRegex: false },
+      { md: '- [ ] ', text: '□ ', enabled: true, isRegex: false },
+      { md: '- ', text: '・', enabled: true, isRegex: false },
+      { md: '* ', text: '・', enabled: true, isRegex: false },
+      { md: '> ', text: '│ ', enabled: true, isRegex: false },
+      { md: '1. ', text: '① ', enabled: true, isRegex: false },
+      { md: '2. ', text: '② ', enabled: true, isRegex: false },
+      { md: '3. ', text: '③ ', enabled: true, isRegex: false },
+      { md: '4. ', text: '④ ', enabled: true, isRegex: false },
+      { md: '5. ', text: '⑤ ', enabled: true, isRegex: false },
+      { md: '6. ', text: '⑥ ', enabled: true, isRegex: false },
+      { md: '7. ', text: '⑦ ', enabled: true, isRegex: false },
+      { md: '8. ', text: '⑧ ', enabled: true, isRegex: false },
+      { md: '9. ', text: '⑨ ', enabled: true, isRegex: false },
+      { md: '`([^`]+)`', text: '「$1」', enabled: true, isRegex: true },
+      { md: '\\*\\*([^*]+)\\*\\*', text: '【$1】', enabled: true, isRegex: true },
+    ];
+
+    /* ============================================
+       State
+    ============================================ */
+    let rules = [];
+    let isConverting = false;
+    let lastActiveInput = null;
+
+    /* ============================================
+       DOM Elements
+    ============================================ */
+    const mdInput = document.getElementById('mdInput');
+    const textInput = document.getElementById('textInput');
+    const settingsBtn = document.getElementById('settingsBtn');
+    const settingsModal = document.getElementById('settingsModal');
+    const closeModal = document.getElementById('closeModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const rulesTableBody = document.getElementById('rulesTableBody');
+    const addRuleForm = document.getElementById('addRuleForm');
+    const resetRulesBtn = document.getElementById('resetRulesBtn');
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const directionArrow = document.getElementById('directionArrow');
+    const directionText = document.getElementById('directionText');
+    const toast = document.getElementById('toast');
+
+    /* ============================================
+       Storage Functions
+    ============================================ */
+    function loadRules() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          rules = JSON.parse(stored);
+        } else {
+          rules = JSON.parse(JSON.stringify(DEFAULT_RULES));
+        }
+      } catch (e) {
+        console.error('Failed to load rules:', e);
+        rules = JSON.parse(JSON.stringify(DEFAULT_RULES));
+      }
+    }
+
+    function saveRules() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(rules));
+      } catch (e) {
+        console.error('Failed to save rules:', e);
+      }
+    }
+
+    function loadTheme() {
+      const savedTheme = localStorage.getItem(THEME_KEY);
+      if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        darkModeToggle.textContent = '☀️';
+      }
+    }
+
+    function toggleTheme() {
+      const isDark = document.body.classList.toggle('dark-mode');
+      localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light');
+      darkModeToggle.textContent = isDark ? '☀️' : '🌙';
+    }
+
+    /* ============================================
+       Conversion Functions
+    ============================================ */
+    function escapeRegExp(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function convertMdToText(input) {
+      let result = input;
+      const lines = result.split('\n');
+      const processedLines = lines.map(line => {
+        let processedLine = line;
+        for (const rule of rules) {
+          if (!rule.enabled || rule.isRegex) continue;
+          if (processedLine.startsWith(rule.md)) {
+            processedLine = rule.text + processedLine.slice(rule.md.length);
+            break;
+          }
+        }
+        return processedLine;
+      });
+      result = processedLines.join('\n');
+      for (const rule of rules) {
+        if (!rule.enabled || !rule.isRegex) continue;
+        try {
+          const regex = new RegExp(rule.md, 'g');
+          result = result.replace(regex, rule.text);
+        } catch (e) {
+          console.error('Invalid regex:', rule.md, e);
+        }
+      }
+      return result;
+    }
+
+    function convertTextToMd(input) {
+      let result = input;
+      const lines = result.split('\n');
+      const processedLines = lines.map(line => {
+        let processedLine = line;
+        for (const rule of rules) {
+          if (!rule.enabled || rule.isRegex) continue;
+          if (processedLine.startsWith(rule.text)) {
+            processedLine = rule.md + processedLine.slice(rule.text.length);
+            break;
+          }
+        }
+        return processedLine;
+      });
+      result = processedLines.join('\n');
+      for (const rule of rules) {
+        if (!rule.enabled || !rule.isRegex) continue;
+        try {
+          if (rule.md.includes('([^`]+)')) {
+            const reverseRegex = /「([^」]+)」/g;
+            result = result.replace(reverseRegex, '`$1`');
+          } else if (rule.md.includes('([^*]+)')) {
+            const reverseRegex = /【([^】]+)】/g;
+            result = result.replace(reverseRegex, '**$1**');
+          }
+        } catch (e) {
+          console.error('Reverse regex error:', rule.text, e);
+        }
+      }
+      return result;
+    }
+
+    /* ============================================
+       UI Functions
+    ============================================ */
+    function updateDirectionIndicator(direction) {
+      directionArrow.classList.remove('md-to-text', 'text-to-md');
+      if (direction === 'md-to-text') {
+        directionArrow.classList.add('md-to-text');
+        directionText.textContent = 'MD → テキスト';
+      } else if (direction === 'text-to-md') {
+        directionArrow.classList.add('text-to-md');
+        directionText.textContent = 'テキスト → MD';
+      } else {
+        directionText.textContent = '編集中のパネルから変換';
+      }
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    function renderRulesTable() {
+      rulesTableBody.innerHTML = '';
+      rules.forEach((rule, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>
+            <input type="text" class="rule-input" value="${escapeHtml(rule.md)}"
+                   data-index="${index}" data-field="md" aria-label="Markdownパターン">
+          </td>
+          <td>
+            <input type="text" class="rule-input" value="${escapeHtml(rule.text)}"
+                   data-index="${index}" data-field="text" aria-label="一般テキストパターン">
+          </td>
+          <td>
+            <input type="checkbox" class="rule-toggle" ${rule.enabled ? 'checked' : ''}
+                   data-index="${index}" aria-label="ルールを有効化">
+          </td>
+          <td>
+            <button type="button" class="delete-rule-btn" data-index="${index}"
+                    aria-label="ルールを削除">🗑</button>
+          </td>
+        `;
+        rulesTableBody.appendChild(tr);
+      });
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    /* ============================================
+       Event Handlers
+    ============================================ */
+    function handleMdInput() {
+      if (isConverting) return;
+      isConverting = true;
+      lastActiveInput = 'md';
+      mdInput.classList.add('active-input');
+      textInput.classList.remove('active-input');
+      updateDirectionIndicator('md-to-text');
+      textInput.value = convertMdToText(mdInput.value);
+      isConverting = false;
+    }
+
+    function handleTextInput() {
+      if (isConverting) return;
+      isConverting = true;
+      lastActiveInput = 'text';
+      textInput.classList.add('active-input');
+      mdInput.classList.remove('active-input');
+      updateDirectionIndicator('text-to-md');
+      mdInput.value = convertTextToMd(textInput.value);
+      isConverting = false;
+    }
+
+    function handleCopyClick(e) {
+      const btn = e.target.closest('.copy-btn');
+      if (!btn) return;
+      const targetId = btn.dataset.target;
+      const targetElement = document.getElementById(targetId);
+      if (targetElement && targetElement.value) {
+        navigator.clipboard.writeText(targetElement.value).then(() => {
+          btn.classList.add('copied');
+          btn.innerHTML = '✓ コピー完了';
+          setTimeout(() => {
+            btn.classList.remove('copied');
+            btn.innerHTML = '📋 コピー';
+          }, 2000);
+        }).catch(() => {
+          showToast('コピーに失敗しました');
+        });
+      }
+    }
+
+    function handleRuleTableChange(e) {
+      const target = e.target;
+      const index = parseInt(target.dataset.index, 10);
+      if (target.classList.contains('rule-input')) {
+        const field = target.dataset.field;
+        rules[index][field] = target.value;
+        saveRules();
+        if (lastActiveInput === 'md') handleMdInput();
+        else if (lastActiveInput === 'text') handleTextInput();
+      } else if (target.classList.contains('rule-toggle')) {
+        rules[index].enabled = target.checked;
+        saveRules();
+        if (lastActiveInput === 'md') handleMdInput();
+        else if (lastActiveInput === 'text') handleTextInput();
+      }
+    }
+
+    function handleDeleteRule(e) {
+      const btn = e.target.closest('.delete-rule-btn');
+      if (!btn) return;
+      const index = parseInt(btn.dataset.index, 10);
+      rules.splice(index, 1);
+      saveRules();
+      renderRulesTable();
+      showToast('ルールを削除しました');
+    }
+
+    function handleAddRule(e) {
+      e.preventDefault();
+      const mdPattern = document.getElementById('newMdPattern').value.trim();
+      const textPattern = document.getElementById('newTextPattern').value.trim();
+      if (!mdPattern || !textPattern) {
+        showToast('両方のパターンを入力してください');
+        return;
+      }
+      rules.push({ md: mdPattern, text: textPattern, enabled: true, isRegex: false });
+      saveRules();
+      renderRulesTable();
+      document.getElementById('newMdPattern').value = '';
+      document.getElementById('newTextPattern').value = '';
+      showToast('ルールを追加しました');
+    }
+
+    function handleResetRules() {
+      if (confirm('すべてのルールを初期設定に戻しますか？')) {
+        rules = JSON.parse(JSON.stringify(DEFAULT_RULES));
+        saveRules();
+        renderRulesTable();
+        showToast('初期設定に戻しました');
+        if (lastActiveInput === 'md') handleMdInput();
+        else if (lastActiveInput === 'text') handleTextInput();
+      }
+    }
+
+    function openModal() {
+      settingsModal.classList.add('active');
+      closeModal.focus();
+    }
+
+    function closeModalFn() {
+      settingsModal.classList.remove('active');
+      settingsBtn.focus();
+    }
+
+    function handleModalKeydown(e) {
+      if (e.key === 'Escape') closeModalFn();
+    }
+
+    function handleModalOverlayClick(e) {
+      if (e.target === settingsModal) closeModalFn();
+    }
+
+    /* ============================================
+       Initialize
+    ============================================ */
+    function init() {
+      loadRules();
+      loadTheme();
+      renderRulesTable();
+      mdInput.addEventListener('input', handleMdInput);
+      textInput.addEventListener('input', handleTextInput);
+      document.addEventListener('click', handleCopyClick);
+      settingsBtn.addEventListener('click', openModal);
+      closeModal.addEventListener('click', closeModalFn);
+      closeModalBtn.addEventListener('click', closeModalFn);
+      settingsModal.addEventListener('click', handleModalOverlayClick);
+      settingsModal.addEventListener('keydown', handleModalKeydown);
+      rulesTableBody.addEventListener('input', handleRuleTableChange);
+      rulesTableBody.addEventListener('click', handleDeleteRule);
+      addRuleForm.addEventListener('submit', handleAddRule);
+      resetRulesBtn.addEventListener('click', handleResetRules);
+      darkModeToggle.addEventListener('click', toggleTheme);
+    }
+
+    init();
+  </script>
+</body>
+</html>
