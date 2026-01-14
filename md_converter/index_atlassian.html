@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MD Converter - マークダウン変換ツール</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================
+       CSS Variables - Atlassian Design System
+    ============================================ */
+    :root {
+      /* Primary - Atlassian Blue */
+      --color-brand-bold: #0052CC;
+      --color-brand-boldHovered: #0065FF;
+      --color-brand-boldPressed: #0747A6;
+
+      /* Secondary - Teal */
+      --color-teal: #00875A;
+      --color-teal-subtle: #E3FCEF;
+
+      /* Purple */
+      --color-purple: #5243AA;
+      --color-purple-subtle: #EAE6FF;
+
+      /* Text */
+      --color-text: #172B4D;
+      --color-text-subtle: #6B778C;
+      --color-text-subtlest: #97A0AF;
+      --color-text-inverse: #FFFFFF;
+      --color-text-brand: #0052CC;
+
+      /* Background */
+      --color-background-neutral: #F4F5F7;
+      --color-background-neutral-subtle: #FAFBFC;
+      --color-background-input: #FAFBFC;
+      --color-background-selected: #DEEBFF;
+      --color-background-card: #FFFFFF;
+
+      /* Border */
+      --color-border: #DFE1E6;
+      --color-border-focused: #4C9AFF;
+      --color-border-bold: #0052CC;
+
+      /* Status */
+      --color-background-success: #E3FCEF;
+      --color-text-success: #006644;
+      --color-background-warning: #FFFAE6;
+      --color-text-warning: #FF8B00;
+      --color-background-danger: #FFEBE6;
+      --color-text-danger: #DE350B;
+      --color-background-information: #DEEBFF;
+      --color-text-information: #0052CC;
+
+      /* Typography */
+      --font-family-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Noto Sans JP', Roboto, Oxygen, Ubuntu, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      --font-family-mono: 'SFMono-Medium', 'SF Mono', 'Segoe UI Mono', 'Roboto Mono', 'Ubuntu Mono', Menlo, Consolas, Courier, monospace;
+
+      /* Spacing (8px base) */
+      --space-025: 2px;
+      --space-050: 4px;
+      --space-100: 8px;
+      --space-150: 12px;
+      --space-200: 16px;
+      --space-300: 24px;
+      --space-400: 32px;
+      --space-500: 40px;
+      --space-600: 48px;
+
+      /* Border Radius */
+      --border-radius-050: 3px;
+      --border-radius-100: 4px;
+      --border-radius-200: 8px;
+      --border-radius-round: 50%;
+
+      /* Shadow */
+      --shadow-overflow: 0 0 0 1px rgba(9, 30, 66, 0.08), 0 2px 4px 1px rgba(9, 30, 66, 0.08);
+      --shadow-raised: 0 1px 1px rgba(9, 30, 66, 0.25), 0 0 1px 1px rgba(9, 30, 66, 0.13);
+      --shadow-overlay: 0 4px 8px -2px rgba(9, 30, 66, 0.25), 0 0 1px rgba(9, 30, 66, 0.31);
+
+      /* Transition */
+      --duration-fast: 100ms;
+      --duration-normal: 200ms;
+      --duration-slow: 300ms;
+      --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    /* Dark Theme */
+    .dark-mode {
+      --color-brand-bold: #579DFF;
+      --color-brand-boldHovered: #85B8FF;
+      --color-brand-boldPressed: #388BFF;
+
+      --color-teal: #4BCE97;
+      --color-teal-subtle: #164B35;
+
+      --color-purple: #9F8FEF;
+      --color-purple-subtle: #352C63;
+
+      --color-text: #B6C2CF;
+      --color-text-subtle: #8C9BAB;
+      --color-text-subtlest: #626F86;
+      --color-text-inverse: #1D2125;
+      --color-text-brand: #579DFF;
+
+      --color-background-neutral: #22272B;
+      --color-background-neutral-subtle: #1D2125;
+      --color-background-input: #22272B;
+      --color-background-selected: #1C2B41;
+      --color-background-card: #282E33;
+
+      --color-border: #3B444C;
+      --color-border-focused: #579DFF;
+      --color-border-bold: #579DFF;
+
+      --color-background-success: #164B35;
+      --color-text-success: #4BCE97;
+      --color-background-warning: #332E1B;
+      --color-text-warning: #E2B203;
+      --color-background-danger: #42221F;
+      --color-text-danger: #F87168;
+      --color-background-information: #1C2B41;
+      --color-text-information: #579DFF;
+
+      --shadow-overflow: 0 0 0 1px rgba(0, 0, 0, 0.4), 0 2px 4px 1px rgba(0, 0, 0, 0.25);
+      --shadow-raised: 0 1px 1px rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(0, 0, 0, 0.3);
+      --shadow-overlay: 0 4px 8px -2px rgba(0, 0, 0, 0.5), 0 0 1px rgba(0, 0, 0, 0.4);
+    }
+
+    /* ============================================
+       Base Styles
+    ============================================ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-size: 14px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: var(--font-family-sans);
+      font-size: 14px;
+      line-height: 1.42857;
+      color: var(--color-text);
+      background: var(--color-background-neutral);
+      min-height: 100vh;
+      transition: background-color var(--duration-normal) var(--easing-standard),
+                  color var(--duration-normal) var(--easing-standard);
+    }
+
+    /* Skip Link */
+    .skip-link {
+      position: absolute;
+      top: -100%;
+      left: var(--space-200);
+      padding: var(--space-100) var(--space-200);
+      background: var(--color-brand-bold);
+      color: var(--color-text-inverse);
+      border-radius: var(--border-radius-050);
+      z-index: 9999;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .skip-link:focus {
+      top: var(--space-200);
+    }
+
+    /* ============================================
+       Layout
+    ============================================ */
+    .app-container {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Top Navigation */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--space-200);
+      height: 56px;
+      background: var(--color-background-card);
+      border-bottom: 1px solid var(--color-border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      transition: background var(--duration-normal) var(--easing-standard),
+                  border-color var(--duration-normal) var(--easing-standard);
+    }
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: var(--space-150);
+    }
+
+    .header-title h1 {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.003em;
+      color: var(--color-text);
+    }
+
+    .header-icon {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-brand-bold);
+      border-radius: var(--border-radius-050);
+      color: var(--color-text-inverse);
+      font-size: 16px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-050);
+    }
+
+    /* Icon Buttons - Atlassian Style */
+    .icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: transparent;
+      border: none;
+      border-radius: var(--border-radius-050);
+      color: var(--color-text-subtle);
+      cursor: pointer;
+      font-size: 18px;
+      transition: background-color var(--duration-fast) var(--easing-standard),
+                  color var(--duration-fast) var(--easing-standard);
+    }
+
+    .icon-btn:hover {
+      background: var(--color-background-neutral);
+      color: var(--color-text);
+    }
+
+    .icon-btn:active {
+      background: var(--color-background-selected);
+    }
+
+    .icon-btn:focus-visible {
+      outline: 2px solid var(--color-border-focused);
+      outline-offset: 2px;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: var(--space-300);
+      gap: var(--space-200);
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Converter Panels */
+    .converter-wrapper {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-300);
+      min-height: 0;
+    }
+
+    /* Card */
+    .panel {
+      display: flex;
+      flex-direction: column;
+      background: var(--color-background-card);
+      border-radius: var(--border-radius-050);
+      box-shadow: var(--shadow-raised);
+      overflow: hidden;
+      min-height: 420px;
+      transition: box-shadow var(--duration-normal) var(--easing-standard),
+                  background var(--duration-normal) var(--easing-standard);
+    }
+
+    .panel:hover {
+      box-shadow: var(--shadow-overlay);
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-200);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .panel-label {
+      display: flex;
+      align-items: center;
+      gap: var(--space-100);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-text);
+    }
+
+    /* Lozenge (Badge) */
+    .panel-badge {
+      display: inline-flex;
+      align-items: center;
+      height: 16px;
+      padding: 0 var(--space-050);
+      background: var(--color-background-information);
+      color: var(--color-text-information);
+      border-radius: var(--border-radius-050);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .panel-badge.text-badge {
+      background: var(--color-purple-subtle);
+      color: var(--color-purple);
+    }
+
+    /* Tonal Button */
+    .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-100);
+      padding: 0 var(--space-150);
+      height: 32px;
+      background: var(--color-background-neutral);
+      border: none;
+      border-radius: var(--border-radius-050);
+      color: var(--color-text);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color var(--duration-fast) var(--easing-standard);
+    }
+
+    .copy-btn:hover {
+      background: var(--color-background-selected);
+    }
+
+    .copy-btn:active {
+      background: var(--color-brand-bold);
+      color: var(--color-text-inverse);
+    }
+
+    .copy-btn:focus-visible {
+      outline: 2px solid var(--color-border-focused);
+      outline-offset: 2px;
+    }
+
+    .copy-btn.copied {
+      background: var(--color-background-success);
+      color: var(--color-text-success);
+    }
+
+    .panel-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: var(--space-200);
+    }
+
+    /* Text Field */
+    .text-area {
+      flex: 1;
+      width: 100%;
+      min-height: 320px;
+      padding: var(--space-150);
+      background: var(--color-background-input);
+      border: 2px solid var(--color-border);
+      border-radius: var(--border-radius-050);
+      font-family: var(--font-family-mono);
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--color-text);
+      resize: none;
+      transition: all var(--duration-fast) var(--easing-standard);
+    }
+
+    .text-area:hover {
+      background: var(--color-background-card);
+    }
+
+    .text-area:focus {
+      outline: none;
+      border-color: var(--color-border-bold);
+      background: var(--color-background-card);
+    }
+
+    .text-area::placeholder {
+      color: var(--color-text-subtlest);
+    }
+
+    .text-area.active-input {
+      border-color: var(--color-border-bold);
+      background: var(--color-background-card);
+    }
+
+    /* Direction Indicator - Lozenge Style */
+    .direction-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-100) 0;
+    }
+
+    .direction-arrow {
+      display: flex;
+      align-items: center;
+      gap: var(--space-100);
+      padding: var(--space-050) var(--space-150);
+      background: var(--color-background-neutral);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-050);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-text-subtle);
+      transition: all var(--duration-fast) var(--easing-standard);
+    }
+
+    .direction-arrow.md-to-text {
+      background: var(--color-background-information);
+      border-color: var(--color-text-information);
+      color: var(--color-text-information);
+    }
+
+    .direction-arrow.text-to-md {
+      background: var(--color-purple-subtle);
+      border-color: var(--color-purple);
+      color: var(--color-purple);
+    }
+
+    /* ============================================
+       Settings Modal - Dialog
+    ============================================ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(9, 30, 66, 0.54);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all var(--duration-normal) var(--easing-standard);
+      padding: var(--space-300);
+    }
+
+    .dark-mode .modal-overlay {
+      background: rgba(0, 0, 0, 0.7);
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 720px;
+      max-height: 80vh;
+      background: var(--color-background-card);
+      border-radius: var(--border-radius-050);
+      box-shadow: var(--shadow-overlay);
+      display: flex;
+      flex-direction: column;
+      transform: translateY(20px);
+      transition: transform var(--duration-slow) var(--easing-standard);
+    }
+
+    .modal-overlay.active .modal {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-300);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .modal-header h2 {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.008em;
+      color: var(--color-text);
+    }
+
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      border-radius: var(--border-radius-050);
+      color: var(--color-text-subtle);
+      cursor: pointer;
+      font-size: 18px;
+      transition: background-color var(--duration-fast) var(--easing-standard);
+    }
+
+    .modal-close:hover {
+      background: var(--color-background-neutral);
+      color: var(--color-text);
+    }
+
+    .modal-close:focus-visible {
+      outline: 2px solid var(--color-border-focused);
+      outline-offset: 2px;
+    }
+
+    .modal-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--space-300);
+    }
+
+    .modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: var(--space-200) var(--space-300);
+      border-top: 1px solid var(--color-border);
+      gap: var(--space-100);
+    }
+
+    /* Data Table */
+    .rules-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .rules-table th,
+    .rules-table td {
+      padding: var(--space-150) var(--space-200);
+      text-align: left;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .rules-table th {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--color-text-subtle);
+      background: var(--color-background-neutral-subtle);
+    }
+
+    .rules-table td {
+      font-size: 14px;
+    }
+
+    .rules-table tbody tr {
+      transition: background var(--duration-fast);
+    }
+
+    .rules-table tbody tr:hover {
+      background: var(--color-background-neutral-subtle);
+    }
+
+    .rule-input {
+      width: 100%;
+      padding: var(--space-100) var(--space-150);
+      background: var(--color-background-input);
+      border: 2px solid var(--color-border);
+      border-radius: var(--border-radius-050);
+      font-family: var(--font-family-mono);
+      font-size: 14px;
+      color: var(--color-text);
+      transition: all var(--duration-fast);
+    }
+
+    .rule-input:hover {
+      background: var(--color-background-card);
+    }
+
+    .rule-input:focus {
+      outline: none;
+      border-color: var(--color-border-bold);
+      background: var(--color-background-card);
+    }
+
+    /* Toggle Switch */
+    .rule-toggle {
+      appearance: none;
+      width: 40px;
+      height: 20px;
+      background: var(--color-text-subtlest);
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      position: relative;
+      transition: all var(--duration-normal) var(--easing-standard);
+    }
+
+    .rule-toggle::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      background: var(--color-text-inverse);
+      border-radius: var(--border-radius-round);
+      transition: all var(--duration-normal) var(--easing-standard);
+    }
+
+    .rule-toggle:checked {
+      background: var(--color-brand-bold);
+    }
+
+    .rule-toggle:checked::after {
+      transform: translateX(20px);
+    }
+
+    .rule-toggle:focus-visible {
+      outline: 2px solid var(--color-border-focused);
+      outline-offset: 2px;
+    }
+
+    .delete-rule-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      border-radius: var(--border-radius-050);
+      color: var(--color-text-danger);
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color var(--duration-fast) var(--easing-standard);
+    }
+
+    .delete-rule-btn:hover {
+      background: var(--color-background-danger);
+    }
+
+    .delete-rule-btn:focus-visible {
+      outline: 2px solid var(--color-border-focused);
+      outline-offset: 2px;
+    }
+
+    /* Buttons - Atlassian Style */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-100);
+      padding: 0 var(--space-150);
+      height: 32px;
+      border-radius: var(--border-radius-050);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color var(--duration-fast) var(--easing-standard),
+                  color var(--duration-fast) var(--easing-standard);
+    }
+
+    .btn:focus-visible {
+      outline: 2px solid var(--color-border-focused);
+      outline-offset: 2px;
+    }
+
+    .btn-primary {
+      background: var(--color-brand-bold);
+      border: none;
+      color: var(--color-text-inverse);
+    }
+
+    .btn-primary:hover {
+      background: var(--color-brand-boldHovered);
+    }
+
+    .btn-primary:active {
+      background: var(--color-brand-boldPressed);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: none;
+      color: var(--color-text);
+    }
+
+    .btn-secondary:hover {
+      background: var(--color-background-neutral);
+    }
+
+    .btn-danger {
+      background: transparent;
+      border: none;
+      color: var(--color-text-danger);
+    }
+
+    .btn-danger:hover {
+      background: var(--color-background-danger);
+    }
+
+    /* Add Rule Form */
+    .add-rule-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: var(--space-200);
+      padding: var(--space-200);
+      background: var(--color-background-neutral-subtle);
+      border-radius: var(--border-radius-050);
+      border: 1px solid var(--color-border);
+      margin-bottom: var(--space-200);
+    }
+
+    .add-rule-form .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-050);
+    }
+
+    .add-rule-form label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-text-subtle);
+    }
+
+    .add-rule-btn {
+      align-self: flex-end;
+    }
+
+    /* ============================================
+       Snackbar / Flag
+    ============================================ */
+    .toast {
+      position: fixed;
+      bottom: var(--space-300);
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      padding: var(--space-200);
+      min-width: 288px;
+      max-width: 400px;
+      background: var(--color-text);
+      color: var(--color-text-inverse);
+      border-radius: var(--border-radius-050);
+      box-shadow: var(--shadow-overlay);
+      font-size: 14px;
+      font-weight: 400;
+      opacity: 0;
+      transition: all var(--duration-normal) var(--easing-standard);
+      z-index: 1001;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* ============================================
+       Responsive Design
+    ============================================ */
+    @media (max-width: 768px) {
+      .header {
+        padding: 0 var(--space-150);
+        height: 48px;
+      }
+
+      .header-title h1 {
+        font-size: 14px;
+      }
+
+      .main-content {
+        padding: var(--space-200);
+      }
+
+      .converter-wrapper {
+        grid-template-columns: 1fr;
+        gap: var(--space-200);
+      }
+
+      .panel {
+        min-height: 280px;
+      }
+
+      .direction-indicator {
+        transform: rotate(90deg);
+      }
+
+      .add-rule-form {
+        grid-template-columns: 1fr;
+      }
+
+      .add-rule-btn {
+        width: 100%;
+      }
+
+      .modal-footer {
+        flex-direction: column;
+      }
+
+      .modal-footer .btn {
+        width: 100%;
+      }
+    }
+
+    /* ============================================
+       Utility Classes
+    ============================================ */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Reduced Motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Skip Link -->
+  <a href="#main-content" class="skip-link">本文へスキップ</a>
+
+  <div class="app-container">
+    <!-- Top Navigation -->
+    <header class="header" role="banner">
+      <div class="header-title">
+        <div class="header-icon" aria-hidden="true">⇄</div>
+        <h1>MD Converter</h1>
+      </div>
+      <div class="header-actions">
+        <button type="button" class="icon-btn" id="darkModeToggle" aria-label="ダークモード切り替え" title="ダークモード切り替え">
+          🌙
+        </button>
+        <button type="button" class="icon-btn" id="settingsBtn" aria-label="設定を開く" title="設定">
+          ⚙️
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content" class="main-content" role="main">
+      <div class="converter-wrapper">
+        <!-- Markdown Panel -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-label">
+              <span class="panel-badge">MD</span>
+              <span>Markdown</span>
+            </div>
+            <button type="button" class="copy-btn" data-target="mdInput" aria-label="Markdownをコピー">
+              📋 コピー
+            </button>
+          </div>
+          <div class="panel-body">
+            <label for="mdInput" class="sr-only">Markdownテキストを入力</label>
+            <textarea
+              id="mdInput"
+              class="text-area"
+              placeholder="Markdownを入力...&#10;&#10;例:&#10;## 見出し2&#10;### 見出し3&#10;- リスト項目&#10;- [ ] 未完了タスク&#10;- [x] 完了タスク&#10;> 引用文&#10;**太字テキスト**&#10;`インラインコード`"
+              spellcheck="false"
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Text Panel -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-label">
+              <span class="panel-badge text-badge">TEXT</span>
+              <span>一般テキスト</span>
+            </div>
+            <button type="button" class="copy-btn" data-target="textInput" aria-label="テキストをコピー">
+              📋 コピー
+            </button>
+          </div>
+          <div class="panel-body">
+            <label for="textInput" class="sr-only">一般テキストを入力</label>
+            <textarea
+              id="textInput"
+              class="text-area"
+              placeholder="一般テキストを入力...&#10;&#10;例:&#10;■ 見出し2&#10;● 見出し3&#10;・リスト項目&#10;□ 未完了タスク&#10;✓ 完了タスク&#10;│ 引用文&#10;【太字テキスト】&#10;「インラインコード」"
+              spellcheck="false"
+            ></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Direction Indicator -->
+      <div class="direction-indicator">
+        <div class="direction-arrow" id="directionArrow">
+          <span id="directionText">編集中のパネルから変換</span>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modalTitle">変換ルール設定</h2>
+        <button type="button" class="modal-close" id="closeModal" aria-label="閉じる">✕</button>
+      </div>
+      <div class="modal-body">
+        <!-- Add Rule Form -->
+        <form class="add-rule-form" id="addRuleForm">
+          <div class="form-group">
+            <label for="newMdPattern">Markdown パターン</label>
+            <input type="text" id="newMdPattern" class="rule-input" placeholder="例: ## ">
+          </div>
+          <div class="form-group">
+            <label for="newTextPattern">一般テキスト</label>
+            <input type="text" id="newTextPattern" class="rule-input" placeholder="例: ■ ">
+          </div>
+          <button type="submit" class="btn btn-primary add-rule-btn">追加</button>
+        </form>
+
+        <!-- Rules Table -->
+        <table class="rules-table" aria-label="変換ルール一覧">
+          <thead>
+            <tr>
+              <th scope="col">Markdown</th>
+              <th scope="col">一般テキスト</th>
+              <th scope="col">有効</th>
+              <th scope="col"><span class="sr-only">操作</span></th>
+            </tr>
+          </thead>
+          <tbody id="rulesTableBody">
+            <!-- Rules will be populated by JS -->
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" id="resetRulesBtn">初期設定に戻す</button>
+        <button type="button" class="btn btn-secondary" id="closeModalBtn">閉じる</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Snackbar -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    /* ============================================
+       Constants & Default Rules
+    ============================================ */
+    const STORAGE_KEY = 'md_converter_rules_v1';
+    const THEME_KEY = 'md_converter_theme';
+
+    const DEFAULT_RULES = [
+      { md: '#### ', text: '○ ', enabled: true, isRegex: false },
+      { md: '### ', text: '● ', enabled: true, isRegex: false },
+      { md: '## ', text: '■ ', enabled: true, isRegex: false },
+      { md: '- [x] ', text: '✓ ', enabled: true, isRegex: false },
+      { md: '- [ ] ', text: '□ ', enabled: true, isRegex: false },
+      { md: '- ', text: '・', enabled: true, isRegex: false },
+      { md: '* ', text: '・', enabled: true, isRegex: false },
+      { md: '> ', text: '│ ', enabled: true, isRegex: false },
+      { md: '1. ', text: '① ', enabled: true, isRegex: false },
+      { md: '2. ', text: '② ', enabled: true, isRegex: false },
+      { md: '3. ', text: '③ ', enabled: true, isRegex: false },
+      { md: '4. ', text: '④ ', enabled: true, isRegex: false },
+      { md: '5. ', text: '⑤ ', enabled: true, isRegex: false },
+      { md: '6. ', text: '⑥ ', enabled: true, isRegex: false },
+      { md: '7. ', text: '⑦ ', enabled: true, isRegex: false },
+      { md: '8. ', text: '⑧ ', enabled: true, isRegex: false },
+      { md: '9. ', text: '⑨ ', enabled: true, isRegex: false },
+      { md: '`([^`]+)`', text: '「$1」', enabled: true, isRegex: true },
+      { md: '\\*\\*([^*]+)\\*\\*', text: '【$1】', enabled: true, isRegex: true },
+    ];
+
+    /* ============================================
+       State
+    ============================================ */
+    let rules = [];
+    let isConverting = false;
+    let lastActiveInput = null;
+
+    /* ============================================
+       DOM Elements
+    ============================================ */
+    const mdInput = document.getElementById('mdInput');
+    const textInput = document.getElementById('textInput');
+    const settingsBtn = document.getElementById('settingsBtn');
+    const settingsModal = document.getElementById('settingsModal');
+    const closeModal = document.getElementById('closeModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const rulesTableBody = document.getElementById('rulesTableBody');
+    const addRuleForm = document.getElementById('addRuleForm');
+    const resetRulesBtn = document.getElementById('resetRulesBtn');
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const directionArrow = document.getElementById('directionArrow');
+    const directionText = document.getElementById('directionText');
+    const toast = document.getElementById('toast');
+
+    /* ============================================
+       Storage Functions
+    ============================================ */
+    function loadRules() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          rules = JSON.parse(stored);
+        } else {
+          rules = JSON.parse(JSON.stringify(DEFAULT_RULES));
+        }
+      } catch (e) {
+        console.error('Failed to load rules:', e);
+        rules = JSON.parse(JSON.stringify(DEFAULT_RULES));
+      }
+    }
+
+    function saveRules() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(rules));
+      } catch (e) {
+        console.error('Failed to save rules:', e);
+      }
+    }
+
+    function loadTheme() {
+      const savedTheme = localStorage.getItem(THEME_KEY);
+      if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        darkModeToggle.textContent = '☀️';
+      }
+    }
+
+    function toggleTheme() {
+      const isDark = document.body.classList.toggle('dark-mode');
+      localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light');
+      darkModeToggle.textContent = isDark ? '☀️' : '🌙';
+    }
+
+    /* ============================================
+       Conversion Functions
+    ============================================ */
+    function escapeRegExp(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function convertMdToText(input) {
+      let result = input;
+      const lines = result.split('\n');
+      const processedLines = lines.map(line => {
+        let processedLine = line;
+        for (const rule of rules) {
+          if (!rule.enabled || rule.isRegex) continue;
+          if (processedLine.startsWith(rule.md)) {
+            processedLine = rule.text + processedLine.slice(rule.md.length);
+            break;
+          }
+        }
+        return processedLine;
+      });
+      result = processedLines.join('\n');
+      for (const rule of rules) {
+        if (!rule.enabled || !rule.isRegex) continue;
+        try {
+          const regex = new RegExp(rule.md, 'g');
+          result = result.replace(regex, rule.text);
+        } catch (e) {
+          console.error('Invalid regex:', rule.md, e);
+        }
+      }
+      return result;
+    }
+
+    function convertTextToMd(input) {
+      let result = input;
+      const lines = result.split('\n');
+      const processedLines = lines.map(line => {
+        let processedLine = line;
+        for (const rule of rules) {
+          if (!rule.enabled || rule.isRegex) continue;
+          if (processedLine.startsWith(rule.text)) {
+            processedLine = rule.md + processedLine.slice(rule.text.length);
+            break;
+          }
+        }
+        return processedLine;
+      });
+      result = processedLines.join('\n');
+      for (const rule of rules) {
+        if (!rule.enabled || !rule.isRegex) continue;
+        try {
+          if (rule.md.includes('([^`]+)')) {
+            const reverseRegex = /「([^」]+)」/g;
+            result = result.replace(reverseRegex, '`$1`');
+          } else if (rule.md.includes('([^*]+)')) {
+            const reverseRegex = /【([^】]+)】/g;
+            result = result.replace(reverseRegex, '**$1**');
+          }
+        } catch (e) {
+          console.error('Reverse regex error:', rule.text, e);
+        }
+      }
+      return result;
+    }
+
+    /* ============================================
+       UI Functions
+    ============================================ */
+    function updateDirectionIndicator(direction) {
+      directionArrow.classList.remove('md-to-text', 'text-to-md');
+      if (direction === 'md-to-text') {
+        directionArrow.classList.add('md-to-text');
+        directionText.textContent = 'MD → テキスト';
+      } else if (direction === 'text-to-md') {
+        directionArrow.classList.add('text-to-md');
+        directionText.textContent = 'テキスト → MD';
+      } else {
+        directionText.textContent = '編集中のパネルから変換';
+      }
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    function renderRulesTable() {
+      rulesTableBody.innerHTML = '';
+      rules.forEach((rule, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>
+            <input type="text" class="rule-input" value="${escapeHtml(rule.md)}"
+                   data-index="${index}" data-field="md" aria-label="Markdownパターン">
+          </td>
+          <td>
+            <input type="text" class="rule-input" value="${escapeHtml(rule.text)}"
+                   data-index="${index}" data-field="text" aria-label="一般テキストパターン">
+          </td>
+          <td>
+            <input type="checkbox" class="rule-toggle" ${rule.enabled ? 'checked' : ''}
+                   data-index="${index}" aria-label="ルールを有効化">
+          </td>
+          <td>
+            <button type="button" class="delete-rule-btn" data-index="${index}"
+                    aria-label="ルールを削除">🗑</button>
+          </td>
+        `;
+        rulesTableBody.appendChild(tr);
+      });
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    /* ============================================
+       Event Handlers
+    ============================================ */
+    function handleMdInput() {
+      if (isConverting) return;
+      isConverting = true;
+      lastActiveInput = 'md';
+      mdInput.classList.add('active-input');
+      textInput.classList.remove('active-input');
+      updateDirectionIndicator('md-to-text');
+      textInput.value = convertMdToText(mdInput.value);
+      isConverting = false;
+    }
+
+    function handleTextInput() {
+      if (isConverting) return;
+      isConverting = true;
+      lastActiveInput = 'text';
+      textInput.classList.add('active-input');
+      mdInput.classList.remove('active-input');
+      updateDirectionIndicator('text-to-md');
+      mdInput.value = convertTextToMd(textInput.value);
+      isConverting = false;
+    }
+
+    function handleCopyClick(e) {
+      const btn = e.target.closest('.copy-btn');
+      if (!btn) return;
+      const targetId = btn.dataset.target;
+      const targetElement = document.getElementById(targetId);
+      if (targetElement && targetElement.value) {
+        navigator.clipboard.writeText(targetElement.value).then(() => {
+          btn.classList.add('copied');
+          btn.innerHTML = '✓ コピー完了';
+          setTimeout(() => {
+            btn.classList.remove('copied');
+            btn.innerHTML = '📋 コピー';
+          }, 2000);
+        }).catch(() => {
+          showToast('コピーに失敗しました');
+        });
+      }
+    }
+
+    function handleRuleTableChange(e) {
+      const target = e.target;
+      const index = parseInt(target.dataset.index, 10);
+      if (target.classList.contains('rule-input')) {
+        const field = target.dataset.field;
+        rules[index][field] = target.value;
+        saveRules();
+        if (lastActiveInput === 'md') handleMdInput();
+        else if (lastActiveInput === 'text') handleTextInput();
+      } else if (target.classList.contains('rule-toggle')) {
+        rules[index].enabled = target.checked;
+        saveRules();
+        if (lastActiveInput === 'md') handleMdInput();
+        else if (lastActiveInput === 'text') handleTextInput();
+      }
+    }
+
+    function handleDeleteRule(e) {
+      const btn = e.target.closest('.delete-rule-btn');
+      if (!btn) return;
+      const index = parseInt(btn.dataset.index, 10);
+      rules.splice(index, 1);
+      saveRules();
+      renderRulesTable();
+      showToast('ルールを削除しました');
+    }
+
+    function handleAddRule(e) {
+      e.preventDefault();
+      const mdPattern = document.getElementById('newMdPattern').value.trim();
+      const textPattern = document.getElementById('newTextPattern').value.trim();
+      if (!mdPattern || !textPattern) {
+        showToast('両方のパターンを入力してください');
+        return;
+      }
+      rules.push({ md: mdPattern, text: textPattern, enabled: true, isRegex: false });
+      saveRules();
+      renderRulesTable();
+      document.getElementById('newMdPattern').value = '';
+      document.getElementById('newTextPattern').value = '';
+      showToast('ルールを追加しました');
+    }
+
+    function handleResetRules() {
+      if (confirm('すべてのルールを初期設定に戻しますか？')) {
+        rules = JSON.parse(JSON.stringify(DEFAULT_RULES));
+        saveRules();
+        renderRulesTable();
+        showToast('初期設定に戻しました');
+        if (lastActiveInput === 'md') handleMdInput();
+        else if (lastActiveInput === 'text') handleTextInput();
+      }
+    }
+
+    function openModal() {
+      settingsModal.classList.add('active');
+      closeModal.focus();
+    }
+
+    function closeModalFn() {
+      settingsModal.classList.remove('active');
+      settingsBtn.focus();
+    }
+
+    function handleModalKeydown(e) {
+      if (e.key === 'Escape') closeModalFn();
+    }
+
+    function handleModalOverlayClick(e) {
+      if (e.target === settingsModal) closeModalFn();
+    }
+
+    /* ============================================
+       Initialize
+    ============================================ */
+    function init() {
+      loadRules();
+      loadTheme();
+      renderRulesTable();
+      mdInput.addEventListener('input', handleMdInput);
+      textInput.addEventListener('input', handleTextInput);
+      document.addEventListener('click', handleCopyClick);
+      settingsBtn.addEventListener('click', openModal);
+      closeModal.addEventListener('click', closeModalFn);
+      closeModalBtn.addEventListener('click', closeModalFn);
+      settingsModal.addEventListener('click', handleModalOverlayClick);
+      settingsModal.addEventListener('keydown', handleModalKeydown);
+      rulesTableBody.addEventListener('input', handleRuleTableChange);
+      rulesTableBody.addEventListener('click', handleDeleteRule);
+      addRuleForm.addEventListener('submit', handleAddRule);
+      resetRulesBtn.addEventListener('click', handleResetRules);
+      darkModeToggle.addEventListener('click', toggleTheme);
+    }
+
+    init();
+  </script>
+</body>
+</html>

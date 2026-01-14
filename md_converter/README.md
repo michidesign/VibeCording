@@ -12,8 +12,10 @@
 |---------|----------------|------|
 | `index-dads.html` | Digital Agency Design System | 行政機関向けデザイン、Noto Sans JP |
 | `index_apple.html` | Apple Design | ミニマル、ガラスモーフィズム |
+| `index_atlassian.html` | Atlassian Design | Jira/Confluence風、プロフェッショナルなブルー |
 | `index_google.html` | Material Design 3 | Google風、エレベーション表現 |
 | `index_paypay.html` | PayPay Design | PayPayレッド、親しみやすい角丸デザイン |
+| `index_salesforce.html` | Salesforce Lightning | エンタープライズ向け、ダークブルーヘッダー |
 | `index_spindle.html` | Spindle (Ameba) | プライマリグリーン、アクセシブルなデザイン |
 
 ※ すべてのファイルは同一機能で、デザインのみ異なります。
