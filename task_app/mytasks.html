@@ -141,7 +141,7 @@
         /* Archived Task Cards */
         body.dark-mode .task-card.archived {
             background: var(--color-background-secondary);
-            border-left: 4px solid var(--color-label-secondary) !important;
+            --task-status-color: var(--color-label-secondary);
             opacity: 0.7;
         }
 
@@ -864,6 +864,7 @@
 
         /* ===== TASK CARDS ===== */
         .task-card {
+            position: relative;
             background: var(--bg-card);
             border-radius: var(--radius-md);
             border: 1px solid var(--border-subtle);
@@ -876,9 +877,23 @@
             box-sizing: border-box;
             transition: transform var(--duration-normal) var(--ease-out),
                 box-shadow var(--duration-normal) var(--ease-out);
+            overflow: hidden;
         }
 
-        .task-card:hover {
+        /* ステータスカラー左ボーダー（角丸対応） */
+        .task-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+            background: var(--task-status-color, transparent);
+            border-radius: var(--radius-md) 0 0 var(--radius-md);
+        }
+
+        /* ドラッグハンドルをホバーしたときだけ浮かび上がる */
+        .task-card:has(.drag-handle:hover) {
             transform: translateY(-4px);
             box-shadow: var(--shadow-md);
             z-index: 5;
@@ -899,7 +914,7 @@
         /* Completed/Archived */
         .task-card.archived {
             background: var(--color-background-secondary);
-            border-left: 4px solid var(--color-label-tertiary) !important;
+            --task-status-color: var(--color-label-tertiary);
             opacity: 0.75;
             box-shadow: none;
         }
@@ -1405,6 +1420,7 @@
         }
 
         .subtask-row {
+            position: relative;
             background: var(--color-background-secondary);
             border-radius: var(--radius-sm);
             padding: 10px;
@@ -1415,6 +1431,19 @@
             transition: all var(--duration-normal) var(--ease-out);
             width: 100%;
             box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        /* サブタスクステータスカラー左ボーダー（角丸対応） */
+        .subtask-row::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+            background: var(--subtask-status-color, transparent);
+            border-radius: var(--radius-sm) 0 0 var(--radius-sm);
         }
 
         .subtask-row:hover {
@@ -1431,14 +1460,35 @@
             min-width: 0;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             width: 100%;
+        }
+
+        .sub-header-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .sub-name-row {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .sub-actions-row {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            flex-shrink: 0;
         }
 
         .sub-input-name {
             font-family: var(--font-text);
             font-size: 16px;
             font-weight: 600;
+            letter-spacing: 0.05em;
             background: transparent;
             border: none;
             border-bottom: 2px solid transparent;
@@ -1943,10 +1993,7 @@
         }
 
         /* 2. Subtask Styling Refinements */
-        .sub-name-row {
-            margin-bottom: 8px;
-            /* Space below title */
-        }
+        /* .sub-name-row styling moved to main CSS section */
 
         /* Subtask Calendar: Blend into gray background */
         .subtask-row .btn-calendar {
@@ -1975,9 +2022,9 @@
 
         /* 2. Subtask Spacing & Layout */
         .sub-actions-row {
-            margin-top: 10px;
+            /* Now positioned in sub-header-row, no margin needed */
             display: flex;
-            gap: 8px;
+            gap: 4px;
             align-items: center;
         }
 
@@ -2828,8 +2875,7 @@
                 <div class="modal-title" id="subtaskModalTitle">サブタスクを追加</div>
             </div>
             <div class="modal-content" style="padding: 20px 0;">
-                <input type="text" id="newSubtaskInput" class="form-control" placeholder="サブタスク名を入力"
-                    onkeydown="if(event.key === 'Enter') submitNewSubtask()">
+                <input type="text" id="newSubtaskInput" class="form-control" placeholder="サブタスク名を入力">
             </div>
             <div class="modal-footer" style="justify-content: center;">
                 <button class="btn-danger-modal" onclick="closeSubtaskModal()">キャンセル</button>
@@ -3105,7 +3151,7 @@
                 else if (task.isArchived) li.classList.add('archived');
                 else {
                     li.style.backgroundColor = `color-mix(in srgb, ${sConfig.color} 5%, var(--mix-base))`;
-                    li.style.borderLeft = `5px solid ${sConfig.color}`;
+                    li.style.setProperty('--task-status-color', sConfig.color);
                 }
 
                 if (showActive) {
@@ -3135,8 +3181,7 @@
                     const genRow = (s) => {
                         const st = appData.settings.statuses.find(x => x.id === s.status) || { color: '#999' };
                         const rowCls = s.isArchived ? 'subtask-row completed-sub' : 'subtask-row';
-                        const style = s.isArchived ? '' : `border-left: 5px solid ${st.color}; background: color-mix(in
-                    srgb, ${st.color} 5%, var(--mix-base));`;
+                        const style = s.isArchived ? '' : `--subtask-status-color: ${st.color}; background: color-mix(in srgb, ${st.color} 5%, var(--mix-base));`;
                         const sOpts = appData.settings.statuses.map(o => `<option value="${o.id}" ${s.status === o.id
                             ? 'selected' : ''}>${o.name}</option>`).join('');
 
@@ -3152,10 +3197,35 @@
                             style="cursor:grab; color:#DDD; padding-top:6px; margin-right:8px; font-size:16px;">⋮⋮</div>
                         ` : ''}
                         <div class="sub-content">
-                            <div class="sub-name-row">
-                                <textarea class="sub-input-name" rows="1" oninput="autoResize(this)"
-                                    onblur="updateSubtask('${task.id}','${s.id}','name',this.value)" ${ro ? 'disabled'
-                                : ''}>${escapeHtml(s.name)}</textarea>
+                            <div class="sub-header-row">
+                                <div class="sub-name-row">
+                                    <textarea class="sub-input-name" rows="1" oninput="autoResize(this)"
+                                        onblur="updateSubtask('${task.id}','${s.id}','name',this.value)" ${ro ? 'disabled'
+                                    : ''}>${escapeHtml(s.name)}</textarea>
+                                </div>
+                                <div class="sub-actions-row">
+                                    ${!ro ? `<button class="btn-mini-complete"
+                                        onclick="toggleSubtaskComplete('${task.id}','${s.id}')">${s.isArchived ? '戻す' :
+                                        '完了'}</button>
+                                    <button class="btn-mini" onclick="moveSubtask('${task.id}','${s.id}','up')"><svg
+                                            width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="18 15 12 9 6 15"></polyline>
+                                        </svg></button>
+                                    <button class="btn-mini" onclick="moveSubtask('${task.id}','${s.id}','down')"><svg
+                                            width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="6 9 12 15 18 9"></polyline>
+                                        </svg></button>
+                                    <button class="btn-mini del" onclick="deleteSubtask('${task.id}','${s.id}')"><svg
+                                            width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                            <path
+                                                d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                            </path>
+                                        </svg></button>` : ''}
+                                </div>
                             </div>
                             <div class="sub-details-row">
                                 <div class="sub-meta-line">
@@ -3196,29 +3266,6 @@
                                 <div class="sub-memo-area memo-view-mode">${s.memo ? linkify(escapeHtml(s.memo)) : '(詳細なし)'}
                                 </div>
                                 `}
-                            </div>
-                            <div class="sub-actions-row">
-                                ${!ro ? `<button class="btn-mini-complete"
-                                    onclick="toggleSubtaskComplete('${task.id}','${s.id}')">${s.isArchived ? '戻す' :
-                                    '完了'}</button>
-                                <button class="btn-mini" onclick="moveSubtask('${task.id}','${s.id}','up')"><svg
-                                        width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <polyline points="18 15 12 9 6 15"></polyline>
-                                    </svg></button>
-                                <button class="btn-mini" onclick="moveSubtask('${task.id}','${s.id}','down')"><svg
-                                        width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <polyline points="6 9 12 15 18 9"></polyline>
-                                    </svg></button>
-                                <button class="btn-mini del" onclick="deleteSubtask('${task.id}','${s.id}')"><svg
-                                        width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <polyline points="3 6 5 6 21 6"></polyline>
-                                        <path
-                                            d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
-                                        </path>
-                                    </svg></button>` : ''}
                             </div>
                         </div>
                     </div>`;
@@ -3301,6 +3348,7 @@
                     <div class="task-content-wrapper" data-category="${escapeHtml(categoryName)}">
                         <div style="display:flex; gap:8px; align-items:center;">
                             <input type="text" class="task-title-input" value="${escapeHtml(task.name)}"
+                                onclick="if(isCompactReorderMode) { exitReorderAndScrollTo(this); }"
                                 onchange="updateTask('${task.id}','name',this.value)" ${ro ? 'disabled' : ''}>
                         </div>
                         <div class="task-meta-row">
@@ -4519,6 +4567,21 @@
             if (isCompactReorderMode) {
                 showToast('並び替えモードON', 'success');
             }
+        }
+
+        function exitReorderAndScrollTo(element) {
+            // 親のタスクカードを取得
+            const taskCard = element.closest('.task-card');
+
+            // 並び替えモードを解除
+            toggleCompactReorderMode();
+
+            // 少し遅延を入れてから要素までスクロール（モード解除のアニメーション後）
+            setTimeout(() => {
+                taskCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // タイトル入力欄にフォーカス
+                element.focus();
+            }, 50);
         }
 
         // DOMContentLoaded時に初期化
