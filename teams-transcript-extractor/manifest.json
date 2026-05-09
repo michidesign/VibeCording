@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "Teams トランスクリプト抽出",
+  "version": "2.0.0",
+  "description": "Microsoft Teams / Stream の会議トランスクリプトを自動スクロールで全文抽出します",
+  "permissions": [
+    "scripting",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "*://*.sharepoint.com/*",
+    "*://*.teams.microsoft.com/*",
+    "*://*.office.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Teams トランスクリプト抽出",
+    "default_icon": {
+      "16":  "icons/icon16.png",
+      "48":  "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16":  "icons/icon16.png",
+    "48":  "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

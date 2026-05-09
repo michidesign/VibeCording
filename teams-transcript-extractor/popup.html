@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teams トランスクリプト抽出</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', 'Hiragino Sans', 'Meiryo', sans-serif;
+      font-size: 13px;
+      width: 340px;
+      background: #f5f5fa;
+      color: #1f1f1f;
+    }
+
+    .header {
+      background: #6264a7;
+      color: white;
+      padding: 14px 16px 12px;
+    }
+    .header h1 { font-size: 14px; font-weight: 600; }
+    .header p  { font-size: 11px; opacity: 0.85; margin-top: 2px; }
+
+    .section {
+      background: white;
+      margin: 10px;
+      border-radius: 8px;
+      padding: 14px;
+      border: 1px solid #e1e1e1;
+    }
+    .section-title {
+      font-size: 11px; font-weight: 600; color: #6264a7;
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;
+    }
+
+    .status-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 0; border-bottom: 1px solid #f0f0f0;
+    }
+    .status-row:last-child { border-bottom: none; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .dot-green  { background: #13a10e; }
+    .dot-red    { background: #d13438; }
+    .dot-gray   { background: #bbb; }
+    .dot-yellow { background: #f7bc00; }
+    .status-label { flex: 1; color: #444; }
+    .status-value { font-weight: 600; font-size: 12px; }
+
+    button {
+      width: 100%; padding: 10px 12px; border: none; border-radius: 6px;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: background 0.15s; margin-top: 8px;
+    }
+    button:first-of-type { margin-top: 0; }
+    button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .btn-primary  { background: #6264a7; color: white; }
+    .btn-primary:hover:not(:disabled)  { background: #585a9a; }
+    .btn-danger   { background: #fde8e8; color: #d13438; }
+    .btn-danger:hover:not(:disabled)   { background: #fcd4d4; }
+    .btn-success  { background: #e8f5e9; color: #107c10; }
+    .btn-success:hover:not(:disabled)  { background: #d4edd5; }
+    .btn-secondary { background: #e8e8f0; color: #6264a7; }
+    .btn-secondary:hover:not(:disabled) { background: #dcdce8; }
+
+    .progress-wrap {
+      background: #e8e8f0; border-radius: 4px; height: 8px;
+      margin: 10px 0 4px; overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%; background: #6264a7; border-radius: 4px;
+      width: 0%; transition: width 0.3s ease;
+    }
+
+    .count-info { font-size: 12px; color: #666; margin-bottom: 8px; text-align: center; }
+
+    .tip {
+      font-size: 11px; color: #888; line-height: 1.6;
+      background: #f8f8fc; border-radius: 6px; padding: 8px 10px;
+      margin-bottom: 10px;
+    }
+
+    .log-area {
+      background: #f8f8fc; border: 1px solid #e0e0ec; border-radius: 6px;
+      padding: 8px; font-size: 11px; color: #555;
+      max-height: 90px; overflow-y: auto; line-height: 1.5;
+      font-family: 'Consolas', 'Cascadia Code', monospace;
+    }
+
+    .result-preview {
+      background: #f0f0f7; border: 1px solid #d8d8ec; border-radius: 6px;
+      padding: 8px; font-size: 11px; max-height: 110px; overflow-y: auto;
+      line-height: 1.6; color: #333; white-space: pre-wrap; word-break: break-all;
+      margin-bottom: 8px;
+    }
+
+    .badge {
+      display: inline-block; padding: 2px 8px; border-radius: 10px;
+      font-size: 11px; font-weight: 700; background: #ededfc; color: #6264a7;
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Teams トランスクリプト抽出</h1>
+  <p>会議録画ページを開いた状態で実行してください</p>
+</div>
+
+<!-- ステータス -->
+<div class="section">
+  <div class="section-title">ステータス</div>
+  <div class="status-row">
+    <div class="dot dot-gray" id="dotPage"></div>
+    <span class="status-label">対象ページ</span>
+    <span class="status-value" id="statusPage">確認中...</span>
+  </div>
+  <div class="status-row">
+    <div class="dot dot-gray" id="dotContainer"></div>
+    <span class="status-label">トランスクリプトパネル</span>
+    <span class="status-value" id="statusContainer">—</span>
+  </div>
+</div>
+
+<!-- 自動スクロール -->
+<div class="section">
+  <div class="section-title">自動スクロール抽出</div>
+
+  <div class="tip">
+    トランスクリプトパネルを開いた状態で「開始」を押してください。<br>
+    自動スクロール中はポップアップを閉じないでください。
+  </div>
+
+  <div class="progress-wrap" id="progressWrap" style="display:none">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+  <div class="count-info" id="countInfo"></div>
+
+  <button class="btn-primary" id="btnScroll">スクロール抽出を開始</button>
+  <button class="btn-danger"  id="btnAbort" style="display:none">中止</button>
+</div>
+
+<!-- ログ -->
+<div class="section" id="logSection" style="display:none">
+  <div class="section-title">ログ</div>
+  <div class="log-area" id="logArea"></div>
+</div>
+
+<!-- 結果 -->
+<div class="section" id="resultSection" style="display:none">
+  <div class="section-title">
+    抽出結果 <span class="badge" id="resultCount">0件</span>
+  </div>
+  <div class="result-preview" id="resultPreview"></div>
+  <button class="btn-success"   id="btnDownload">テキストファイルに保存</button>
+  <button class="btn-secondary" id="btnCopy" style="margin-top:6px">クリップボードにコピー</button>
+</div>
+
+<script src="popup.js"></script>
+</body>
+</html>

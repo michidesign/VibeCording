@@ -759,6 +759,98 @@
             ]
         };
 
+        // ===== Web Audio API Sound Manager (iOS/Android対応) =====
+        const SoundManager = {
+            audioContext: null,
+            buffers: {},
+            unlocked: false,
+
+            init() {
+                try {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    this.audioContext = new AudioContext();
+                } catch (e) {
+                    console.log('Web Audio API not supported:', e);
+                }
+            },
+
+            // iOS/Androidではユーザー操作時にAudioContextをresumeする必要がある
+            async unlock() {
+                if (this.unlocked || !this.audioContext) return;
+                try {
+                    if (this.audioContext.state === 'suspended') {
+                        await this.audioContext.resume();
+                    }
+                    // 無音バッファを再生してアンロック
+                    const silentBuffer = this.audioContext.createBuffer(1, 1, 22050);
+                    const source = this.audioContext.createBufferSource();
+                    source.buffer = silentBuffer;
+                    source.connect(this.audioContext.destination);
+                    source.start(0);
+                    this.unlocked = true;
+                    console.log('AudioContext unlocked successfully');
+                    // アンロック後に全音声ファイルを読み込み
+                    await this.loadAll();
+                } catch (e) {
+                    console.log('AudioContext unlock failed:', e);
+                }
+            },
+
+            async loadSound(name, url) {
+                if (!this.audioContext) return;
+                try {
+                    const response = await fetch(url);
+                    const arrayBuffer = await response.arrayBuffer();
+                    const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+                    this.buffers[name] = audioBuffer;
+                    console.log('Loaded sound:', name);
+                } catch (e) {
+                    console.log('Failed to load sound:', name, e);
+                }
+            },
+
+            async loadAll() {
+                await Promise.all([
+                    this.loadSound('question', 'sounds/question.mp3'),
+                    this.loadSound('correct', 'sounds/correct.mp3'),
+                    this.loadSound('wrong', 'sounds/wrong.mp3'),
+                    this.loadSound('fanfare', 'sounds/fanfare.mp3')
+                ]);
+            },
+
+            play(name) {
+                if (!this.audioContext || !this.buffers[name]) {
+                    console.log('Sound not ready:', name);
+                    return;
+                }
+                try {
+                    if (this.audioContext.state === 'suspended') {
+                        this.audioContext.resume();
+                    }
+                    const source = this.audioContext.createBufferSource();
+                    source.buffer = this.buffers[name];
+                    source.connect(this.audioContext.destination);
+                    source.start(0);
+                } catch (e) {
+                    console.log('Sound play failed:', name, e);
+                }
+            }
+        };
+
+        // SoundManager初期化
+        SoundManager.init();
+
+        // 最初のユーザー操作でAudioContextをアンロック
+        const unlockHandler = () => {
+            SoundManager.unlock();
+            document.removeEventListener('touchstart', unlockHandler);
+            document.removeEventListener('touchend', unlockHandler);
+            document.removeEventListener('click', unlockHandler);
+        };
+        document.addEventListener('touchstart', unlockHandler, { passive: true });
+        document.addEventListener('touchend', unlockHandler, { passive: true });
+        document.addEventListener('click', unlockHandler);
+
         // Game State
         let currentQuestions = [];
         let currentIndex = 0;
@@ -827,12 +919,8 @@
             answerArea.style.display = 'none';
             document.getElementById('map').style.display = 'none'; // Hide map initially
 
-            // Play Question Sound
-            const audio = document.getElementById('sound-question');
-            if (audio) {
-                audio.currentTime = 0;
-                audio.play().catch(e => console.log('Audio play failed:', e));
-            }
+            // Play Question Sound (Web Audio API)
+            SoundManager.play('question');
 
             // Update Content
             const currentQ = currentQuestions[currentIndex];
@@ -878,14 +966,8 @@
             if (isAnswering) return;
             isAnswering = true;
 
-            // Play Sound
-            const soundId = isCorrect ? 'sound-correct' : 'sound-wrong';
-            const audio = document.getElementById(soundId);
-            if (audio) {
-                // Reset and play
-                audio.currentTime = 0;
-                audio.play().catch(e => console.log('Audio play failed (user interaction needed?):', e));
-            }
+            // Play Sound (Web Audio API)
+            SoundManager.play(isCorrect ? 'correct' : 'wrong');
 
             // Show Feedback Animation
             const overlay = document.getElementById('feedback-overlay');
@@ -942,12 +1024,8 @@
 
             // --- Rich Effects ---
 
-            // 1. Play Fanfare
-            const fanfare = document.getElementById('sound-fanfare');
-            if (fanfare) {
-                fanfare.currentTime = 0;
-                fanfare.play().catch(e => console.log('Fanfare play failed:', e));
-            }
+            // 1. Play Fanfare (Web Audio API)
+            SoundManager.play('fanfare');
 
             // 2. Score Count-up Animation
             animateScore(finalScoreDisplay, 0, score, 1500);
@@ -1016,11 +1094,7 @@
         }
     </script>
 
-    <!-- Audio Assets -->
-    <audio id="sound-correct" src="sounds/correct.mp3" preload="auto"></audio>
-    <audio id="sound-wrong" src="sounds/wrong.mp3" preload="auto"></audio>
-    <audio id="sound-question" src="sounds/question.mp3" preload="auto"></audio>
-    <audio id="sound-fanfare" src="sounds/fanfare.mp3" preload="auto"></audio>
+    <!-- Audio Assets は Web Audio API (SoundManager) に移行済み -->
 
     <!-- Feedback UI -->
     <div id="feedback-overlay">
